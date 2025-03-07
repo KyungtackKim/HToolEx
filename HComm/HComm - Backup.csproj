@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Copyright>Copyright 2020. Hantas all right reserved.</Copyright>
+        <Company>Hantas</Company>
+        <Authors>Eloiz</Authors>
+        <Version>1.2.9.14</Version>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <Description>Hantas tool device communication library</Description>
+        <PackageProjectUrl>https://github.com/hantas-soft/HComm.git</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageTags>C#, .Net Standard 2.0</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <AssemblyVersion>1.2.9.14</AssemblyVersion>
+        <FileVersion>1.2.9.14</FileVersion>
+        <Platforms>AnyCPU</Platforms>
+        <PackageVersion>1.2.9.16</PackageVersion>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="icon.png" Pack="true" PackagePath="\" />
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="hidlibrary" Version="3.3.40" />
+        <PackageReference Include="SuperSocket.ClientEngine" Version="0.10.0" />
+        <PackageReference Include="SuperSocket.ProtoBase" Version="1.7.0.17" />
+        <PackageReference Include="System.IO.Ports" Version="4.7.0" />
+    </ItemGroup>
+
+</Project>

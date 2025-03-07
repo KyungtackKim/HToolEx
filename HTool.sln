@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTool", "HTool\HTool.csproj", "{59C93832-392D-426D-A705-3D624E72F4C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HToolEx", "HToolEx\HToolEx.csproj", "{249BAA95-8B6C-7502-D3D9-0200A01C53B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HComm", "HComm\HComm.csproj", "{24366DC1-927E-6F10-6009-24992A393D1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HCommEz", "HCommEz\HCommEz.csproj", "{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.ActiveCfg = Debug|x86
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.Build.0 = Debug|x86
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Release|x86.ActiveCfg = Release|x86
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Release|x86.Build.0 = Release|x86
+		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Debug|x86.ActiveCfg = Debug|x86
+		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Debug|x86.Build.0 = Debug|x86
+		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Release|x86.ActiveCfg = Release|x86
+		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Release|x86.Build.0 = Release|x86
+		{24366DC1-927E-6F10-6009-24992A393D1A}.Debug|x86.ActiveCfg = Debug|x86
+		{24366DC1-927E-6F10-6009-24992A393D1A}.Debug|x86.Build.0 = Debug|x86
+		{24366DC1-927E-6F10-6009-24992A393D1A}.Release|x86.ActiveCfg = Release|x86
+		{24366DC1-927E-6F10-6009-24992A393D1A}.Release|x86.Build.0 = Release|x86
+		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Debug|x86.ActiveCfg = Debug|x86
+		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Debug|x86.Build.0 = Debug|x86
+		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.ActiveCfg = Release|x86
+		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C08B659-05FF-4B90-AB5B-F0B13C300F34}
+	EndGlobalSection
+EndGlobal

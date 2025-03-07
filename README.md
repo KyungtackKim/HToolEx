@@ -1,2 +1,2 @@
-# HToolEx
-Hantas tool management library project
+# HTool
+Library of connection control for Hantas tool

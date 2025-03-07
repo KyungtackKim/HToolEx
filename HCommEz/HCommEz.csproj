@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>1.0.0.4</Version>
+        <Company>Hantas</Company>
+        <Authors>Eloiz</Authors>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageTags>C#, Hantas, EZTorQ</PackageTags>
+        <Copyright>Copyright 2022. Hantas all right reserved.</Copyright>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageIconUrl/>
+        <AssemblyVersion>1.0.0.4</AssemblyVersion>
+        <FileVersion>1.0.0.4</FileVersion>
+        <Description>Hantas torque meter device communication library</Description>
+        <PackageVersion>1.0.0.4</PackageVersion>
+        <ApplicationIcon>icon.ico</ApplicationIcon>
+        <Win32Resource/>
+        <Platforms>AnyCPU;x86</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="icon.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Device\"/>
+        <Folder Include="WCL\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.IO.Ports" Version="4.7.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="wclBluetoothFramework">
+            <HintPath>WCL\wclBluetoothFramework.dll</HintPath>
+        </Reference>
+        <Reference Include="wclCommon">
+            <HintPath>WCL\wclCommon.dll</HintPath>
+        </Reference>
+        <Reference Include="wclCommunication">
+            <HintPath>WCL\wclCommunication.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="WCL\wclBluetoothFramework.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <Pack>True</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include="WCL\wclCommon.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <Pack>True</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+        <Content Include="WCL\wclCommunication.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <Pack>True</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </Content>
+    </ItemGroup>
+
+</Project>
