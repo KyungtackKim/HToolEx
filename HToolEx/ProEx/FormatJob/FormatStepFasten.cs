@@ -7,113 +7,103 @@ namespace HToolEx.ProEx.FormatJob;
 /// <summary>
 ///     Step fasten data class
 /// </summary>
+[PublicAPI]
 public sealed class FormatStepFasten : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepFasten() {
+    public FormatStepFasten(int revision = 0) {
         // set type
         Type = JobStepTypes.Fastening;
         // check screws count
-        for (var i = 0; i < MaxScrewCount; i++)
+        for (var i = 0; i < MaxScrewCount; i++) {
             // add screw
             Screws[i] = new FormatScrew();
+            // add encoder
+            Encoders[i] = new FormatEncoder();
+        }
     }
 
     /// <summary>
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStepFasten(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStepFasten(byte[] values, int revision = 0) : this(revision) {
         // set values
-        Set(values);
+        Set(values, revision);
     }
 
-    [PublicAPI] public static int MaxScrewCount => 99;
+    /// <summary>
+    ///     Max screw count
+    /// </summary>
+    public static int MaxScrewCount => 99;
 
     /// <summary>
     ///     Tool name
     /// </summary>
-    [PublicAPI]
     public string ToolName { get; set; } = string.Empty;
 
     /// <summary>
     ///     Preset no.
     /// </summary>
-    [PublicAPI]
     public int Preset { get; set; }
 
     /// <summary>
     ///     Count of screws
     /// </summary>
-    [PublicAPI]
     public int CountOfScrew { get; set; }
 
     /// <summary>
     ///     Enabled image status
     /// </summary>
-    [PublicAPI]
     public bool IsImage { get; set; }
 
     /// <summary>
     ///     Image path
     /// </summary>
-    [PublicAPI]
     public string ImagePath { get; set; } = string.Empty;
 
     /// <summary>
     ///     Screw position data : total 99 ea.
     /// </summary>
-    [PublicAPI]
     public FormatScrew[] Screws { get; } = new FormatScrew[MaxScrewCount];
 
     /// <summary>
     ///     Virtual preset data
     /// </summary>
-    [PublicAPI]
     public FormatVirtual Virtual { get; } = new();
 
     /// <summary>
     ///     ReTight status
     /// </summary>
-    [PublicAPI]
     public bool IsReTight { get; set; }
 
     /// <summary>
     ///     Max ReTight count
     /// </summary>
-    [PublicAPI]
     public int MaxReTight { get; set; }
 
     /// <summary>
     ///     ReTight preset no.
     /// </summary>
-    [PublicAPI]
     public int ReTightPreset { get; set; }
 
     /// <summary>
     ///     ReTight virtual preset data
     /// </summary>
-    [PublicAPI]
     public FormatVirtual ReTightVirtual { get; } = new();
 
     /// <summary>
     ///     Socket tray number
     /// </summary>
-    [PublicAPI]
     public int SocketNumber { get; set; }
 
     /// <summary>
-    ///     Reserved data
-    /// </summary>
-    [PublicAPI]
-    public byte[] Reserve { get; } = new byte[68];
-
-    /// <summary>
     ///     Update values
+    ///     <param name="revision">revision</param>
     /// </summary>
-    [PublicAPI]
-    public override void Update() {
+    public override void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -160,14 +150,37 @@ public sealed class FormatStepFasten : FormatStep {
         bin.Write(ReTightVirtual.Fasten);
         bin.Write(ReTightVirtual.Advance);
         bin.Write(SocketNumber);
-        bin.Write(Reserve);
+        // check revision
+        switch (revision) {
+            case 1:
+                bin.Write(Convert.ToInt32(EnableEncoder));
+                bin.Write(Convert.ToInt32(EnableNonSeq));
+                foreach (var enc in Encoders) {
+                    bin.Write(Convert.ToInt32(enc.SavePos[0]));
+                    bin.Write(Convert.ToInt32(enc.SavePos[1]));
+                    bin.Write(Convert.ToInt32(enc.SavePos[2]));
+                    bin.Write(Convert.ToInt32(enc.SavePos[3]));
+                    bin.Write(Convert.ToInt32(enc.ZoneTol[0]));
+                    bin.Write(Convert.ToInt32(enc.ZoneTol[1]));
+                    bin.Write(Convert.ToInt32(enc.ZoneTol[2]));
+                    bin.Write(Convert.ToInt32(enc.ZoneTol[3]));
+                    bin.Write(Convert.ToInt32(enc.OkTol[0]));
+                    bin.Write(Convert.ToInt32(enc.OkTol[1]));
+                    bin.Write(Convert.ToInt32(enc.OkTol[2]));
+                    bin.Write(Convert.ToInt32(enc.OkTol[3]));
+                    bin.Write(Convert.ToInt32(enc.EnabledPickUp[0]));
+                    bin.Write(Convert.ToInt32(enc.EnabledPickUp[1]));
+                }
+
+                break;
+        }
     }
 
     /// <summary>
     ///     Refresh values
+    ///     <param name="revision">revision</param>
     /// </summary>
-    [PublicAPI]
-    public override void Refresh() {
+    public override void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -256,7 +269,61 @@ public sealed class FormatStepFasten : FormatStep {
 
         // set socket tray number
         SocketNumber = bin.ReadInt32();
-        // reserved
-        bin.ReadBytes(Reserve.Length);
+
+        // check revision
+        switch (revision) {
+            case 1:
+                // set encoder option
+                EnableEncoder = Convert.ToBoolean(bin.ReadInt32());
+                EnableNonSeq = Convert.ToBoolean(bin.ReadInt32());
+                // check screw count
+                for (var i = 0; i < MaxScrewCount; i++) {
+                    // get encoder
+                    var enc = Encoders[i];
+                    // set encoder values
+                    enc.SavePos[0] = bin.ReadInt32();
+                    enc.SavePos[1] = bin.ReadInt32();
+                    enc.SavePos[2] = bin.ReadInt32();
+                    enc.SavePos[3] = bin.ReadInt32();
+                    enc.ZoneTol[0] = bin.ReadInt32();
+                    enc.ZoneTol[1] = bin.ReadInt32();
+                    enc.ZoneTol[2] = bin.ReadInt32();
+                    enc.ZoneTol[3] = bin.ReadInt32();
+                    enc.OkTol[0] = bin.ReadInt32();
+                    enc.OkTol[1] = bin.ReadInt32();
+                    enc.OkTol[2] = bin.ReadInt32();
+                    enc.OkTol[3] = bin.ReadInt32();
+                    enc.EnabledPickUp[0] = Convert.ToBoolean(bin.ReadInt32());
+                    enc.EnabledPickUp[1] = Convert.ToBoolean(bin.ReadInt32());
+                }
+
+                break;
+        }
     }
+
+    #region REVISION
+
+    #region REV.1.0
+
+    /// <summary>
+    ///     Enabled encoder
+    /// </summary>
+
+    public bool EnableEncoder { get; set; }
+
+    /// <summary>
+    ///     Enabled non-sequence
+    /// </summary>
+
+    public bool EnableNonSeq { get; set; }
+
+    /// <summary>
+    ///     Encoder data
+    /// </summary>
+
+    public FormatEncoder[] Encoders { get; } = new FormatEncoder[MaxScrewCount];
+
+    #endregion
+
+    #endregion
 }

@@ -8,11 +8,13 @@ namespace HToolEx.ProEx.FormatJob;
 /// <summary>
 ///     Step input data class
 /// </summary>
+[PublicAPI]
 public sealed class FormatStepInput : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepInput() {
+    /// <param name="revision">revision</param>
+    public FormatStepInput(int revision = 0) {
         // set type
         Type = JobStepTypes.Input;
     }
@@ -21,28 +23,27 @@ public sealed class FormatStepInput : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStepInput(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStepInput(byte[] values, int revision = 0) : this(revision) {
         // set values
-        Set(values);
+        Set(values, revision);
     }
 
     /// <summary>
     ///     Input port enable status
     /// </summary>
-    [PublicAPI]
     public bool[] IsPort { get; } = new bool[FormatSetInOut.Port];
 
     /// <summary>
     ///     Input port signal type
     /// </summary>
-    [PublicAPI]
     public InputSignalTypes InputType { get; set; }
 
     /// <summary>
     ///     Update values
     /// </summary>
-    [PublicAPI]
-    public override void Update() {
+    /// <param name="revision">revision</param>
+    public override void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -63,8 +64,8 @@ public sealed class FormatStepInput : FormatStep {
     /// <summary>
     ///     Refresh values
     /// </summary>
-    [PublicAPI]
-    public override void Refresh() {
+    /// <param name="revision">revision</param>
+    public override void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader

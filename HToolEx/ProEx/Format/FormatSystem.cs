@@ -12,7 +12,7 @@ public class FormatSystem {
     /// <summary>
     ///     Share information size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [88, 90];
+    [PublicAPI] public static readonly int[] Size = [88, 90, 91];
 
     /// <summary>
     ///     Constructor
@@ -58,6 +58,11 @@ public class FormatSystem {
             return;
         // get revision.1
         LatestEventRevision = bin.ReadUInt16();
+        // check revision.2
+        if (revision < 2)
+            return;
+        // get revision.2
+        IsSupportPos = bin.ReadByte() > 0;
     }
 
     /// <summary>
@@ -155,6 +160,12 @@ public class FormatSystem {
     /// </summary>
     [PublicAPI]
     public int LatestEventRevision { get; }
+
+    /// <summary>
+    ///     Support for position control feature
+    /// </summary>
+    [PublicAPI]
+    public bool IsSupportPos { get; }
 
     /// <summary>
     ///     Check sum

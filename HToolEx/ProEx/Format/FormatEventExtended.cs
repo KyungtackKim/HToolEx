@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace HToolEx.ProEx.Format;
 
 /// <summary>
-///     Format event data class using Pro-X 
+///     Format event data class using Pro-X
 /// </summary>
 public class FormatEventExtended : FormatEvent {
     /// <summary>
@@ -241,7 +241,7 @@ public class FormatEventExtended : FormatEvent {
     public string IdName6 { get; set; }
 
     /// <summary>
-    ///     Graph values 
+    ///     Graph values
     /// </summary>
     [PublicAPI]
     public Dictionary<int, List<float>> Graph { get; set; } = [];

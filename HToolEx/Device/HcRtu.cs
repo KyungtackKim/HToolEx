@@ -333,6 +333,7 @@ public class HcRtu : IHComm {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
+
             // check analyze count
             if (AnalyzeBuf.Count > 0)
                 // check analyze timeout
@@ -365,12 +366,10 @@ public class HcRtu : IHComm {
                 // clear buffer
                 AnalyzeBuf.Clear();
             }
-            else
-            {
+            else {
                 int frame;
                 // check function code
-                switch (cmd)
-                {
+                switch (cmd) {
                     case CodeTypes.ReadHoldingReg:
                     case CodeTypes.ReadInputReg:
                         // ID(1) + FC(1) + LEN(1)=DATA_LEN + DATA(N) + CRC(2)
@@ -408,12 +407,12 @@ public class HcRtu : IHComm {
                 // get crc
                 var crc = GetCrc(packet.Take(frame - 2)).ToArray();
                 // check crc
-                if (crc[0] != packet[^2] || crc[1] != packet[^1])
-                {
+                if (crc[0] != packet[^2] || crc[1] != packet[^1]) {
                     // debug
                     Debug.WriteLine("CRC ERROR!");
                     return;
                 }
+
                 // update event
                 ReceivedMsg?.Invoke(cmd, packet);
                 // reset analyze time

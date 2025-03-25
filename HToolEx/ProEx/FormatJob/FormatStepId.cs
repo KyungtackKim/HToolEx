@@ -12,7 +12,8 @@ public sealed class FormatStepId : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepId() {
+    /// <param name="revision">revision</param>
+    public FormatStepId(int revision = 0) {
         // set type
         Type = JobStepTypes.Id;
         // create array
@@ -23,9 +24,10 @@ public sealed class FormatStepId : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStepId(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStepId(byte[] values, int revision = 0) : this(revision) {
         // set values
-        Set(values);
+        Set(values, revision);
     }
 
     /// <summary>
@@ -125,9 +127,9 @@ public sealed class FormatStepId : FormatStep {
 
     /// <summary>
     ///     Update values
+    ///     <param name="revision">revision</param>
     /// </summary>
-    [PublicAPI]
-    public override void Update() {
+    public override void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -164,9 +166,9 @@ public sealed class FormatStepId : FormatStep {
 
     /// <summary>
     ///     Refresh values
+    ///     <param name="revision">revision</param>
     /// </summary>
-    [PublicAPI]
-    public override void Refresh() {
+    public override void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader

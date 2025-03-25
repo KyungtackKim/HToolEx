@@ -7,11 +7,13 @@ namespace HToolEx.ProEx.FormatJob;
 /// <summary>
 ///     Step delay data class
 /// </summary>
+[PublicAPI]
 public sealed class FormatStepDelay : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepDelay() {
+    /// <param name="revision">revision</param>
+    public FormatStepDelay(int revision = 0) {
         // set type
         Type = JobStepTypes.Delay;
         // check message length
@@ -24,72 +26,64 @@ public sealed class FormatStepDelay : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStepDelay(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStepDelay(byte[] values, int revision = 0) : this(revision) {
         // set values
-        Set(values);
+        Set(values, revision);
     }
 
     /// <summary>
     ///     Delay type
     /// </summary>
-    [PublicAPI]
     public DelayTypes DelayType { get; set; }
 
     /// <summary>
     ///     Delay time for time mode
     /// </summary>
-    [PublicAPI]
     public int DelayTime { get; set; }
 
     /// <summary>
     ///     Delay time for time mode
     /// </summary>
-    [PublicAPI]
     public DelayTimeUnitTypes DelayTimeUnit { get; set; }
 
 
     /// <summary>
     ///     Messages for popup mode
     /// </summary>
-    [PublicAPI]
     public string[] Message { get; } = new string[3];
 
 
     /// <summary>
     ///     Barcode for barcode mode
     /// </summary>
-    [PublicAPI]
     public string Code { get; set; } = string.Empty;
 
     /// <summary>
     ///     Mask status for barcode mode
     /// </summary>
-    [PublicAPI]
     public bool IsMask { get; set; }
 
     /// <summary>
     ///     Mask high value for barcode mode
     /// </summary>
-    [PublicAPI]
     public uint MaskHigh { get; set; }
 
     /// <summary>
     ///     Mask low value for barcode mode
     /// </summary>
-    [PublicAPI]
     public uint MaskLow { get; set; }
 
     /// <summary>
     ///     Mask value for barcode mode
     /// </summary>
-    [PublicAPI]
     public ulong Mask => Convert.ToUInt64(((ulong)MaskHigh << 32) | MaskLow);
 
     /// <summary>
     ///     Update values
     /// </summary>
-    [PublicAPI]
-    public override void Update() {
+    /// <param name="revision">revision</param>
+    public override void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -133,8 +127,8 @@ public sealed class FormatStepDelay : FormatStep {
     /// <summary>
     ///     Refresh values
     /// </summary>
-    [PublicAPI]
-    public override void Refresh() {
+    /// <param name="revision">revision</param>
+    public override void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader

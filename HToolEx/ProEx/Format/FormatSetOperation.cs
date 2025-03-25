@@ -12,7 +12,7 @@ public class FormatSetOperation {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [178, 220, 221, 504];
+    [PublicAPI] public static readonly int[] Size = [178, 220, 221, 504, 506];
 
     /// <summary>
     ///     Constructor
@@ -151,6 +151,12 @@ public class FormatSetOperation {
         EditId5WithoutPass = Convert.ToInt32(bin.ReadByte());
         EditId6WithoutPass = Convert.ToInt32(bin.ReadByte());
         AllScrewPosAppearAtOnce = Convert.ToInt32(bin.ReadByte());
+        // check revision.4
+        if (revision < 4)
+            return;
+        // get revision.4 information
+        ResetToolAlarmWithoutPassword = Convert.ToInt32(bin.ReadByte());
+        EnableSidePanel = Convert.ToInt32(bin.ReadByte());
     }
 
     /// <summary>
@@ -307,6 +313,11 @@ public class FormatSetOperation {
         values.Add(Convert.ToByte(EditId5WithoutPass));
         values.Add(Convert.ToByte(EditId6WithoutPass));
         values.Add(Convert.ToByte(AllScrewPosAppearAtOnce));
+        // check revision.4
+        if (revision < 4)
+            return values.ToArray();
+        values.Add(Convert.ToByte(ResetToolAlarmWithoutPassword));
+        values.Add(Convert.ToByte(EnableSidePanel));
         // values
         return values.ToArray();
     }
@@ -649,6 +660,20 @@ public class FormatSetOperation {
         /// </summary>
         public int Lock { get; set; }
     }
+
+    #endregion
+
+    #region REV.4
+
+    /// <summary>
+    ///     Reset tool alarm without password
+    /// </summary>
+    public int ResetToolAlarmWithoutPassword { get; set; }
+
+    /// <summary>
+    ///     Enable side panel
+    /// </summary>
+    public int EnableSidePanel { get; set; }
 
     #endregion
 

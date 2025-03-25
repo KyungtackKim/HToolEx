@@ -14,8 +14,7 @@ public enum LogTypes {
     [Description("Step name")] StepName,
     [Description("Tool name")] ToolName,
 
-    [Description("Barcode")] [Obsolete("Support Rev.0 only")]
-    Barcode,
+    [Description("Barcode")] [Obsolete("Support Rev.0 only")] Barcode,
     [Description("Fasten time")] FastenTime,
     [Description("Preset no.")] PresetNo,
     [Description("Torque unit")] TorqueUnit,
