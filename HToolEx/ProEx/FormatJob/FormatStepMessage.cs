@@ -7,11 +7,13 @@ namespace HToolEx.ProEx.FormatJob;
 /// <summary>
 ///     Step message data class
 /// </summary>
+[PublicAPI]
 public sealed class FormatStepMessage : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepMessage() {
+    /// <param name="revision">revision</param>
+    public FormatStepMessage(int revision = 0) {
         // set type
         Type = JobStepTypes.Message;
         // check message length
@@ -24,41 +26,38 @@ public sealed class FormatStepMessage : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStepMessage(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStepMessage(byte[] values, int revision = 0) : this(revision) {
         // set values
-        Set(values);
+        Set(values, revision);
     }
 
     /// <summary>
     ///     Messages items
     /// </summary>
-    [PublicAPI]
     public string[] Message { get; } = new string[3];
 
 
     /// <summary>
     ///     Image path
     /// </summary>
-    [PublicAPI]
     public string ImagePath { get; set; } = string.Empty;
 
     /// <summary>
     ///     Message type
     /// </summary>
-    [PublicAPI]
     public MessageTypes MessageType { get; set; } = MessageTypes.Validation;
 
     /// <summary>
     ///     Delay time
     /// </summary>
-    [PublicAPI]
     public int DelayTime { get; set; }
 
     /// <summary>
     ///     Update values
     /// </summary>
-    [PublicAPI]
-    public override void Update() {
+    /// <param name="revision">revision</param>
+    public override void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -96,8 +95,8 @@ public sealed class FormatStepMessage : FormatStep {
     /// <summary>
     ///     Refresh values
     /// </summary>
-    [PublicAPI]
-    public override void Refresh() {
+    /// <param name="revision">revision</param>
+    public override void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader

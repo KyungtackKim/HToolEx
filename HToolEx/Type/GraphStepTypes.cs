@@ -18,6 +18,5 @@ public enum GraphStepTypes {
     [Description("Clamp")] Clamp,
     [Description("Torque complete")] TorqueComplete,
 
-    [Description("Rotation after torque-up")]
-    RotationAfterTorqueUp
+    [Description("Rotation after torque-up")] RotationAfterTorqueUp
 }

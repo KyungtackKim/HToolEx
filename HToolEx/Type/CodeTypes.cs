@@ -10,8 +10,7 @@ public enum CodeTypes {
     [Description("Read input register")] ReadInputReg = 0x04,
     [Description("Write single register")] WriteSingleReg = 0x06,
 
-    [Description("Write multiple register")]
-    WriteMultiReg = 0x10,
+    [Description("Write multiple register")] WriteMultiReg = 0x10,
     [Description("Graph register")] Graph = 0x64,
     [Description("Graph result register")] GraphRes = 0x65,
     [Description("Error")] Error = 0x80

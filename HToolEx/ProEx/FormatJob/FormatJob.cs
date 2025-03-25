@@ -11,7 +11,11 @@ public class FormatJob {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatJob() { }
+    public FormatJob() {
+        // reset default version
+        Major = 1;
+        Minor = 0;
+    }
 
     /// <summary>
     ///     Constructor
@@ -50,10 +54,13 @@ public class FormatJob {
         CountOfMessage = source.CountOfMessage;
         CountOfId = source.CountOfId;
         FileName = source.FileName;
+        // set revision
+        Revision = Major >= 1 ? 1 : 0;
     }
 
     /// <summary>
     ///     Job header size
+    ///     Size가 176 이 아닌 이유는 Job의 헤더를 읽기 전까지는 version 을 알수 없기 때문에 rev.0 기준으로 Size를 체크
     /// </summary>
     [PublicAPI]
     public static int Size => 172;
@@ -67,12 +74,20 @@ public class FormatJob {
     /// <summary>
     ///     Version.Major
     /// </summary>
+    [PublicAPI]
     public int Major { get; set; }
 
     /// <summary>
     ///     Version.Minor
     /// </summary>
+    [PublicAPI]
     public int Minor { get; set; }
+
+    /// <summary>
+    ///     Revision number
+    /// </summary>
+    [PublicAPI]
+    public int Revision { get; private set; }
 
     /// <summary>
     ///     Version
@@ -183,7 +198,7 @@ public class FormatJob {
         values.AddRange(BitConverter.GetBytes(CountOfMessage));
 
         // check version
-        if (Major == 0 && Minor >= 3)
+        if (Major >= 1 || (Major == 0 && Minor >= 3))
             // set id step count
             values.AddRange(BitConverter.GetBytes(CountOfId));
         // return values
@@ -237,9 +252,11 @@ public class FormatJob {
         // message step
         CountOfMessage = bin.ReadInt32();
         // check version
-        if (headerOnly == false && Major == 0 && Minor >= 3)
+        if (headerOnly == false && (Major >= 1 || (Major == 0 && Minor >= 3)))
             // id step
             CountOfId = bin.ReadInt32();
+        // set revision
+        Revision = Major >= 1 ? 1 : 0;
 
         // result
         return true;
@@ -251,11 +268,6 @@ public class FormatJob {
     /// <returns></returns>
     public static int GetLength(int major = 0, int minor = 0) {
         // get length
-        return major switch {
-            // version 0.3
-            0 when minor == 3 => Size + 4,
-            // default
-            _ => Size
-        };
+        return major >= 1 || (major == 0 && minor >= 3) ? Size + 4 : Size;
     }
 }

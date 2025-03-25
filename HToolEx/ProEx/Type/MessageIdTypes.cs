@@ -92,6 +92,13 @@ public enum MessageIdTypes {
     ModbusRequest = 110,
     ModbusReply,
 
+    // ENCODER
+    EncoderRequest = 120,
+    EncoderReply,
+    EncoderSet,
+    EncoderValueRequest,
+    EncoderValueReply,
+
     // Dummy
     None = 999
 }

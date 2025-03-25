@@ -17,7 +17,14 @@ public class FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="values">values</param>
-    public FormatStep(byte[] values) : this() {
+    /// <param name="revision">revision</param>
+    public FormatStep(byte[] values, int revision = 0) : this() {
+        // check revision
+        if (revision >= Size.Length)
+            return;
+        // check data size
+        if (values.Length < Size[revision])
+            return;
         // memory stream
         using var stream = new MemoryStream(values);
         // binary reader
@@ -32,29 +39,38 @@ public class FormatStep {
         // set step name
         Name = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
 
+        // create values and data
+        Values = new byte[Size[revision]];
+        Data = new byte[DataSize[revision]];
         // check data size
-        for (var i = 0; i < DataSize; i++)
+        for (var i = 0; i < DataSize[revision]; i++)
             // set value
-            Values[Size - DataSize + i] = bin.ReadByte();
+            Values[HeaderSize + i] = bin.ReadByte();
     }
 
     /// <summary>
     ///     Step size
     /// </summary>
     [PublicAPI]
-    public static int Size => 4096;
+    public static int[] Size => [4096, 12288];
+
+    /// <summary>
+    ///     Step header size
+    /// </summary>
+    [PublicAPI]
+    public static int HeaderSize => 132;
 
     /// <summary>
     ///     Step data size
     /// </summary>
     [PublicAPI]
-    public static int DataSize => 3964;
+    public static int[] DataSize => [Size[0] - HeaderSize, Size[1] - HeaderSize];
 
     /// <summary>
     ///     Values
     /// </summary>
     [PublicAPI]
-    public byte[] Values { get; } = new byte[Size];
+    public byte[] Values { get; private set; } = [];
 
     /// <summary>
     ///     Step type
@@ -72,16 +88,17 @@ public class FormatStep {
     ///     Step data
     /// </summary>
     [PublicAPI]
-    public byte[] Data { get; } = new byte[DataSize];
+    public byte[] Data { get; private set; } = [];
 
     /// <summary>
     ///     Get values
     /// </summary>
+    /// <param name="revision">revision</param>
     /// <returns>values</returns>
     [PublicAPI]
-    public virtual byte[] Get() {
+    public virtual byte[] Get(int revision = 0) {
         // update
-        Update();
+        Update(revision);
         // return values
         return Values;
     }
@@ -90,29 +107,32 @@ public class FormatStep {
     ///     Set values
     /// </summary>
     /// <param name="values">values</param>
+    /// <param name="revision">revision</param>
     /// <returns>result</returns>
     [PublicAPI]
-    public virtual bool Set(byte[] values) {
+    public virtual bool Set(byte[] values, int revision = 0) {
         // check size
-        if (values.Length != Size)
+        if (values.Length != Size[revision])
             return false;
-
+        // create values and data
+        Values = new byte[Size[revision]];
+        Data = new byte[DataSize[revision]];
         // check size
-        for (var i = 0; i < Size; i++)
+        for (var i = 0; i < Size[revision]; i++)
             // set value
             Values[i] = values[i];
         // refresh
-        Refresh();
-
+        Refresh(revision);
         // result
         return true;
     }
 
     /// <summary>
     ///     Update values
+    ///     <param name="revision">revision</param>
     /// </summary>
     [PublicAPI]
-    public virtual void Update() {
+    public virtual void Update(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader
@@ -127,9 +147,10 @@ public class FormatStep {
 
     /// <summary>
     ///     Refresh values
+    ///     <param name="revision">revision</param>
     /// </summary>
     [PublicAPI]
-    public virtual void Refresh() {
+    public virtual void Refresh(int revision = 0) {
         // memory stream
         using var stream = new MemoryStream(Values);
         // binary reader

@@ -10,8 +10,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Title>HToolEx</Title>
-        <Version>1.1.13</Version>
-        <PackageVersion>1.1.13</PackageVersion>
+        <Version>1.1.14</Version>
+        <PackageVersion>1.1.14</PackageVersion>
         <PackageProjectUrl>https://github.com/KyungtackKim/HToolEx</PackageProjectUrl>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>
@@ -20,6 +20,7 @@
         <LangVersion>12</LangVersion>
         <PlatformTarget>x86</PlatformTarget>
         <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+        <NoWarn>$(NoWarn);0618</NoWarn>
         <Platforms>AnyCPU;x86</Platforms>
     </PropertyGroup>
 
@@ -32,18 +33,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentFTP" Version="49.0.1"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0"/>
-        <PackageReference Include="SuperSimpleTcp" Version="3.0.13"/>
-        <PackageReference Include="System.IO.Ports" Version="8.0.0"/>
+        <PackageReference Include="FluentFTP" Version="49.0.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+        <PackageReference Include="SuperSimpleTcp" Version="3.0.13" />
+        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="README.md" Pack="true" PackagePath="\"/>
-        <None Update="HToolEx.png" Pack="true" PackagePath="\"/>
+        <None Update="README.md" Pack="true" PackagePath="\" />
+        <None Update="HToolEx.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="ProEx\"/>
+        <Folder Include="ProEx\" />
     </ItemGroup>
 </Project>

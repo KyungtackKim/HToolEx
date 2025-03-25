@@ -1,9 +1,6 @@
-﻿namespace HCommEz
-{
+﻿namespace HCommEz {
     /// <summary>
     ///     Hantas EZTorQ manager class
     /// </summary>
-    public class HCommEz
-    {
-    }
+    public class HCommEz { }
 }

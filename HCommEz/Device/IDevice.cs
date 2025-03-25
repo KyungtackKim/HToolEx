@@ -1,10 +1,8 @@
-﻿namespace HCommEz.Device
-{
+﻿namespace HCommEz.Device {
     /// <summary>
     ///     EZtorQ interface
     /// </summary>
-    public interface IDevice
-    {
+    public interface IDevice {
         /// <summary>
         ///     Received calibration data event
         /// </summary>

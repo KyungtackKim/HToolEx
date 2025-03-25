@@ -5,13 +5,11 @@ using System.Threading;
 using HComm.Common;
 using HComm.Device;
 
-namespace HComm
-{
+namespace HComm {
     /// <summary>
     ///     HComm interface class
     /// </summary>
-    public class HComm
-    {
+    public class HComm {
         /// <summary>
         ///     HComm connection state changed delegate
         /// </summary>
@@ -45,8 +43,7 @@ namespace HComm
         /// <summary>
         ///     HComm interface constructor
         /// </summary>
-        public HComm()
-        {
+        public HComm() {
             // message process timer
             MsgTimer = new Timer(ProcessTimer);
         }
@@ -78,19 +75,15 @@ namespace HComm
         /// <summary>
         ///     HComm communicator waiting queue count
         /// </summary>
-        public int QueueCount
-        {
-            get
-            {
+        public int QueueCount {
+            get {
                 // lock message queue
                 if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                     return 0;
-                try
-                {
+                try {
                     return MsgQueue.Count;
                 }
-                finally
-                {
+                finally {
                     // unlock
                     Monitor.Exit(MsgQueue);
                 }
@@ -105,11 +98,9 @@ namespace HComm
         /// <summary>
         ///     HComm communicator automatic request information command
         /// </summary>
-        public bool AutoRequestInfo
-        {
+        public bool AutoRequestInfo {
             get => _autoRequestInfo;
-            set
-            {
+            set {
                 // set auto request information
                 _autoRequestInfo = value;
                 // reset connect time
@@ -120,11 +111,9 @@ namespace HComm
         /// <summary>
         ///     HComm communicator automatic disconnect
         /// </summary>
-        public bool AutoDisconnect
-        {
+        public bool AutoDisconnect {
             get => _autoDisconnect;
-            set
-            {
+            set {
                 // set auto request information
                 _autoDisconnect = value;
                 // reset connect time
@@ -162,11 +151,9 @@ namespace HComm
         /// </summary>
         /// <param name="type">communication type</param>
         /// <returns>result</returns>
-        public bool SetUp(CommType type)
-        {
+        public bool SetUp(CommType type) {
             // check type
-            switch (type)
-            {
+            switch (type) {
                 case CommType.None:
                     break;
                 case CommType.Serial:
@@ -208,8 +195,7 @@ namespace HComm
         /// <param name="option">option</param>
         /// <param name="id">id</param>
         /// <returns>result</returns>
-        public bool Connect(string target, int option, byte id = 0x01)
-        {
+        public bool Connect(string target, int option, byte id = 0x01) {
             // check state
             if (State != ConnectionState.Disconnected)
                 return false;
@@ -233,8 +219,7 @@ namespace HComm
         ///     HComm interface close
         /// </summary>
         /// <returns>result</returns>
-        public bool Close()
-        {
+        public bool Close() {
             // stop process timer
             MsgTimer.Change(Timeout.Infinite, Timeout.Infinite);
             // set state
@@ -254,16 +239,14 @@ namespace HComm
         /// <param name="count">count</param>
         /// <param name="merge">merge state</param>
         /// <returns>result</returns>
-        public bool GetParam(ushort addr, ushort count, bool merge = false)
-        {
+        public bool GetParam(ushort addr, ushort count, bool merge = false) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -286,8 +269,7 @@ namespace HComm
                 // check merge block
                 if (!merge)
                     // check block
-                    for (var i = 0; i < limit; i++)
-                    {
+                    for (var i = 0; i < limit; i++) {
                         // set address
                         var start = (ushort)(addr + i * blockSize);
                         // check block num
@@ -302,8 +284,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -316,16 +297,14 @@ namespace HComm
         /// <param name="value">value</param>
         /// <param name="slow">slow write</param>
         /// <returns>result</returns>
-        public bool SetParam(ushort addr, ushort value, bool slow = false)
-        {
+        public bool SetParam(ushort addr, ushort value, bool slow = false) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -340,8 +319,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -351,16 +329,14 @@ namespace HComm
         ///     HComm device get information
         /// </summary>
         /// <returns>result</returns>
-        public bool GetInfo()
-        {
+        public bool GetInfo() {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -372,8 +348,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -385,16 +360,14 @@ namespace HComm
         /// <param name="addr">address</param>
         /// <param name="state">state</param>
         /// <returns>result</returns>
-        public bool SetRealTime(ushort addr = 4002, ushort state = 1)
-        {
+        public bool SetRealTime(ushort addr = 4002, ushort state = 1) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -406,8 +379,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -419,16 +391,14 @@ namespace HComm
         /// <param name="addr">address</param>
         /// <param name="state">state</param>
         /// <returns>result</returns>
-        public bool SetGraph(ushort addr = 4100, ushort state = 1)
-        {
+        public bool SetGraph(ushort addr = 4100, ushort state = 1) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -440,8 +410,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -453,16 +422,14 @@ namespace HComm
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>result</returns>
-        public bool GetState(ushort addr = 3300, ushort count = 14)
-        {
+        public bool GetState(ushort addr = 3300, ushort count = 14) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -479,8 +446,7 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -492,16 +458,14 @@ namespace HComm
         /// <param name="addr">not use: address</param>
         /// <param name="count">not use: count</param>
         /// <returns>result</returns>
-        public bool GetGraph(ushort addr = 4200, ushort count = 1)
-        {
+        public bool GetGraph(ushort addr = 4200, ushort count = 1) {
             // check comm
             if (Comm == null)
                 return false;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return false;
-            try
-            {
+            try {
                 // check max queue size
                 if (MsgQueue.Count >= MaxQueueSize)
                     return false;
@@ -513,26 +477,22 @@ namespace HComm
                 // result
                 return true;
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
         }
 
-        private void ProcessTimer(object state)
-        {
+        private void ProcessTimer(object state) {
             // check comm
             if (Comm == null)
                 return;
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return;
-            try
-            {
+            try {
                 // check connection state
-                if (AutoDisconnect && (DateTime.Now - ConnectionTime).TotalSeconds > 3)
-                {
+                if (AutoDisconnect && (DateTime.Now - ConnectionTime).TotalSeconds > 3) {
                     // stop process timer
                     MsgTimer.Change(Timeout.Infinite, Timeout.Infinite);
                     // change state
@@ -556,13 +516,11 @@ namespace HComm
                 }
 
                 // check message queue
-                if (MsgQueue.Count > 0)
-                {
+                if (MsgQueue.Count > 0) {
                     // get first message
                     var msg = MsgQueue[0];
                     // check queue active
-                    if (!msg.Active)
-                    {
+                    if (!msg.Active) {
                         // write
                         if (!Comm.Write(msg.Packet.ToArray(), msg.Packet.Count))
                             return;
@@ -572,8 +530,7 @@ namespace HComm
                         msg.Time = DateTime.Now;
                         msg.Active = true;
                     }
-                    else
-                    {
+                    else {
                         // laps
                         var laps = DateTime.Now - msg.Time;
                         // check time
@@ -592,8 +549,7 @@ namespace HComm
                         ReceivedMsg?.Invoke(Command.Error, 0, new[] { 0x00 });
                     }
                 }
-                else if (AutoRequestInfo && (DateTime.Now - InfoTime).TotalSeconds > 1)
-                {
+                else if (AutoRequestInfo && (DateTime.Now - InfoTime).TotalSeconds > 1) {
                     /*
                     // add queue request information
                     GetInfo();
@@ -604,15 +560,13 @@ namespace HComm
                         MsgQueue.Add(new HCommMsg(Command.Info, 0, 0, Comm.PacketGetInfo()));
                 }
             }
-            finally
-            {
+            finally {
                 // unlock msg queue
                 Monitor.Exit(MsgQueue);
             }
         }
 
-        private void AckReceivedCallback(Command cmd, byte[] packet)
-        {
+        private void AckReceivedCallback(Command cmd, byte[] packet) {
             int[] values = null;
             var length = 0;
             int count;
@@ -620,16 +574,14 @@ namespace HComm
             // reset connection time
             ConnectionTime = DateTime.Now;
             // check command
-            switch (cmd)
-            {
+            switch (cmd) {
                 case Command.Read:
                     // check packet length
                     if (packet.Length > 0)
                         // set length
                         length = packet[0];
                     // check length
-                    if (length == packet.Length - 1)
-                    {
+                    if (length == packet.Length - 1) {
                         count = length / 2;
                         values = new int[count];
                         // set values
@@ -644,8 +596,7 @@ namespace HComm
                         // set length
                         length = packet[0];
                     // check length
-                    if (length == packet.Length - 1)
-                    {
+                    if (length == packet.Length - 1) {
                         count = length / 2;
                         values = new int[count];
                         // set values
@@ -660,8 +611,7 @@ namespace HComm
                         // set length
                         length = 4;
                     // check length
-                    if (length == packet.Length)
-                    {
+                    if (length == packet.Length) {
                         count = length / 2;
                         values = new int[count];
                         // set values
@@ -676,8 +626,7 @@ namespace HComm
                         // set length
                         length = packet[0];
                     // check length
-                    if (length == packet.Length - 1)
-                    {
+                    if (length == packet.Length - 1) {
                         count = length;
                         values = new int[count];
                         // set values
@@ -692,13 +641,11 @@ namespace HComm
                         // set length
                         length = (packet[0] << 8) | packet[1];
                     // check length
-                    if (length == packet.Length - 2)
-                    {
+                    if (length == packet.Length - 2) {
                         count = length / 2;
                         values = new int[count];
                         // set values
-                        for (var i = 0; i < count; i++)
-                        {
+                        for (var i = 0; i < count; i++) {
                             values[i] = (packet[i * 2 + 2] << 8) | packet[i * 2 + 3];
                             // check MSB
                             if ((values[i] & 0x8000) == 0x8000)
@@ -714,13 +661,11 @@ namespace HComm
                         // set length
                         length = (packet[0] << 8) | packet[1];
                     // check length
-                    if (length == packet.Length - 2)
-                    {
+                    if (length == packet.Length - 2) {
                         count = length / 2;
                         values = new int[count];
                         // set values
-                        for (var i = 0; i < count; i++)
-                        {
+                        for (var i = 0; i < count; i++) {
                             values[i] = (packet[i * 2 + 2] << 8) | packet[i * 2 + 3];
                             // check MSB
                             if ((values[i] & 0x8000) == 0x8000)
@@ -736,13 +681,11 @@ namespace HComm
                         // set length
                         length = packet[0];
                     // check length
-                    if (length > 1 && length == packet.Length - 1)
-                    {
+                    if (length > 1 && length == packet.Length - 1) {
                         count = (length - 2) / 2 + 1;
                         values = new int[count];
                         // set values
-                        for (var i = 0; i < count; i++)
-                        {
+                        for (var i = 0; i < count; i++) {
                             values[i] = (packet[i * 2 + 1] << 8) | packet[i * 2 + 2];
                             // check MSB
                             if ((values[i] & 0x8000) == 0x8000)
@@ -757,8 +700,7 @@ namespace HComm
                     if (packet.Length > 0)
                         length = 1;
                     // check length
-                    if (length == packet.Length)
-                    {
+                    if (length == packet.Length) {
                         count = 1;
                         values = new int[count];
                         // set values
@@ -774,8 +716,7 @@ namespace HComm
             // lock message queue
             if (!Monitor.TryEnter(MsgQueue, MonitorTimeout))
                 return;
-            try
-            {
+            try {
                 // get message
                 var msg = MsgQueue.Count > 0 ? MsgQueue[0] : null;
                 // get address
@@ -800,24 +741,20 @@ namespace HComm
                 // clear first queue
                 MsgQueue.RemoveAt(0);
             }
-            finally
-            {
+            finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
         }
 
-        private void AckRawReceived(byte[] packet)
-        {
+        private void AckRawReceived(byte[] packet) {
             // update event
             SendReceiveMsg?.Invoke(packet);
         }
 
-        private void AckMorReceived(MonitorCommand cmd, byte[] packet)
-        {
+        private void AckMorReceived(MonitorCommand cmd, byte[] packet) {
             // check command
-            switch (cmd)
-            {
+            switch (cmd) {
                 case MonitorCommand.Backup:
                     // acknowledge
                     if (!Comm.Write(HcEthernet.MonitorAck, HcEthernet.MonitorAck.Length))
@@ -834,17 +771,14 @@ namespace HComm
             ReceivedMorMsg?.Invoke(cmd, packet);
         }
 
-        private void ConnectionChanged(bool state)
-        {
+        private void ConnectionChanged(bool state) {
             // check state
-            switch (State)
-            {
+            switch (State) {
                 case ConnectionState.None:
                     break;
                 case ConnectionState.Connecting:
                     // check state
-                    if (state)
-                    {
+                    if (state) {
                         // change state
                         State = ConnectionState.Connected;
                         // set event
@@ -860,8 +794,7 @@ namespace HComm
                     break;
                 case ConnectionState.Disconnecting:
                     // check state
-                    if (!state)
-                    {
+                    if (!state) {
                         // stop process timer
                         MsgTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         // reset event
@@ -887,8 +820,7 @@ namespace HComm
         /// <summary>
         ///     Tool device information class
         /// </summary>
-        public class DeviceInfo
-        {
+        public class DeviceInfo {
             private List<byte> Values { get; } = new List<byte>();
 
             /// <summary>
@@ -928,8 +860,7 @@ namespace HComm
             ///     Set data information
             /// </summary>
             /// <param name="data">packet data</param>
-            public void SetInfo(IEnumerable<int> data)
-            {
+            public void SetInfo(IEnumerable<int> data) {
                 // clear values
                 Values.Clear();
                 // check data
