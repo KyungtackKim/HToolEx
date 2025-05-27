@@ -12,7 +12,7 @@ public sealed class FormatStepFasten : FormatStep {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatStepFasten(int revision = 0) {
+    public FormatStepFasten(int revision = 0) : base(new byte[Size[revision]], revision) {
         // set type
         Type = JobStepTypes.Fastening;
         // check screws count
@@ -29,7 +29,16 @@ public sealed class FormatStepFasten : FormatStep {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
-    public FormatStepFasten(byte[] values, int revision = 0) : this(revision) {
+    public FormatStepFasten(byte[] values, int revision = 0) : base(values, revision) {
+        // set type
+        Type = JobStepTypes.Fastening;
+        // check screws count
+        for (var i = 0; i < MaxScrewCount; i++) {
+            // add screw
+            Screws[i] = new FormatScrew();
+            // add encoder
+            Encoders[i] = new FormatEncoder();
+        }
         // set values
         Set(values, revision);
     }

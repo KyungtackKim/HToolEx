@@ -12,7 +12,8 @@ public class FormatSetShare {
     /// <summary>
     ///     Share setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [280];
+    [PublicAPI]
+    public static readonly int[] Size = [280, 283];
 
     /// <summary>
     ///     Constructor
@@ -56,6 +57,12 @@ public class FormatSetShare {
         TcpServerPort = Convert.ToInt32(bin.ReadUInt16());
         RemoteJob = Convert.ToInt32(bin.ReadByte());
         RemoteJobPort = Convert.ToInt32(bin.ReadUInt16());
+        // check revision.1 information
+        if (revision < 1)
+            return;
+        // get revision.1 information
+        OpenProtocol = Convert.ToInt32(bin.ReadByte());
+        OpenProtocolPort = Convert.ToInt32(bin.ReadUInt16());
     }
 
     /// <summary>
@@ -149,6 +156,18 @@ public class FormatSetShare {
     public int RemoteJobPort { get; set; }
 
     /// <summary>
+    ///     Open protocol
+    /// </summary>
+    [PublicAPI]
+    public int OpenProtocol { get; set; }
+
+    /// <summary>
+    ///     Open protocol port
+    /// </summary>
+    [PublicAPI]
+    public int OpenProtocolPort { get; set; }
+
+    /// <summary>
     ///     Check sum
     /// </summary>
     [Browsable(false)]
@@ -193,6 +212,13 @@ public class FormatSetShare {
         values.Add(Convert.ToByte(RemoteJob));
         values.Add(Convert.ToByte((RemoteJobPort >> 8) & 0xFF));
         values.Add(Convert.ToByte(RemoteJobPort & 0xFF));
+        // check revision.1 information
+        if (revision < 1)
+            return values.ToArray();
+        // get revision.1 values
+        values.Add(Convert.ToByte(OpenProtocol));
+        values.Add(Convert.ToByte((OpenProtocolPort >> 8) & 0xFF));
+        values.Add(Convert.ToByte(OpenProtocolPort & 0xFF));
         // values
         return values.ToArray();
     }

@@ -13,7 +13,7 @@ public sealed class FormatStepMessage : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="revision">revision</param>
-    public FormatStepMessage(int revision = 0) {
+    public FormatStepMessage(int revision = 0) : base(new byte[Size[revision]], revision) {
         // set type
         Type = JobStepTypes.Message;
         // check message length
@@ -27,7 +27,13 @@ public sealed class FormatStepMessage : FormatStep {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
-    public FormatStepMessage(byte[] values, int revision = 0) : this(revision) {
+    public FormatStepMessage(byte[] values, int revision = 0) : base(values, revision) {
+        // set type
+        Type = JobStepTypes.Message;
+        // check message length
+        for (var i = 0; i < 3; i++)
+            // reset message
+            Message[i] = string.Empty;
         // set values
         Set(values, revision);
     }
@@ -36,7 +42,6 @@ public sealed class FormatStepMessage : FormatStep {
     ///     Messages items
     /// </summary>
     public string[] Message { get; } = new string[3];
-
 
     /// <summary>
     ///     Image path

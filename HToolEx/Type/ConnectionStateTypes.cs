@@ -3,8 +3,4 @@
 /// <summary>
 ///     Connection state types
 /// </summary>
-public enum ConnectionStateTypes {
-    Closed,
-    Connected,
-    Connecting
-}
+public enum ConnectionStateTypes { Closed, Connected, Connecting }

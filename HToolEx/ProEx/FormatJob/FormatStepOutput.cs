@@ -14,7 +14,7 @@ public sealed class FormatStepOutput : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="revision">revision</param>
-    public FormatStepOutput(int revision = 0) {
+    public FormatStepOutput(int revision = 0) : base(new byte[Size[revision]], revision) {
         // set type
         Type = JobStepTypes.Output;
     }
@@ -24,7 +24,9 @@ public sealed class FormatStepOutput : FormatStep {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
-    public FormatStepOutput(byte[] values, int revision = 0) : this(revision) {
+    public FormatStepOutput(byte[] values, int revision = 0) : base(values, revision) {
+        // set type
+        Type = JobStepTypes.Output;
         // set values
         Set(values, revision);
     }

@@ -13,7 +13,7 @@ public sealed class FormatStepDelay : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="revision">revision</param>
-    public FormatStepDelay(int revision = 0) {
+    public FormatStepDelay(int revision = 0) : base(new byte[Size[revision]], revision) {
         // set type
         Type = JobStepTypes.Delay;
         // check message length
@@ -27,7 +27,13 @@ public sealed class FormatStepDelay : FormatStep {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
-    public FormatStepDelay(byte[] values, int revision = 0) : this(revision) {
+    public FormatStepDelay(byte[] values, int revision = 0) : base(values, revision) {
+        // set type
+        Type = JobStepTypes.Delay;
+        // check message length
+        for (var i = 0; i < 3; i++)
+            // reset message
+            Message[i] = string.Empty;
         // set values
         Set(values, revision);
     }
@@ -47,12 +53,10 @@ public sealed class FormatStepDelay : FormatStep {
     /// </summary>
     public DelayTimeUnitTypes DelayTimeUnit { get; set; }
 
-
     /// <summary>
     ///     Messages for popup mode
     /// </summary>
     public string[] Message { get; } = new string[3];
-
 
     /// <summary>
     ///     Barcode for barcode mode

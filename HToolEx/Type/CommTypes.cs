@@ -3,8 +3,4 @@
 /// <summary>
 ///     Communication types
 /// </summary>
-public enum CommTypes {
-    None,
-    Rtu,
-    Tcp
-}
+public enum CommTypes { None, Rtu, Tcp }

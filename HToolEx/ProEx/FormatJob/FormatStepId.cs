@@ -13,7 +13,7 @@ public sealed class FormatStepId : FormatStep {
     ///     Constructor
     /// </summary>
     /// <param name="revision">revision</param>
-    public FormatStepId(int revision = 0) {
+    public FormatStepId(int revision = 0) : base(new byte[Size[revision]], revision) {
         // set type
         Type = JobStepTypes.Id;
         // create array
@@ -25,7 +25,11 @@ public sealed class FormatStepId : FormatStep {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
-    public FormatStepId(byte[] values, int revision = 0) : this(revision) {
+    public FormatStepId(byte[] values, int revision = 0) : base(values, revision) {
+        // set type
+        Type = JobStepTypes.Id;
+        // create array
+        Position = new byte[100];
         // set values
         Set(values, revision);
     }
