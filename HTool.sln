@@ -17,8 +17,8 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.ActiveCfg = Debug|x86
-		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.Build.0 = Debug|x86
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{59C93832-392D-426D-A705-3D624E72F4C4}.Debug|x86.Build.0 = Debug|Any CPU
 		{59C93832-392D-426D-A705-3D624E72F4C4}.Release|x86.ActiveCfg = Release|x86
 		{59C93832-392D-426D-A705-3D624E72F4C4}.Release|x86.Build.0 = Release|x86
 		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Debug|x86.ActiveCfg = Debug|x86
@@ -26,11 +26,9 @@ Global
 		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Release|x86.ActiveCfg = Release|x86
 		{249BAA95-8B6C-7502-D3D9-0200A01C53B5}.Release|x86.Build.0 = Release|x86
 		{24366DC1-927E-6F10-6009-24992A393D1A}.Debug|x86.ActiveCfg = Debug|x86
-		{24366DC1-927E-6F10-6009-24992A393D1A}.Debug|x86.Build.0 = Debug|x86
 		{24366DC1-927E-6F10-6009-24992A393D1A}.Release|x86.ActiveCfg = Release|x86
 		{24366DC1-927E-6F10-6009-24992A393D1A}.Release|x86.Build.0 = Release|x86
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Debug|x86.ActiveCfg = Debug|x86
-		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Debug|x86.Build.0 = Debug|x86
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.ActiveCfg = Release|x86
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection

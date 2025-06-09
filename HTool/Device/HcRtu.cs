@@ -14,6 +14,7 @@ namespace HTool.Device;
 /// </summary>
 [PublicAPI]
 public class HcRtu : ITool {
+    private const int ErrorFrameSize = 5;
     private static readonly int[] BaudRates = [9600, 19200, 38400, 57600, 115200, 230400];
     private SerialPort Port { get; } = new();
     private ConcurrentQueue<byte> ReceiveBuf { get; } = [];
@@ -116,8 +117,7 @@ public class HcRtu : ITool {
 
             // result ok
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // console
             Console.WriteLine(e.Message);
         }
@@ -141,8 +141,7 @@ public class HcRtu : ITool {
             Port.DataReceived -= PortOnDataReceived;
             // connection changed event
             ChangedConnect?.Invoke(false);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -167,8 +166,7 @@ public class HcRtu : ITool {
             TransmitRaw?.Invoke(packet);
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -185,7 +183,8 @@ public class HcRtu : ITool {
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
         // create packet
         var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.ReadHoldingReg,
+            DeviceId,
+            (byte)CodeTypes.ReadHoldingReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -206,7 +205,8 @@ public class HcRtu : ITool {
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
         // create packet
         var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.ReadInputReg,
+            DeviceId,
+            (byte)CodeTypes.ReadInputReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -227,7 +227,8 @@ public class HcRtu : ITool {
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
         // create packet
         var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.WriteSingleReg,
+            DeviceId,
+            (byte)CodeTypes.WriteSingleReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((value >> 8) & 0xFF),
@@ -250,7 +251,8 @@ public class HcRtu : ITool {
         var count = values.Length;
         // create packet
         var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.WriteMultiReg,
+            DeviceId,
+            (byte)CodeTypes.WriteMultiReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -285,7 +287,8 @@ public class HcRtu : ITool {
         var count = length / 2;
         // create packet
         var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.WriteMultiReg,
+            DeviceId,
+            (byte)CodeTypes.WriteMultiReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -311,9 +314,7 @@ public class HcRtu : ITool {
     /// <returns>result</returns>
     public byte[] GetInfoRegPacket() {
         // create packet
-        var packet = new List<byte> {
-            DeviceId, (byte)CodeTypes.ReadInfoReg
-        };
+        var packet = new List<byte> { DeviceId, (byte)CodeTypes.ReadInfoReg };
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
         // packet
@@ -394,6 +395,7 @@ public class HcRtu : ITool {
                 return;
             // get command value
             var value = (int)AnalyzeBuf.Peek(FunctionPos);
+#if NOT_USE
             // check command
             if (!Enum.IsDefined(typeof(CodeTypes), value) && (value & (int)CodeTypes.Error) != (int)CodeTypes.Error)
                 return;
@@ -401,14 +403,17 @@ public class HcRtu : ITool {
             var cmd = (CodeTypes)value;
             // check error
             if ((value & (int)CodeTypes.Error) == (int)CodeTypes.Error) {
+                // check length
+                if (AnalyzeBuf.Available < ErrorFrameSize)
+                    return;
                 // get error command
                 cmd = (CodeTypes)((byte)cmd & 0x7F);
+                // remove packet : TID(2) PID(2) LEN(2) UID(1) FC(1) ERROR(1)
+                var packet = AnalyzeBuf.ReadBytes(ErrorFrameSize);
                 // get error code
-                var code = AnalyzeBuf.Available > HeaderSize ? AnalyzeBuf.Peek(HeaderSize) : (byte)0x00;
+                var code = packet[HeaderSize];
                 // error invoke
                 ReceivedData?.Invoke(CodeTypes.Error, [DeviceId, (byte)cmd, 0x02, 0x00, code, 0x00, 0x00]);
-                // clear buffer
-                AnalyzeBuf.Clear();
             }
             else {
                 // check function code
@@ -439,8 +444,41 @@ public class HcRtu : ITool {
                     // update event
                     ReceivedData?.Invoke(cmd, packet);
             }
-        }
-        finally {
+#else
+            // check command
+            if (!Enum.IsDefined(typeof(CodeTypes), value) && (value & (int)CodeTypes.Error) != (int)CodeTypes.Error)
+                return;
+            // get command
+            var cmd = Enum.IsDefined(typeof(CodeTypes), value) ? (CodeTypes)value : CodeTypes.Error;
+            // check function code
+            var frame = cmd switch {
+                // ID(1) + FC(1) + LEN(1)=DATA_LEN + DATA(N) + CRC(2)
+                CodeTypes.ReadHoldingReg or CodeTypes.ReadInputReg or CodeTypes.ReadInfoReg =>
+                    AnalyzeBuf.Peek(HeaderSize) + 5,
+                // ID(1) + FC(1) + ADDR(2) + VALUE(2)/COUNT(2) + CRC(2)
+                CodeTypes.WriteSingleReg or CodeTypes.WriteMultiReg => 8,
+                // ID(1) + FC(1) + LEN(2)=DATA_LEN + DATA(N) + CRC(2)
+                CodeTypes.Graph or CodeTypes.GraphRes =>
+                    ((AnalyzeBuf.Peek(HeaderSize) << 8) | AnalyzeBuf.Peek(HeaderSize + 1)) + 6,
+                // ID(1) + FC(1) + ERROR(1) + CRC(2)
+                CodeTypes.Error => 5,
+                // exception
+                _ => throw new ArgumentOutOfRangeException(string.Empty)
+            };
+
+            // check frame length
+            if (AnalyzeBuf.Available < frame)
+                return;
+            // get packet
+            var packet = AnalyzeBuf.ReadBytes(frame);
+            // get crc
+            var crc = Utils.CalculateCrc(packet[..^2]).ToArray();
+            // check crc
+            if (crc[0] == packet[^2] && crc[1] == packet[^1])
+                // update event
+                ReceivedData?.Invoke(cmd, packet);
+#endif
+        } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);
         }

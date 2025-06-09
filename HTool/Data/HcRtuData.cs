@@ -40,7 +40,7 @@ public class HcRtuData : IReceivedData {
     /// <summary>
     ///     Data
     /// </summary>
-    public byte[] Data { get; private set; } = default!;
+    public byte[] Data { get; private set; } = null!;
 
     /// <summary>
     ///     Create for the data format
@@ -51,13 +51,15 @@ public class HcRtuData : IReceivedData {
         // set header
         DeviceId = values[pos++];
         Code = (CodeTypes)values[pos++];
-
+        // check code
+        if ((byte)((int)Code & (int)CodeTypes.Error) == (byte)CodeTypes.Error)
+            // change code
+            Code = CodeTypes.Error;
         // check function code
         switch (Code) {
             case CodeTypes.ReadHoldingReg:
             case CodeTypes.ReadInputReg:
             case CodeTypes.ReadInfoReg:
-            case CodeTypes.Error:
                 // get length
                 Length = values[pos++];
                 // create values
@@ -74,8 +76,16 @@ public class HcRtuData : IReceivedData {
                 break;
             case CodeTypes.Graph:
             case CodeTypes.GraphRes:
+            case CodeTypes.HighResGraph:
                 // get length
                 Length = (values[pos++] << 8) | values[pos++];
+                // create values
+                Data = new byte[Length];
+
+                break;
+            case CodeTypes.Error:
+                // get length
+                Length = 1;
                 // create values
                 Data = new byte[Length];
 

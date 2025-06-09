@@ -14,6 +14,7 @@ namespace HTool.Device;
 /// </summary>
 [PublicAPI]
 public class HcTcp : ITool {
+    private const int ErrorFrameSize = 9;
     private SimpleTcpClient? Client { get; set; }
     private ConcurrentQueue<byte> ReceiveBuf { get; } = [];
     private RingBuffer AnalyzeBuf { get; } = new(16 * 1024);
@@ -118,8 +119,7 @@ public class HcTcp : ITool {
 
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -147,8 +147,7 @@ public class HcTcp : ITool {
             Client?.Dispose();
             // clear
             Client = null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -173,8 +172,7 @@ public class HcTcp : ITool {
             TransmitRaw?.Invoke(packet);
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -191,16 +189,26 @@ public class HcTcp : ITool {
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.ReadHoldingReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.ReadHoldingReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
         // packet
         return packet.ToArray();
     }
@@ -214,16 +222,26 @@ public class HcTcp : ITool {
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.ReadInputReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.ReadInputReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
         // packet
         return packet.ToArray();
     }
@@ -237,16 +255,26 @@ public class HcTcp : ITool {
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteSingleReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((value >> 8) & 0xFF), (byte)(value & 0xFF)
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteSingleReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((value >> 8) & 0xFF),
+            (byte)(value & 0xFF)
         };
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
         // packet
         return packet.ToArray();
     }
@@ -262,14 +290,27 @@ public class HcTcp : ITool {
         var count = values.Length;
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x00,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)(count * 2)
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x00,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
@@ -277,8 +318,11 @@ public class HcTcp : ITool {
             packet.Add((byte)(value & 0xFF));
         }
 
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
+        // get the length
+        var len = packet.Count - 6;
+        // set the length
+        packet[4] = (byte)((len >> 8) & 0xFF);
+        packet[5] = (byte)(len & 0xFF);
         // packet
         return packet.ToArray();
     }
@@ -299,14 +343,27 @@ public class HcTcp : ITool {
         var count = length / 2;
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)length
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)length
         };
         // add string
         packet.AddRange(str.Select(c => (byte)c));
@@ -314,9 +371,11 @@ public class HcTcp : ITool {
         if (str.Length < length)
             // add dummy data
             packet.AddRange(new byte[length - str.Length]);
-
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
+        // get the length
+        var len = packet.Count - 6;
+        // set the length
+        packet[4] = (byte)((len >> 8) & 0xFF);
+        packet[5] = (byte)(len & 0xFF);
         // packet
         return packet.ToArray();
     }
@@ -328,14 +387,20 @@ public class HcTcp : ITool {
     public byte[] GetInfoRegPacket() {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((DeviceId >> 8) & 0xFF), (byte)(DeviceId & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.ReadInfoReg
+            /*TID   */
+            (byte)((DeviceId >> 8) & 0xFF),
+            (byte)(DeviceId & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.ReadInfoReg
         };
-        // get crc
-        packet.AddRange(Utils.CalculateCrc(packet));
         // packet
         return packet.ToArray();
     }
@@ -408,49 +473,35 @@ public class HcTcp : ITool {
             if (!Enum.IsDefined(typeof(CodeTypes), value) && (value & (int)CodeTypes.Error) != (int)CodeTypes.Error)
                 return;
             // get command
-            var cmd = (CodeTypes)value;
-            // check error
-            if ((value & (int)CodeTypes.Error) == (int)CodeTypes.Error) {
-                // get error command
-                cmd = (CodeTypes)((byte)cmd & 0x7F);
-                // get error code
-                var code = AnalyzeBuf.Available > HeaderSize ? AnalyzeBuf.Peek(HeaderSize) : (byte)0x00;
-                // error invoke
-                ReceivedData?.Invoke(CodeTypes.Error, [DeviceId, (byte)cmd, 0x02, 0x00, code, 0x00, 0x00]);
-                // clear buffer
-                AnalyzeBuf.Clear();
-            }
-            else {
-                // check function code
-                var frame = cmd switch {
-                    // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(1)=DATA_LEN DATA(N)
-                    CodeTypes.ReadHoldingReg or CodeTypes.ReadInputReg or CodeTypes.ReadInfoReg =>
-                        AnalyzeBuf.Peek(HeaderSize) + 9,
-                    // TID(2) PID(2) LEN(2) UID(1) FC(1) ADDR(2) VALUE(2)/COUNT(2)
-                    CodeTypes.WriteSingleReg or CodeTypes.WriteMultiReg => 12,
-                    // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(2)=DATA_LEN DATA(N)
-                    CodeTypes.Graph or CodeTypes.GraphRes =>
-                        ((AnalyzeBuf.Peek(HeaderSize) << 8) | AnalyzeBuf.Peek(HeaderSize + 1)) + 10,
-                    // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(2)=DATA_LEN REV(2) DATA(N)
-                    CodeTypes.HighResGraph =>
-                        ((AnalyzeBuf.Peek(HeaderSize) << 8) | AnalyzeBuf.Peek(HeaderSize + 1)) + 10,
-                    // TID(2) PID(2) LEN(2) UID(1) FC(1) ERROR(1)
-                    CodeTypes.Error => 9,
-                    // exception
-                    _ => throw new ArgumentOutOfRangeException(string.Empty)
-                };
+            var cmd = Enum.IsDefined(typeof(CodeTypes), value) ? (CodeTypes)value : CodeTypes.Error;
+            // check function code
+            var frame = cmd switch {
+                // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(1)=DATA_LEN DATA(N)
+                CodeTypes.ReadHoldingReg or CodeTypes.ReadInputReg or CodeTypes.ReadInfoReg =>
+                    AnalyzeBuf.Peek(HeaderSize) + 9,
+                // TID(2) PID(2) LEN(2) UID(1) FC(1) ADDR(2) VALUE(2)/COUNT(2)
+                CodeTypes.WriteSingleReg or CodeTypes.WriteMultiReg => 12,
+                // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(2)=DATA_LEN DATA(N)
+                CodeTypes.Graph or CodeTypes.GraphRes =>
+                    ((AnalyzeBuf.Peek(HeaderSize) << 8) | AnalyzeBuf.Peek(HeaderSize + 1)) + 10,
+                // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(2)=DATA_LEN REV(2) DATA(N)
+                CodeTypes.HighResGraph =>
+                    ((AnalyzeBuf.Peek(HeaderSize) << 8) | AnalyzeBuf.Peek(HeaderSize + 1)) + 10,
+                // TID(2) PID(2) LEN(2) UID(1) FC(1) ERROR(1)
+                CodeTypes.Error => ErrorFrameSize,
+                // exception
+                _ => throw new ArgumentOutOfRangeException(string.Empty)
+            };
 
-                // check frame length
-                if (AnalyzeBuf.Available < frame)
-                    return;
+            // check frame length
+            if (AnalyzeBuf.Available < frame)
+                return;
 
-                // get packet
-                var packet = AnalyzeBuf.ReadBytes(frame);
-                // update event
-                ReceivedData?.Invoke(cmd, packet);
-            }
-        }
-        finally {
+            // get packet
+            var packet = AnalyzeBuf.ReadBytes(frame);
+            // update event
+            ReceivedData?.Invoke(cmd, packet);
+        } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);
         }

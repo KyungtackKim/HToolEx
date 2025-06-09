@@ -504,7 +504,7 @@
              // check queue
              if (msg is { Activated: true })
                  // check code
-                 if (code == msg.Code) {
+                 if (code == msg.Code || code == CodeTypes.Error) {
                      // set address
                      addr = msg.Address;
                      // try dequeue
