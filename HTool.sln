@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HComm", "HComm\HComm.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HCommEz", "HCommEz\HCommEz.csproj", "{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HToolEz", "HToolEz\HToolEz.csproj", "{B9F5D4BA-6DDC-43F6-84CB-CFF5644280C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -31,6 +33,10 @@ Global
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Debug|x86.ActiveCfg = Debug|x86
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.ActiveCfg = Release|x86
 		{65EFCC1F-2395-34E4-E72E-10CBA1AD9685}.Release|x86.Build.0 = Release|x86
+		{B9F5D4BA-6DDC-43F6-84CB-CFF5644280C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B9F5D4BA-6DDC-43F6-84CB-CFF5644280C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{B9F5D4BA-6DDC-43F6-84CB-CFF5644280C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{B9F5D4BA-6DDC-43F6-84CB-CFF5644280C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
