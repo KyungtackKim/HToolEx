@@ -12,7 +12,8 @@ public class FormatSetNetwork {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [69];
+    [PublicAPI]
+    public static readonly int[] Size = [69, 70];
 
     /// <summary>
     ///     Constructor
@@ -47,7 +48,55 @@ public class FormatSetNetwork {
         CountryType = Convert.ToInt32(bin.ReadByte());
         ManualChannel = Convert.ToInt32(bin.ReadByte());
         Channel = Convert.ToInt32(bin.ReadUInt16());
+        // check revision.1 information
+        if (revision < 1)
+            return;
+        // get revision.1 information
+        UsedDhcp = Convert.ToInt32(bin.ReadByte());
     }
+
+    /// <summary>
+    ///     Check sum
+    /// </summary>
+    [Browsable(false)]
+    [PublicAPI]
+    public int CheckSum { get; set; }
+
+    /// <summary>
+    ///     Get values
+    /// </summary>
+    /// <param name="revision">revision</param>
+    /// <returns>values</returns>
+    [PublicAPI]
+    public byte[] GetValues(int revision = 0) {
+        var values = new List<byte>();
+        // get string values
+        var ssid = Encoding.ASCII.GetBytes(Ssid).ToList();
+        var password = Encoding.ASCII.GetBytes(Password).ToList();
+        // string length offset
+        ssid.AddRange(new byte[32 - Ssid.Length]);
+        password.AddRange(new byte[32 - Password.Length]);
+        // get revision.0 values
+        values.AddRange(ssid);
+        values.AddRange(password);
+        values.Add(Convert.ToByte(BandBy5G));
+        values.Add(Convert.ToByte(CountryType));
+        values.Add(Convert.ToByte(ManualChannel));
+        values.Add(Convert.ToByte((Channel >> 8) & 0xFF));
+        values.Add(Convert.ToByte(Channel & 0xFF));
+        // check revision.1
+        if (revision < 1)
+            // values
+            return values.ToArray();
+        // get revision.1 values
+        values.Add(Convert.ToByte(UsedDhcp));
+        // values
+        return values.ToArray();
+    }
+
+    #region REVISION
+
+    #region REV.0
 
     /// <summary>
     ///     AP SSID
@@ -85,36 +134,13 @@ public class FormatSetNetwork {
     [PublicAPI]
     public int Channel { get; set; }
 
-    /// <summary>
-    ///     Check sum
-    /// </summary>
-    [Browsable(false)]
-    [PublicAPI]
-    public int CheckSum { get; set; }
+    #endregion
 
-    /// <summary>
-    ///     Get values
-    /// </summary>
-    /// <param name="revision">revision</param>
-    /// <returns>values</returns>
-    [PublicAPI]
-    public byte[] GetValues(int revision = 0) {
-        var values = new List<byte>();
-        // get string values
-        var ssid = Encoding.ASCII.GetBytes(Ssid).ToList();
-        var password = Encoding.ASCII.GetBytes(Password).ToList();
-        // string length offset
-        ssid.AddRange(new byte[32 - Ssid.Length]);
-        password.AddRange(new byte[32 - Password.Length]);
-        // get revision.0 values
-        values.AddRange(ssid);
-        values.AddRange(password);
-        values.Add(Convert.ToByte(BandBy5G));
-        values.Add(Convert.ToByte(CountryType));
-        values.Add(Convert.ToByte(ManualChannel));
-        values.Add(Convert.ToByte((Channel >> 8) & 0xFF));
-        values.Add(Convert.ToByte(Channel & 0xFF));
-        // values
-        return values.ToArray();
-    }
+    #region REV.1
+
+    public int UsedDhcp { get; set; }
+
+    #endregion
+
+    #endregion
 }

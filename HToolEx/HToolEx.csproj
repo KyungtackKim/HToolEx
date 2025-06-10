@@ -10,8 +10,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Title>HToolEx</Title>
-        <Version>1.1.15</Version>
-        <PackageVersion>1.1.15</PackageVersion>
+        <Version>1.1.16</Version>
+        <PackageVersion>1.1.16</PackageVersion>
         <PackageProjectUrl>https://github.com/KyungtackKim/HToolEx</PackageProjectUrl>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>
