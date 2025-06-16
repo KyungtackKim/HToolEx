@@ -1,10 +1,8 @@
-﻿namespace HComm.Common
-{
+﻿namespace HComm.Common {
     /// <summary>
     ///     Communicator type
     /// </summary>
-    public enum CommType
-    {
+    public enum CommType {
         None,
         Serial,
         Ethernet,
@@ -14,8 +12,7 @@
     /// <summary>
     ///     Communicator connection types
     /// </summary>
-    public enum ConnectionState
-    {
+    public enum ConnectionState {
         // Connection state
         None,
         Connecting,
@@ -27,8 +24,7 @@
     /// <summary>
     ///     Communicator command
     /// </summary>
-    public enum Command
-    {
+    public enum Command {
         None = 0x00,
         Read = 0x03,
         Mor = 0x04,
@@ -43,9 +39,5 @@
     /// <summary>
     ///     Monitoring event command types
     /// </summary>
-    public enum MonitorCommand
-    {
-        Backup = 0x04,
-        Report = 0x66
-    }
+    public enum MonitorCommand { Backup = 0x04, Report = 0x66 }
 }

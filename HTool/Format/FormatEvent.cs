@@ -35,19 +35,19 @@ public class FormatEvent {
             case GenerationTypes.GenRev1:
             case GenerationTypes.GenRev1Ad:
                 // set values
-                Id = bin.ReadUInt16();
-                Date = DateTime.Now;
-                Time = Date;
-                FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
+                Id           = bin.ReadUInt16();
+                Date         = DateTime.Now;
+                Time         = Date;
+                FastenTime   = bin.ReadUInt16();
+                Preset       = bin.ReadUInt16();
                 TargetTorque = bin.ReadUInt16() / 100.0f;
-                Torque = bin.ReadUInt16() / 100.0f;
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                RemainScrew = bin.ReadUInt16();
-                Error = bin.ReadUInt16();
+                Torque       = bin.ReadUInt16() / 100.0f;
+                Speed        = bin.ReadUInt16();
+                Angle1       = bin.ReadUInt16();
+                Angle2       = bin.ReadUInt16();
+                Angle        = bin.ReadUInt16();
+                RemainScrew  = bin.ReadUInt16();
+                Error        = bin.ReadUInt16();
                 // get direction value
                 val = bin.ReadUInt16();
                 // check defined direction
@@ -61,23 +61,23 @@ public class FormatEvent {
                     // set event status
                     Event = (EventTypes)val;
                 SnugAngle = bin.ReadUInt16();
-                Barcode = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
+                Barcode   = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
                 break;
             case GenerationTypes.GenRev1Plus:
                 // set values
-                Id = bin.ReadUInt16();
-                Date = DateTime.Now;
-                Time = Date;
-                FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
+                Id           = bin.ReadUInt16();
+                Date         = DateTime.Now;
+                Time         = Date;
+                FastenTime   = bin.ReadUInt16();
+                Preset       = bin.ReadUInt16();
                 TargetTorque = bin.ReadUInt16() / 100.0f;
-                Torque = bin.ReadUInt16() / 100.0f;
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                RemainScrew = bin.ReadUInt16();
-                Error = bin.ReadUInt16();
+                Torque       = bin.ReadUInt16() / 100.0f;
+                Speed        = bin.ReadUInt16();
+                Angle1       = bin.ReadUInt16();
+                Angle2       = bin.ReadUInt16();
+                Angle        = bin.ReadUInt16();
+                RemainScrew  = bin.ReadUInt16();
+                Error        = bin.ReadUInt16();
                 // get direction value
                 val = bin.ReadUInt16();
                 // check defined direction
@@ -90,22 +90,22 @@ public class FormatEvent {
                 if (Enum.IsDefined(typeof(EventTypes), (int)val))
                     // set event status
                     Event = (EventTypes)val;
-                SnugAngle = bin.ReadUInt16();
-                SeatingTorque = bin.ReadUInt16() / 100.0f;
-                ClampTorque = bin.ReadUInt16() / 100.0f;
+                SnugAngle        = bin.ReadUInt16();
+                SeatingTorque    = bin.ReadUInt16() / 100.0f;
+                ClampTorque      = bin.ReadUInt16() / 100.0f;
                 PrevailingTorque = bin.ReadUInt16() / 100.0f;
-                SnugTorque = bin.ReadUInt16() / 100.0f;
-                Barcode = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
+                SnugTorque       = bin.ReadUInt16() / 100.0f;
+                Barcode          = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
                 break;
             case GenerationTypes.GenRev2:
                 // set values
                 Revision = $"{bin.ReadByte()}.{bin.ReadByte()}";
-                Id = bin.ReadUInt16();
+                Id       = bin.ReadUInt16();
                 Date = new DateTime(bin.ReadUInt16(), bin.ReadByte(), bin.ReadByte(),
                     bin.ReadByte(), bin.ReadByte(), bin.ReadByte(), bin.ReadByte());
-                Time = Date;
+                Time       = Date;
                 FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
+                Preset     = bin.ReadUInt16();
                 // get unit value
                 val = bin.ReadUInt16();
                 // check defined unit
@@ -126,17 +126,17 @@ public class FormatEvent {
                 if (Enum.IsDefined(typeof(EventTypes), (int)val))
                     // set event status
                     Event = (EventTypes)val;
-                TargetTorque = bin.ReadSingle();
-                Torque = bin.ReadSingle();
-                SeatingTorque = bin.ReadSingle();
-                ClampTorque = bin.ReadSingle();
+                TargetTorque     = bin.ReadSingle();
+                Torque           = bin.ReadSingle();
+                SeatingTorque    = bin.ReadSingle();
+                ClampTorque      = bin.ReadSingle();
                 PrevailingTorque = bin.ReadSingle();
-                SnugTorque = bin.ReadSingle();
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                SnugAngle = bin.ReadUInt16();
+                SnugTorque       = bin.ReadSingle();
+                Speed            = bin.ReadUInt16();
+                Angle1           = bin.ReadUInt16();
+                Angle2           = bin.ReadUInt16();
+                Angle            = bin.ReadUInt16();
+                SnugAngle        = bin.ReadUInt16();
                 // reserved
                 bin.ReadBytes(16);
                 // barcode
@@ -155,11 +155,11 @@ public class FormatEvent {
                     TypeOfChannel2 = (GraphTypes)val;
                 CountOfChannel1 = bin.ReadUInt16();
                 CountOfChannel2 = bin.ReadUInt16();
-                SamplingRate = bin.ReadUInt16();
+                SamplingRate    = bin.ReadUInt16();
                 // check count
                 for (var i = 0; i < GraphSteps.Length; i++) {
                     // get id/index
-                    var id = (GraphStepTypes)bin.ReadUInt16();
+                    var id    = (GraphStepTypes)bin.ReadUInt16();
                     var index = bin.ReadUInt16();
                     // check defined id
                     if (Enum.IsDefined(typeof(GraphStepTypes), id))
@@ -185,7 +185,6 @@ public class FormatEvent {
     ///     Generation type
     /// </summary>
     public GenerationTypes Type { get; set; }
-
 
     /// <summary>
     ///     Event id
@@ -338,7 +337,6 @@ public class FormatEvent {
     /// </summary>
     [Browsable(false)]
     public int CheckSum { get; set; }
-
 
     /// <summary>
     ///     Graph step class

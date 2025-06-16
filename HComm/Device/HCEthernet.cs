@@ -7,33 +7,24 @@ using System.Threading;
 using HComm.Common;
 using SuperSocket.ClientEngine;
 
-namespace HComm.Device
-{
-    public class HcEthernet : IHComm
-    {
+namespace HComm.Device {
+    public class HcEthernet : IHComm {
         private const int ProcessTime = 10;
 
         /// <summary>
         ///     Monitoring acknowledge packet
         /// </summary>
-        public static readonly byte[] MonitorAck =
-        {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x06, 0x0F, 0xB0, 0x00, 0x01
-        };
+        public static readonly byte[] MonitorAck = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x06, 0x0F, 0xB0, 0x00, 0x01 };
 
         /// <summary>
         ///     Monitoring acknowledge graph packet
         /// </summary>
-        public static readonly byte[] MonitorGraphAck =
-        {
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x06, 0x0F, 0xBA, 0x00, 0x01
-        };
+        public static readonly byte[] MonitorGraphAck = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x06, 0x0F, 0xBA, 0x00, 0x01 };
 
         /// <summary>
         ///     HComm ethernet constructor
         /// </summary>
-        public HcEthernet()
-        {
+        public HcEthernet() {
             // set session general event
             Session.Connected += Session_Connected;
             Session.Closed += Session_Closed;
@@ -87,8 +78,7 @@ namespace HComm.Device
         /// <param name="option">port</param>
         /// <param name="id">id</param>
         /// <returns>try connect result</returns>
-        public bool Connect(string target, int option, byte id = 1)
-        {
+        public bool Connect(string target, int option, byte id = 1) {
             var tryIp = IPAddress.TryParse(target, out var ip);
             // check target
             if (!tryIp)
@@ -100,8 +90,7 @@ namespace HComm.Device
             if (id > 0x0F)
                 return false;
 
-            try
-            {
+            try {
                 // try connect
                 Session.Connect(new IPEndPoint(ip, option));
                 MorSession.Connect(new IPEndPoint(ip, option + 1));
@@ -109,9 +98,7 @@ namespace HComm.Device
                 Id = id;
                 // result
                 return true;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // error
                 Console.WriteLine($@"{this}_Connect: {e.Message}");
             }
@@ -123,8 +110,7 @@ namespace HComm.Device
         ///     HComm session close
         /// </summary>
         /// <returns>session close result</returns>
-        public bool Close()
-        {
+        public bool Close() {
             // close
             Session.Close();
             MorSession.Close();
@@ -138,21 +124,17 @@ namespace HComm.Device
         /// <param name="packet">packet</param>
         /// <param name="length">packet length</param>
         /// <returns>result</returns>
-        public bool Write(byte[] packet, int length)
-        {
+        public bool Write(byte[] packet, int length) {
             // check connection
             if (!Session.IsConnected)
                 return false;
 
-            try
-            {
+            try {
                 // write packet
                 Session.Send(packet, 0, length);
                 // result
                 return true;
-            }
-            catch
-            {
+            } catch {
                 return false;
             }
         }
@@ -163,19 +145,20 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count)
-        {
+        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count) {
             // transaction id
             Transaction += 1;
             // packet
-            var packet = new List<byte>
-            {
+            var packet = new List<byte> {
                 // transaction id
-                (byte)((Transaction >> 8) & 0xFF), (byte)(Transaction & 0xFF),
+                (byte)((Transaction >> 8) & 0xFF),
+                (byte)(Transaction & 0xFF),
                 // protocol id
-                0x00, (byte)Id,
+                0x00,
+                (byte)Id,
                 // length
-                0x00, 0x06,
+                0x00,
+                0x06,
                 // unit id
                 0x00,
                 // command
@@ -196,19 +179,20 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="value">value</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value)
-        {
+        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value) {
             // transaction id
             Transaction += 1;
             // packet
-            var packet = new List<byte>
-            {
+            var packet = new List<byte> {
                 // transaction id
-                (byte)((Transaction >> 8) & 0xFF), (byte)(Transaction & 0xFF),
+                (byte)((Transaction >> 8) & 0xFF),
+                (byte)(Transaction & 0xFF),
                 // protocol id
-                0x00, (byte)Id,
+                0x00,
+                (byte)Id,
                 // length
-                0x00, 0x06,
+                0x00,
+                0x06,
                 // unit id
                 0x00,
                 // command
@@ -229,19 +213,20 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetState(ushort addr, ushort count)
-        {
+        public IEnumerable<byte> PacketGetState(ushort addr, ushort count) {
             // transaction id
             Transaction += 1;
             // packet
-            var packet = new List<byte>
-            {
+            var packet = new List<byte> {
                 // transaction id
-                (byte)((Transaction >> 8) & 0xFF), (byte)(Transaction & 0xFF),
+                (byte)((Transaction >> 8) & 0xFF),
+                (byte)(Transaction & 0xFF),
                 // protocol id
-                0x00, (byte)Id,
+                0x00,
+                (byte)Id,
                 // length
-                0x00, 0x06,
+                0x00,
+                0x06,
                 // unit id
                 0x00,
                 // command
@@ -260,19 +245,20 @@ namespace HComm.Device
         ///     HComm device get information packet make
         /// </summary>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetInfo()
-        {
+        public IEnumerable<byte> PacketGetInfo() {
             // transaction id
             Transaction += 1;
             // packet
-            var packet = new List<byte>
-            {
+            var packet = new List<byte> {
                 // transaction id
-                (byte)((Transaction >> 8) & 0xFF), (byte)(Transaction & 0xFF),
+                (byte)((Transaction >> 8) & 0xFF),
+                (byte)(Transaction & 0xFF),
                 // protocol id
-                0x00, (byte)Id,
+                0x00,
+                (byte)Id,
                 // length
-                0x00, 0x02,
+                0x00,
+                0x02,
                 // unit id
                 0x00,
                 // command
@@ -288,13 +274,11 @@ namespace HComm.Device
         /// <param name="addr">not use: address</param>
         /// <param name="count">not use: count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count)
-        {
+        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count) {
             return null;
         }
 
-        private void Session_Connected(object sender, EventArgs e)
-        {
+        private void Session_Connected(object sender, EventArgs e) {
             // get session
             if (!(sender is AsyncTcpSession session))
                 return;
@@ -302,8 +286,7 @@ namespace HComm.Device
             if (!session.IsConnected)
                 return;
             // check session
-            if (session == Session)
-            {
+            if (session == Session) {
                 // check empty
                 while (!ReceiveBuf.IsEmpty)
                     // remove
@@ -317,9 +300,7 @@ namespace HComm.Device
                     ProcessTimer = new Timer(ProcessTimerCallback);
                 // start timer
                 ProcessTimer.Change(ProcessTime, ProcessTime);
-            }
-            else if (session == MorSession)
-            {
+            } else if (session == MorSession) {
                 // check empty
                 while (!MorReceiveBuf.IsEmpty)
                     // remove
@@ -341,8 +322,7 @@ namespace HComm.Device
                 ConnectionChanged?.Invoke(IsConnected = true);
         }
 
-        private void Session_Closed(object sender, EventArgs e)
-        {
+        private void Session_Closed(object sender, EventArgs e) {
             // check sessions state
             if (Session.IsConnected || MorSession.IsConnected)
                 return;
@@ -367,14 +347,12 @@ namespace HComm.Device
             ConnectionChanged?.Invoke(IsConnected = false);
         }
 
-        private void Session_Error(object sender, ErrorEventArgs e)
-        {
+        private void Session_Error(object sender, ErrorEventArgs e) {
             // error
             AckReceived?.Invoke(Command.Error, new byte[] { 0xFF });
         }
 
-        private void SessionDataReceived(object sender, DataEventArgs e)
-        {
+        private void SessionDataReceived(object sender, DataEventArgs e) {
             // get data
             var data = e.Data.Take(e.Length).ToArray();
             // check data
@@ -385,8 +363,7 @@ namespace HComm.Device
             AckRawReceived?.Invoke(data);
         }
 
-        private void MorSessionDataReceived(object sender, DataEventArgs e)
-        {
+        private void MorSessionDataReceived(object sender, DataEventArgs e) {
             // get data
             var data = e.Data.Take(e.Length).ToArray();
             // check data
@@ -395,14 +372,12 @@ namespace HComm.Device
                 MorReceiveBuf.Enqueue(b);
         }
 
-        private void ProcessTimerCallback(object state)
-        {
+        private void ProcessTimerCallback(object state) {
             // check state
             if (state == null)
                 return;
             // try catch finally
-            try
-            {
+            try {
                 // pause timer
                 ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 // enter monitor
@@ -433,8 +408,7 @@ namespace HComm.Device
                 // set command
                 var cmd = (Command)packet[7];
                 // check error
-                if (((byte)cmd & 0xF0) == 0x80)
-                {
+                if (((byte)cmd & 0xF0) == 0x80) {
                     // error
                     AckReceived?.Invoke(Command.Error, packet.Skip(frame - 1).Take(1).ToArray());
                     // remove analyze buffer
@@ -449,14 +423,10 @@ namespace HComm.Device
                 if (AnalyzeBuf.Count >= frame)
                     // remove analyze buffer
                     AnalyzeBuf.RemoveRange(0, frame);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 // clear buffer
                 AnalyzeBuf.Clear();
-            }
-            finally
-            {
+            } finally {
                 // exit monitor
                 Monitor.Exit(AnalyzeBuf);
                 // resume timer
@@ -464,14 +434,12 @@ namespace HComm.Device
             }
         }
 
-        private void MorTimerCallback(object state)
-        {
+        private void MorTimerCallback(object state) {
             // check state
             if (state == null)
                 return;
             // try catch finally
-            try
-            {
+            try {
                 // pause timer
                 MorTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 // enter monitor
@@ -505,14 +473,10 @@ namespace HComm.Device
                 AckMorReceived?.Invoke(cmd, packet.Skip(8).Take(length).ToArray());
                 // remove analyze buffer
                 MorAnalyzeBuf.Clear();
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 // clear buffer
                 MorAnalyzeBuf.Clear();
-            }
-            finally
-            {
+            } finally {
                 // exit monitor
                 Monitor.Exit(MorAnalyzeBuf);
                 // resume timer

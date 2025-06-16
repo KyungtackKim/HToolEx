@@ -12,7 +12,8 @@ public class FormatSystem {
     /// <summary>
     ///     Share information size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [88, 90, 91];
+    [PublicAPI]
+    public static readonly int[] Size = [88, 90, 91];
 
     /// <summary>
     ///     Constructor

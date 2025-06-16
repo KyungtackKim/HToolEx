@@ -6,9 +6,14 @@ namespace HToolEx.ProEx.Type;
 ///     Graph channel types for ParaMon-Pro X
 /// </summary>
 public enum GraphTypes {
-    [Description("None")] None,
-    [Description("Torque")] Torque,
-    [Description("Speed")] Speed,
-    [Description("Angle")] Angle,
-    [Description("Torque / Angle")] TorqueAngle
+    [Description("None")]
+    None,
+    [Description("Torque")]
+    Torque,
+    [Description("Speed")]
+    Speed,
+    [Description("Angle")]
+    Angle,
+    [Description("Torque / Angle")]
+    TorqueAngle
 }

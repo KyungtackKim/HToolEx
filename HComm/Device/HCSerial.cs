@@ -7,10 +7,8 @@ using System.Text;
 using System.Threading;
 using HComm.Common;
 
-namespace HComm.Device
-{
-    public class HcSerial : IHComm
-    {
+namespace HComm.Device {
+    public class HcSerial : IHComm {
         private const int ProcessTime = 10;
         private static readonly int[] BaudRates = { 9600, 19200, 38400, 57600, 115200, 230400 };
         private SerialPort Port { get; } = new SerialPort();
@@ -53,8 +51,7 @@ namespace HComm.Device
         /// <param name="option">baud-rate</param>
         /// <param name="id">id</param>
         /// <returns>result</returns>
-        public bool Connect(string target, int option, byte id = 1)
-        {
+        public bool Connect(string target, int option, byte id = 1) {
             // check target
             if (string.IsNullOrWhiteSpace(target))
                 return false;
@@ -65,8 +62,7 @@ namespace HComm.Device
             if (id > 0x0F)
                 return false;
 
-            try
-            {
+            try {
                 // set com port
                 Port.PortName = target;
                 Port.BaudRate = option;
@@ -91,9 +87,7 @@ namespace HComm.Device
                 ProcessTimer.Change(ProcessTime, ProcessTime);
                 // result
                 return true;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // error
                 Console.WriteLine($@"{this}_Connect: {e.Message}");
             }
@@ -105,8 +99,7 @@ namespace HComm.Device
         ///     HCommInterface serial close
         /// </summary>
         /// <returns>result</returns>
-        public bool Close()
-        {
+        public bool Close() {
             // stop timer
             ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
             // close port
@@ -127,21 +120,17 @@ namespace HComm.Device
         /// <param name="packet">packet</param>
         /// <param name="length">packet length</param>
         /// <returns>result</returns>
-        public bool Write(byte[] packet, int length)
-        {
+        public bool Write(byte[] packet, int length) {
             // check connection
             if (!Port.IsOpen)
                 return false;
 
-            try
-            {
+            try {
                 // write packet
                 Port.Write(packet, 0, length);
                 // result
                 return true;
-            }
-            catch
-            {
+            } catch {
                 return false;
             }
         }
@@ -152,11 +141,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Read,
+        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Read,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((count >> 8) & 0xFF),
@@ -174,11 +162,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="value">value</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Write,
+        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Write,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((value >> 8) & 0xFF),
@@ -196,11 +183,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetState(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Mor,
+        public IEnumerable<byte> PacketGetState(ushort addr, ushort count) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Mor,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((count >> 8) & 0xFF),
@@ -216,12 +202,8 @@ namespace HComm.Device
         ///     HCommInterface serial get info packet make
         /// </summary>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetInfo()
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Info
-            };
+        public IEnumerable<byte> PacketGetInfo() {
+            var packet = new List<byte> { Id, (byte)Command.Info };
             // crc
             packet.AddRange(GetCrc(packet.ToArray()));
             // packet
@@ -234,12 +216,8 @@ namespace HComm.Device
         /// <param name="addr">not use: address</param>
         /// <param name="count">not use: count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.GraphAd, 0x00
-            };
+        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count) {
+            var packet = new List<byte> { Id, (byte)Command.GraphAd, 0x00 };
             // crc
             packet.AddRange(GetCrc(packet.ToArray()));
             // packet
@@ -250,8 +228,7 @@ namespace HComm.Device
         ///     HComm serial get port names
         /// </summary>
         /// <returns>port list</returns>
-        public static IEnumerable<string> GetPortNames()
-        {
+        public static IEnumerable<string> GetPortNames() {
             return SerialPort.GetPortNames();
         }
 
@@ -259,23 +236,19 @@ namespace HComm.Device
         ///     HComm serial get port baud-rates
         /// </summary>
         /// <returns>baud-rate list</returns>
-        public static IEnumerable<int> GetBaudRates()
-        {
+        public static IEnumerable<int> GetBaudRates() {
             return BaudRates;
         }
 
-        private static IEnumerable<byte> GetCrc(IEnumerable<byte> packet)
-        {
+        private static IEnumerable<byte> GetCrc(IEnumerable<byte> packet) {
             var crc = new byte[] { 0xFF, 0xFF };
             ushort crcFull = 0xFFFF;
             // check total packet
-            foreach (var data in packet)
-            {
+            foreach (var data in packet) {
                 // XOR 1 byte
                 crcFull = (ushort)(crcFull ^ data);
                 // cyclic redundancy check
-                for (var j = 0; j < 8; j++)
-                {
+                for (var j = 0; j < 8; j++) {
                     // get LSB
                     var lsb = (ushort)(crcFull & 0x0001);
                     // check AND
@@ -294,8 +267,7 @@ namespace HComm.Device
             return crc;
         }
 
-        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
+        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e) {
             // get data
             var data = Port.Encoding.GetBytes(Port.ReadExisting());
             // check data length
@@ -306,15 +278,13 @@ namespace HComm.Device
             AckRawReceived?.Invoke(data);
         }
 
-        private void ProcessTimerCallback(object state)
-        {
+        private void ProcessTimerCallback(object state) {
             // check state
             if (state == null)
                 return;
 
             // try catch finally
-            try
-            {
+            try {
                 // pause timer
                 ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 // enter monitor
@@ -346,8 +316,7 @@ namespace HComm.Device
                 if (AnalyzeBuf.Count < 4)
                     return;
                 // check command
-                switch (cmd)
-                {
+                switch (cmd) {
                     case Command.Write:
                         // set length
                         length = 8;
@@ -384,13 +353,10 @@ namespace HComm.Device
                 // get crc
                 var crc = GetCrc(packet.Take(length - 2).ToArray()).ToArray();
                 // check crc
-                if (packet.Length < 2 || crc[0] != packet[packet.Length - 2] || crc[1] != packet[packet.Length - 1])
-                {
+                if (packet.Length < 2 || crc[0] != packet[packet.Length - 2] || crc[1] != packet[packet.Length - 1]) {
                     // error
                     AckReceived?.Invoke(Command.Error, new byte[] { 0xFF });
-                }
-                else
-                {
+                } else {
                     // check state
                     if (!IsConnected)
                         // update event
@@ -403,14 +369,10 @@ namespace HComm.Device
                 if (AnalyzeBuf.Count >= length)
                     // remove analyze buffer
                     AnalyzeBuf.RemoveRange(0, length);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 // clear buffer
                 AnalyzeBuf.Clear();
-            }
-            finally
-            {
+            } finally {
                 // exit monitor
                 Monitor.Exit(AnalyzeBuf);
                 // resume timer

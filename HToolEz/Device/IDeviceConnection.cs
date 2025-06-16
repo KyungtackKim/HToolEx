@@ -33,11 +33,4 @@ public interface IDeviceConnection : IAsyncDisposable {
     /// <param name="token">cancellation token</param>
     /// <returns>result</returns>
     ValueTask<bool> SendAsync(ReadOnlyMemory<byte> data, CancellationToken token = default);
-
-    /// <summary>
-    ///     ReceiveAsync from the device
-    /// </summary>
-    /// <param name="token">cancellation token</param>
-    /// <returns>result</returns>
-    IAsyncEnumerable<ReadOnlyMemory<byte>> ReceiveAsync(CancellationToken token = default);
 }

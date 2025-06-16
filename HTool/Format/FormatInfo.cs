@@ -15,12 +15,12 @@ public class FormatInfo {
     /// </summary>
     public FormatInfo() {
         // reset values
-        Id = 0;
+        Id         = 0;
         Controller = 0;
-        Driver = 0;
-        Firmware = 0;
-        Serial = "0000000000";
-        Model = 0;
+        Driver     = 0;
+        Firmware   = 0;
+        Serial     = "0000000000";
+        Model      = 0;
     }
 
     /// <summary>
@@ -38,10 +38,10 @@ public class FormatInfo {
         using var bin = new BinaryReaderBigEndian(stream);
 
         // get values
-        Id = bin.ReadUInt16();
+        Id         = bin.ReadUInt16();
         Controller = bin.ReadUInt16();
-        Driver = bin.ReadUInt16();
-        Firmware = bin.ReadUInt16();
+        Driver     = bin.ReadUInt16();
+        Firmware   = bin.ReadUInt16();
         // get serial raw values
         var s = bin.ReadBytes(5);
         // set serial number

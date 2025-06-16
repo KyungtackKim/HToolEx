@@ -8,6 +8,8 @@ namespace HTool.Type;
 /// </summary>
 [PublicAPI]
 public enum ComTypes {
-    [Description("MODBUS-RTU")] Rtu,
-    [Description("MODBUS-TCP")] Tcp
+    [Description("MODBUS-RTU")]
+    Rtu,
+    [Description("MODBUS-TCP")]
+    Tcp
 }

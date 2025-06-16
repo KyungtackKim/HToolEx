@@ -12,17 +12,20 @@ public class FormatSetLog {
     /// <summary>
     ///     Data field count
     /// </summary>
-    [PublicAPI] public static readonly int[] DataFieldCount = [22, 35, 35];
+    [PublicAPI]
+    public static readonly int[] DataFieldCount = [22, 35, 35];
 
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [27, 56, 63];
+    [PublicAPI]
+    public static readonly int[] Size = [27, 56, 63];
 
     /// <summary>
     ///     Data field
     /// </summary>
-    [PublicAPI] public int[] DataField;
+    [PublicAPI]
+    public int[] DataField;
 
     /// <summary>
     ///     Constructor

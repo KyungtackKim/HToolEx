@@ -50,7 +50,7 @@ public class HcRtuData : IReceivedData {
         var pos = 0;
         // set header
         DeviceId = values[pos++];
-        Code = (CodeTypes)values[pos++];
+        Code     = (CodeTypes)values[pos++];
         // check code
         if ((byte)((int)Code & (int)CodeTypes.Error) == (byte)CodeTypes.Error)
             // change code

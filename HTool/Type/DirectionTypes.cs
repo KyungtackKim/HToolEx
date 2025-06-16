@@ -8,6 +8,8 @@ namespace HTool.Type;
 /// </summary>
 [PublicAPI]
 public enum DirectionTypes {
-    [Description("Fastening")] Fastening,
-    [Description("Loosening")] Loosening
+    [Description("Fastening")]
+    Fastening,
+    [Description("Loosening")]
+    Loosening
 }

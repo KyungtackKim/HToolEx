@@ -12,12 +12,14 @@ public class FormatSetIoToolName {
     /// <summary>
     ///     I/O tool count
     /// </summary>
-    [PublicAPI] public static readonly int[] ToolCount = [8];
+    [PublicAPI]
+    public static readonly int[] ToolCount = [8];
 
     /// <summary>
     ///     I/O Tool name size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [256];
+    [PublicAPI]
+    public static readonly int[] Size = [256];
 
     /// <summary>
     ///     Constructor

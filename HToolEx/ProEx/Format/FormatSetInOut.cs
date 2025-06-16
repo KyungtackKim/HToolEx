@@ -12,49 +12,77 @@ public class FormatSetInOut {
     ///     Input function types
     /// </summary>
     public enum SetInputTypes {
-        [Description("Disable")] Disable,
-        [Description("Job selection 1")] JobSelect1,
-        [Description("Job selection 2")] JobSelect2,
-        [Description("Job selection 3")] JobSelect3,
-        [Description("Job selection 4")] JobSelect4,
-        [Description("Job selection 5")] JobSelect5,
-        [Description("Job selection 6")] JobSelect6,
-        [Description("Job selection 7")] JobSelect7,
-        [Description("Job selection 8")] JobSelect8,
-        [Description("Skip")] Skip,
-        [Description("Back")] Back,
-        [Description("Step reset")] StepReset,
-        [Description("Job reset")] JobReset,
-        [Description("Next job")] NextJob,
-        [Description("Previous job")] PreviousJob,
-        [Description("Tool alarm reset")] AlarmReset,
-        [Description("Emergency lock")] EmergencyLock
+        [Description("Disable")]
+        Disable,
+        [Description("Job selection 1")]
+        JobSelect1,
+        [Description("Job selection 2")]
+        JobSelect2,
+        [Description("Job selection 3")]
+        JobSelect3,
+        [Description("Job selection 4")]
+        JobSelect4,
+        [Description("Job selection 5")]
+        JobSelect5,
+        [Description("Job selection 6")]
+        JobSelect6,
+        [Description("Job selection 7")]
+        JobSelect7,
+        [Description("Job selection 8")]
+        JobSelect8,
+        [Description("Skip")]
+        Skip,
+        [Description("Back")]
+        Back,
+        [Description("Step reset")]
+        StepReset,
+        [Description("Job reset")]
+        JobReset,
+        [Description("Next job")]
+        NextJob,
+        [Description("Previous job")]
+        PreviousJob,
+        [Description("Tool alarm reset")]
+        AlarmReset,
+        [Description("Emergency lock")]
+        EmergencyLock
     }
 
     /// <summary>
     ///     Output function types
     /// </summary>
     public enum SetOutputTypes {
-        [Description("Disable")] Disable,
-        [Description("Fastening OK")] FastenOk,
-        [Description("Fastening NG")] FastenNg,
-        [Description("Step OK")] StepOk,
-        [Description("Step NG")] StepNg,
-        [Description("Job OK")] JobOk,
-        [Description("Job NG")] JobNg,
-        [Description("Ready (Continuous)")] SystemReady,
-        [Description("Alarm (Continuous)")] Alarm
+        [Description("Disable")]
+        Disable,
+        [Description("Fastening OK")]
+        FastenOk,
+        [Description("Fastening NG")]
+        FastenNg,
+        [Description("Step OK")]
+        StepOk,
+        [Description("Step NG")]
+        StepNg,
+        [Description("Job OK")]
+        JobOk,
+        [Description("Job NG")]
+        JobNg,
+        [Description("Ready (Continuous)")]
+        SystemReady,
+        [Description("Alarm (Continuous)")]
+        Alarm
     }
 
     /// <summary>
     ///     Input/Output port count
     /// </summary>
-    [PublicAPI] public static readonly int Port = 16;
+    [PublicAPI]
+    public static readonly int Port = 16;
 
     /// <summary>
     ///     Input/Output setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [96];
+    [PublicAPI]
+    public static readonly int[] Size = [96];
 
     /// <summary>
     ///     Constructor

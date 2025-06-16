@@ -70,8 +70,7 @@ public class FtpManager {
 
             // set result
             res = true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // set error
             error = e.Message;
             // dispose
@@ -100,8 +99,7 @@ public class FtpManager {
             Client?.Dispose();
             // clear
             Client = null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -115,8 +113,11 @@ public class FtpManager {
     /// <param name="mode">mode</param>
     /// <param name="block">block list</param>
     /// <returns>result</returns>
-    public async Task<bool> DownloadFilesAsync(string local, string remote,
-        FtpFolderSyncMode mode = FtpFolderSyncMode.Mirror, List<string>? block = null) {
+    public async Task<bool> DownloadFilesAsync(
+        string local,
+        string remote,
+        FtpFolderSyncMode mode = FtpFolderSyncMode.Mirror,
+        List<string>? block = null) {
         // check client
         if (Client == null)
             return false;
@@ -139,8 +140,7 @@ public class FtpManager {
                 FtpVerify.OnlyChecksum, rules, progress, Token);
             // result
             return !res.Any(x => x.IsFailed);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }
@@ -156,8 +156,11 @@ public class FtpManager {
     /// <param name="mode">mode</param>
     /// <param name="exists">exists</param>
     /// <returns>result</returns>
-    public async Task<bool> UploadFilesAsync(string local, string remote,
-        FtpFolderSyncMode mode = FtpFolderSyncMode.Update, FtpRemoteExists exists = FtpRemoteExists.Overwrite) {
+    public async Task<bool> UploadFilesAsync(
+        string local,
+        string remote,
+        FtpFolderSyncMode mode = FtpFolderSyncMode.Update,
+        FtpRemoteExists exists = FtpRemoteExists.Overwrite) {
         // check client
         if (Client == null)
             return false;
@@ -174,8 +177,7 @@ public class FtpManager {
                 Token);
             // result
             return !res.Any(x => x.IsFailed);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }
@@ -190,7 +192,9 @@ public class FtpManager {
     /// <param name="remote">remote path</param>
     /// <param name="exists">exists</param>
     /// <returns>result</returns>
-    public async Task<bool> UploadFileAsync(string local, string remote,
+    public async Task<bool> UploadFileAsync(
+        string local,
+        string remote,
         FtpRemoteExists exists = FtpRemoteExists.Overwrite) {
         // check client
         if (Client == null)
@@ -207,8 +211,7 @@ public class FtpManager {
             var res = await Client.UploadFile(local, remote, exists, true, FtpVerify.OnlyChecksum, progress, Token);
             // result
             return res != FtpStatus.Failed;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }
@@ -234,15 +237,13 @@ public class FtpManager {
             await Client.DeleteFile(file, Token);
             // result
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }
 
         return false;
     }
-
 
     /// <summary>
     ///     Set chmod the file
@@ -267,8 +268,7 @@ public class FtpManager {
             await Client.Chmod(file, permission, Token);
             // result
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }
@@ -298,8 +298,7 @@ public class FtpManager {
             await Client.Rename(file, newFile, Token);
             // result
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // debug
             Console.WriteLine(e.Message);
         }

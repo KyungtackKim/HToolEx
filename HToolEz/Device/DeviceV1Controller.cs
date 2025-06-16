@@ -7,9 +7,7 @@ namespace HToolEz.Device;
 ///     Device(EZtorQ-III) control management class
 /// </summary>
 public sealed class DeviceV1Controller : IDeviceController {
-    private static readonly byte[] Header = [0x5A, 0xA5];
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public ReadOnlyMemory<byte> Build(DeviceCommandTypes command, object? payload = null) {
         return command switch {
             DeviceCommandTypes.ReqCalData or DeviceCommandTypes.ReqCalTerminate or DeviceCommandTypes.ReqSetData => BuildSimple(command),
@@ -23,8 +21,8 @@ public sealed class DeviceV1Controller : IDeviceController {
         // create buffer
         Span<byte> buffer = stackalloc byte[5];
         // set the data
-        buffer[0] = Header[0];
-        buffer[1] = Header[1];
+        buffer[0] = DeviceProtocolConstants.Header[0];
+        buffer[1] = DeviceProtocolConstants.Header[1];
         buffer[2] = 0x01;
         buffer[3] = 0x00;
         buffer[4] = (byte)command;
@@ -36,8 +34,8 @@ public sealed class DeviceV1Controller : IDeviceController {
         // create buffer
         Span<byte> buffer = stackalloc byte[7];
         // set the data
-        buffer[0] = Header[0];
-        buffer[1] = Header[1];
+        buffer[0] = DeviceProtocolConstants.Header[0];
+        buffer[1] = DeviceProtocolConstants.Header[1];
         buffer[2] = 0x03;
         buffer[3] = 0x00;
         buffer[4] = (byte)DeviceCommandTypes.ReqCalSetPoint;
@@ -54,8 +52,8 @@ public sealed class DeviceV1Controller : IDeviceController {
         // get the length
         var length = CalibrationData.Size[(int)data.Body] - 4;
         // set the data
-        buffer[0] = Header[0];
-        buffer[1] = Header[1];
+        buffer[0] = DeviceProtocolConstants.Header[0];
+        buffer[1] = DeviceProtocolConstants.Header[1];
         buffer[2] = (byte)((length >> 0) & 0xFF);
         buffer[3] = (byte)((length >> 8) & 0xFF);
         buffer[4] = (byte)DeviceCommandTypes.ReqCalSave;

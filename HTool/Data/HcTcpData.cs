@@ -60,10 +60,10 @@ public class HcTcpData : IReceivedData {
         var pos = 0;
         // set header
         TransactionId = (values[pos++] << 8) | values[pos++];
-        ProtocolId = (values[pos++] << 8) | values[pos++];
-        FrameLength = (values[pos++] << 8) | values[pos++];
-        UnitId = values[pos++];
-        Code = (CodeTypes)values[pos++];
+        ProtocolId    = (values[pos++] << 8) | values[pos++];
+        FrameLength   = (values[pos++] << 8) | values[pos++];
+        UnitId        = values[pos++];
+        Code          = (CodeTypes)values[pos++];
         // check code
         if ((byte)((int)Code & (int)CodeTypes.Error) == (byte)CodeTypes.Error)
             // change code

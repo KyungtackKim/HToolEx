@@ -12,7 +12,8 @@ public class FormatSetSound {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [512];
+    [PublicAPI]
+    public static readonly int[] Size = [512];
 
     /// <summary>
     ///     Constructor

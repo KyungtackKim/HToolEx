@@ -12,7 +12,8 @@ public class FormatSetOperation {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [178, 220, 221, 504, 506];
+    [PublicAPI]
+    public static readonly int[] Size = [178, 220, 221, 504, 506];
 
     /// <summary>
     ///     Constructor

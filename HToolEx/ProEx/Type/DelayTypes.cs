@@ -5,6 +5,8 @@
 /// </summary>
 public enum DelayTypes {
     Time,
-    [Obsolete("Support Rev.0 only")] PopUp,
-    [Obsolete("Support Rev.0 only")] Barcode
+    [Obsolete("Support Rev.0 only")]
+    PopUp,
+    [Obsolete("Support Rev.0 only")]
+    Barcode
 }

@@ -8,8 +8,8 @@ namespace HTool.Util;
 [PublicAPI]
 public class RingBuffer {
     private readonly byte[] _buffer;
-    private int _readPos;
-    private int _writePos;
+    private          int    _readPos;
+    private          int    _writePos;
 
     /// <summary>
     ///     Constructor
@@ -104,7 +104,7 @@ public class RingBuffer {
     /// </summary>
     public void Clear() {
         // reset positions
-        _readPos = 0;
+        _readPos  = 0;
         _writePos = 0;
     }
 }

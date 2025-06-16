@@ -8,13 +8,22 @@ namespace HTool.Type;
 /// </summary>
 [PublicAPI]
 public enum GraphTypes {
-    [Description("None")] None,
-    [Description("Torque")] Torque,
-    [Description("Current")] Current,
-    [Description("Speed")] Speed,
-    [Description("Angle")] Angle,
-    [Description("Speed command")] SpeedCmd,
-    [Description("Current command")] CurrentCmd,
-    [Description("Snug angle")] SnugAngle,
-    [Description("Torque / Angle")] TorqueAngle
+    [Description("None")]
+    None,
+    [Description("Torque")]
+    Torque,
+    [Description("Current")]
+    Current,
+    [Description("Speed")]
+    Speed,
+    [Description("Angle")]
+    Angle,
+    [Description("Speed command")]
+    SpeedCmd,
+    [Description("Current command")]
+    CurrentCmd,
+    [Description("Snug angle")]
+    SnugAngle,
+    [Description("Torque / Angle")]
+    TorqueAngle
 }

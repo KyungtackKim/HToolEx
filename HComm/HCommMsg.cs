@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using HComm.Common;
 
-namespace HComm
-{
+namespace HComm {
     /// <summary>
     ///     HCommInterface message send struct
     /// </summary>
-    public class HCommMsg
-    {
+    public class HCommMsg {
         /// <summary>
         ///     HCommInterface send message constructor
         /// </summary>
@@ -17,8 +15,7 @@ namespace HComm
         /// <param name="count">Count</param>
         /// <param name="packet">Packet</param>
         /// <param name="retry">Retry count</param>
-        public HCommMsg(Command cmd, int addr, int count, IEnumerable<byte> packet, int retry = 1)
-        {
+        public HCommMsg(Command cmd, int addr, int count, IEnumerable<byte> packet, int retry = 1) {
             Command = cmd;
             Address = addr;
             Count = count;

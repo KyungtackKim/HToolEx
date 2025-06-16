@@ -272,8 +272,7 @@ public partial class FormatEvent {
             CountOfChannel2 = countCh2;
             SamplingRate = sample;
             Barcode = data[Count - 1];
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // set error
             msg = e.Message;
         }

@@ -8,10 +8,16 @@ namespace HToolEx.ProEx.Type;
 /// </summary>
 [PublicAPI]
 public enum JobStepTypes {
-    [Description("Fastening")] Fastening,
-    [Description("Input")] Input,
-    [Description("Output")] Output,
-    [Description("Delay")] Delay,
-    [Description("Message")] Message,
-    [Description("ID")] Id
+    [Description("Fastening")]
+    Fastening,
+    [Description("Input")]
+    Input,
+    [Description("Output")]
+    Output,
+    [Description("Delay")]
+    Delay,
+    [Description("Message")]
+    Message,
+    [Description("ID")]
+    Id
 }

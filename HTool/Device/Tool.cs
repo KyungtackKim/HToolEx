@@ -17,7 +17,7 @@ public class Tool {
         return type switch {
             ComTypes.Rtu => new HcRtu(),
             ComTypes.Tcp => new HcTcp(),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            _            => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 }

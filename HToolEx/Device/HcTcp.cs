@@ -106,8 +106,7 @@ public class HcTcp : IHComm {
 
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -135,8 +134,7 @@ public class HcTcp : IHComm {
             Client?.Dispose();
             // clear
             Client = null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -159,8 +157,7 @@ public class HcTcp : IHComm {
             Client.Send(packet);
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -178,13 +175,25 @@ public class HcTcp : IHComm {
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((id >> 8) & 0xFF), (byte)(id & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.ReadHoldingReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            (byte)((id >> 8) & 0xFF),
+            (byte)(id & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.ReadHoldingReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -200,13 +209,25 @@ public class HcTcp : IHComm {
     public byte[] GetReadInputRegPacket(ushort addr, ushort count, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((id >> 8) & 0xFF), (byte)(id & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.ReadInputReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            (byte)((id >> 8) & 0xFF),
+            (byte)(id & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.ReadInputReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -222,13 +243,25 @@ public class HcTcp : IHComm {
     public byte[] SetSingleRegPacket(ushort addr, ushort value, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((id >> 8) & 0xFF), (byte)(id & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteSingleReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((value >> 8) & 0xFF), (byte)(value & 0xFF)
+            /*TID   */
+            (byte)((id >> 8) & 0xFF),
+            (byte)(id & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteSingleReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((value >> 8) & 0xFF),
+            (byte)(value & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -246,14 +279,27 @@ public class HcTcp : IHComm {
         var count = values.Length;
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((id >> 8) & 0xFF), (byte)(id & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x00,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)(count * 2)
+            /*TID   */
+            (byte)((id >> 8) & 0xFF),
+            (byte)(id & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x00,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
@@ -288,14 +334,27 @@ public class HcTcp : IHComm {
         var count = length / 2;
         // create packet
         var packet = new List<byte> {
-            /*TID   */(byte)((id >> 8) & 0xFF), (byte)(id & 0xFF),
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */0x00,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)length
+            /*TID   */
+            (byte)((id >> 8) & 0xFF),
+            (byte)(id & 0xFF),
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            0x00,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)length
         };
         // add string
         packet.AddRange(str.Select(c => (byte)c));
@@ -384,17 +443,11 @@ public class HcTcp : IHComm {
                 // error invoke
                 ReceivedMsg?.Invoke(CodeTypes.Error, new byte[] {
                     // (byte)((TransactionId >> 8) & 0xFF), (byte)(TransactionId & 0xFF),   // NOT USE
-                    0x00, 0x00,
-                    0x00, 0x00,
-                    0x00, 0x06,
-                    0x00, (byte)cmd,
-                    0x00, code,
-                    0x00, 0x00
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, (byte)cmd, 0x00, code, 0x00, 0x00
                 });
                 // clear buffer
                 AnalyzeBuf.Clear();
-            }
-            else {
+            } else {
                 int frame;
                 // check function code
                 switch (cmd) {
@@ -439,8 +492,7 @@ public class HcTcp : IHComm {
                 // reset analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
-        }
-        finally {
+        } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);
         }

@@ -1,10 +1,10 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
 using System.IO.Ports;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
 using HToolEz.Defines.Enums;
+using HToolEz.Utils;
 
 namespace HToolEz.Device;
 
@@ -17,6 +17,7 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
     private readonly CancellationTokenSource _cts;
     private readonly SerialPort _port;
     private bool _isDisconnected;
+    private Task? _processTask;
     private Task? _receiveTask;
 
     /// <summary>
@@ -39,8 +40,6 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
         _cts.Dispose();
         // reset disconnected
         _isDisconnected = false;
-        // finalize
-        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc />
@@ -73,6 +72,7 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
             ConnectionState = DeviceConnectionTypes.Connected;
             // start the task
             _receiveTask = Task.Run(ReadLoopAsync, _cts.Token);
+            _processTask = Task.Run(ProcessLoopAsync, _cts.Token);
             // success
             return Task.FromResult(true);
         } catch (Exception ex) {
@@ -102,6 +102,9 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
             if (_receiveTask != null)
                 // wait the task
                 await _receiveTask.ConfigureAwait(false);
+            if (_processTask != null)
+                // wait the task
+                await _processTask.ConfigureAwait(false);
         } catch (Exception ex) {
             // debug
             Debug.WriteLine(ex.Message);
@@ -137,15 +140,6 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
         return false;
     }
 
-    /// <inheritdoc />
-    public async IAsyncEnumerable<ReadOnlyMemory<byte>> ReceiveAsync([EnumeratorCancellation] CancellationToken token = default) {
-        // wait to read async
-        while (await _channel.Reader.WaitToReadAsync(token).ConfigureAwait(false))
-        while (_channel.Reader.TryRead(out var data))
-            // return the data
-            yield return data;
-    }
-
     private async Task ReadLoopAsync() {
         // rent a pool
         var buffer = ArrayPool<byte>.Shared.Rent(4096);
@@ -178,6 +172,59 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
             ArrayPool<byte>.Shared.Return(buffer);
             // complete the writer
             _channel.Writer.TryComplete();
+        }
+    }
+
+    private async Task ProcessLoopAsync() {
+        // try catch
+        try {
+            // buffer
+            var buffer = new CircularBuffer<byte>(4096);
+
+            // wait to read async
+            while (await _channel.Reader.WaitToReadAsync(_cts.Token).ConfigureAwait(false))
+            while (_channel.Reader.TryRead(out var data)) {
+                // add data
+                buffer.EnqueueRange(data.Span);
+                // check data
+                while (true) {
+                    // check length
+                    if (buffer.Count < 4)
+                        break;
+                    // check header 0x5A
+                    if (buffer[0] != DeviceProtocolConstants.Header[0]) {
+                        // remove
+                        buffer.Dequeue();
+                        // break
+                        continue;
+                    }
+
+                    // check header 0xA5
+                    if (buffer[1] != DeviceProtocolConstants.Header[1]) {
+                        // remove
+                        buffer.Dequeue();
+                        // break
+                        continue;
+                    }
+
+                    // get length
+                    var length = buffer[2] | (buffer[3] << 8);
+                    var frame = length + DeviceProtocolConstants.Header.Length + 2;
+                    // check length
+                    if (buffer.Count < frame)
+                        break;
+
+                    // create the packet
+                    var packet = new byte[frame];
+                    // copy the data
+                    buffer.DequeueRange(packet);
+
+                    // TODO : event invoke
+                }
+            }
+        } catch (Exception ex) {
+            // debug
+            Debug.WriteLine(ex.Message);
         }
     }
 }

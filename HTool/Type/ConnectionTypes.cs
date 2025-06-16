@@ -8,7 +8,10 @@ namespace HTool.Type;
 /// </summary>
 [PublicAPI]
 public enum ConnectionTypes {
-    [Description("Closed")] Close,
-    [Description("Connecting")] Connecting,
-    [Description("Connected")] Connected
+    [Description("Closed")]
+    Close,
+    [Description("Connecting")]
+    Connecting,
+    [Description("Connected")]
+    Connected
 }

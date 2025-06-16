@@ -158,8 +158,7 @@ public class HCommEx {
             MessageTimer.Start();
 
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -376,8 +375,7 @@ public class HCommEx {
                     CommState = ConnectionStateTypes.Connected;
                     // connection changed event
                     ConnectionState?.Invoke(true);
-                }
-                else {
+                } else {
                     // enqueue message
                     EnqueueMsg(new HCommMsg(CodeTypes.ReadInputReg, 1,
                         Comm.GetReadInputRegPacket(1, FormatInfo.Count, Comm.DeviceId)));
@@ -438,8 +436,7 @@ public class HCommEx {
             Console.WriteLine($"Timeout message: {queue.CodeTypes}, {queue.Address}");
             // try dequeue
             MessageQue.TryDequeue(out _);
-        }
-        else {
+        } else {
             // get packet array
             var packet = queue.Packet.ToArray();
             // write packet

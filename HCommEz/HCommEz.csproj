@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>1.0.0.4</Version>
+        <Version>1.0.0.6</Version>
         <Company>Hantas</Company>
         <Authors>Eloiz</Authors>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -10,14 +10,14 @@
         <Copyright>Copyright 2022. Hantas all right reserved.</Copyright>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageIconUrl/>
-        <AssemblyVersion>1.0.0.4</AssemblyVersion>
-        <FileVersion>1.0.0.4</FileVersion>
+        <PackageIconUrl />
+        <AssemblyVersion>1.0.0.6</AssemblyVersion>
+        <FileVersion>1.0.0.6</FileVersion>
         <Description>Hantas torque meter device communication library</Description>
-        <PackageVersion>1.0.0.4</PackageVersion>
+        <PackageVersion>1.0.0.6</PackageVersion>
         <ApplicationIcon>icon.ico</ApplicationIcon>
-        <Win32Resource/>
-        <Platforms>AnyCPU;x86</Platforms>
+        <Win32Resource />
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,12 +28,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Device\"/>
-        <Folder Include="WCL\"/>
+        <Folder Include="Device\" />
+        <Folder Include="WCL\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.IO.Ports" Version="4.7.0"/>
+        <PackageReference Include="System.IO.Ports" Version="9.0.6" />
     </ItemGroup>
 
     <ItemGroup>

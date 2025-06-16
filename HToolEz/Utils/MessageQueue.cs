@@ -103,7 +103,7 @@ public sealed class MessageQueue<TRequest> : IDisposable where TRequest : IMessa
         // check the packet in the message
         if (msg.Packet == null)
             // throw exception
-            throw new ArgumentException(@"Packet data cannot be null.", nameof(msg));
+            throw new ArgumentException("Packet data cannot be null.", nameof(msg));
 
         // check the hash
         if (msg.Sum == 0)

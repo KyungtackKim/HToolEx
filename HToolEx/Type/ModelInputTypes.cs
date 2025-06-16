@@ -6,9 +6,14 @@ namespace HToolEx.Type;
 ///     Model input function types
 /// </summary>
 public enum ModelInputTypes {
-    [Description("None")] None,
-    [Description("Active High")] ActiveHigh,
-    [Description("Active Low")] ActiveLow,
-    [Description("Status High")] StatusHigh,
-    [Description("Status Low")] StatusLow
+    [Description("None")]
+    None,
+    [Description("Active High")]
+    ActiveHigh,
+    [Description("Active Low")]
+    ActiveLow,
+    [Description("Status High")]
+    StatusHigh,
+    [Description("Status Low")]
+    StatusLow
 }

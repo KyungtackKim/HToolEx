@@ -136,8 +136,7 @@ public class HCommProEx {
             if (!ftp.result) {
                 // disconnect session
                 Session.Disconnect();
-            }
-            else {
+            } else {
                 // set event
                 Session.ReceivedMsg += OnReceivedMsg;
                 // clear queue
@@ -390,8 +389,7 @@ public class HCommProEx {
             ProcessTimer.Dispose();
             // clear timer
             ProcessTimer = null!;
-        }
-        else {
+        } else {
             // check empty queue
             if (MessageQue.Count() == 0) {
                 // check request member tools time
@@ -570,10 +568,13 @@ public class HCommProEx {
                 // check job event id
                 if (jobData.Id > 0)
                     // request event data
-                    RequestMessage(CreateRequestPacket(MessageIdTypes.OldEventRequest, values: [
-                        (byte)((jobData.Id >> 24) & 0xFF), (byte)((jobData.Id >> 16) & 0xFF),
-                        (byte)((jobData.Id >> 8) & 0xFF), (byte)(jobData.Id & 0xFF)
-                    ]));
+                    RequestMessage(CreateRequestPacket(MessageIdTypes.OldEventRequest,
+                        values: [
+                            (byte)((jobData.Id >> 24) & 0xFF),
+                            (byte)((jobData.Id >> 16) & 0xFF),
+                            (byte)((jobData.Id >> 8) & 0xFF),
+                            (byte)(jobData.Id & 0xFF)
+                        ]));
 
                 break;
             case MessageIdTypes.LastEvent:
@@ -586,10 +587,13 @@ public class HCommProEx {
                 // check message id
                 if (msg.Header?.Id == MessageIdTypes.LastEvent) {
                     // create message
-                    var ackEvent = CreateRequestPacket(MessageIdTypes.LastEventAcknowledge, values: [
-                        (byte)((eventData.Id >> 24) & 0xFF), (byte)((eventData.Id >> 16) & 0xFF),
-                        (byte)((eventData.Id >> 8) & 0xFF), (byte)(eventData.Id & 0xFF)
-                    ]);
+                    var ackEvent = CreateRequestPacket(MessageIdTypes.LastEventAcknowledge,
+                        values: [
+                            (byte)((eventData.Id >> 24) & 0xFF),
+                            (byte)((eventData.Id >> 16) & 0xFF),
+                            (byte)((eventData.Id >> 8) & 0xFF),
+                            (byte)(eventData.Id & 0xFF)
+                        ]);
                     // not acknowledge state
                     ackEvent.IsNotAck = true;
                     // acknowledge
@@ -635,13 +639,25 @@ public class HCommProEx {
             // set message
             Message = new FormatMessage([
                 // length
-                (byte)((length >> 8) & 0xFF), (byte)(length & 0xFF),
+                (byte)((length >> 8) & 0xFF),
+                (byte)(length & 0xFF),
                 // message id
-                (byte)(((int)id >> 8) & 0xFF), (byte)((int)id & 0xFF),
+                (byte)(((int)id >> 8) & 0xFF),
+                (byte)((int)id & 0xFF),
                 // revision
-                (byte)((revision >> 8) & 0xFF), (byte)(revision & 0xFF),
+                (byte)((revision >> 8) & 0xFF),
+                (byte)(revision & 0xFF),
                 // dummy
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00
             ])
         };
         // check values

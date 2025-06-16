@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HComm.Common
-{
+namespace HComm.Common {
     /// <summary>
     ///     HCommInterface acknowledge delegate
     /// </summary>
@@ -25,8 +24,7 @@ namespace HComm.Common
     /// </summary>
     public delegate void ChangedConnection(bool state);
 
-    public interface IHComm
-    {
+    public interface IHComm {
         /// <summary>
         ///     HCommInterface connection state
         /// </summary>

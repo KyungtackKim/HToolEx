@@ -119,8 +119,7 @@ public class SessionManager {
             ProcessTimer.Start();
             // set result
             res = true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // set error
             error = e.Message;
             // dispose
@@ -154,8 +153,7 @@ public class SessionManager {
             Client?.Dispose();
             // clear
             Client = null;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -180,8 +178,7 @@ public class SessionManager {
             Client.Send(values);
             // result
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Console.WriteLine(e.Message);
         }
 
@@ -273,8 +270,7 @@ public class SessionManager {
                 AnalyzeBuf.Clear();
             // update event
             ReceivedMsg?.Invoke(msg);
-        }
-        finally {
+        } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);
         }

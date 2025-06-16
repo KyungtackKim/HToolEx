@@ -12,7 +12,8 @@ public class FormatSetBarcode {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [130];
+    [PublicAPI]
+    public static readonly int[] Size = [130];
 
     /// <summary>
     ///     Constructor

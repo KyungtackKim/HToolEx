@@ -15,7 +15,7 @@ public static class Utils {
     /// <returns>result</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static IEnumerable<byte> CalculateCrc(IEnumerable<byte> packet) {
-        var crc = new byte[] { 0xFF, 0xFF };
+        var    crc     = new byte[] { 0xFF, 0xFF };
         ushort crcFull = 0xFFFF;
         // check total packet
         foreach (var data in packet) {
@@ -36,7 +36,7 @@ public static class Utils {
 
         // set CRC
         crc[1] = (byte)((crcFull >> 8) & 0xFF);
-        crc[0] = (byte)(crcFull & 0xFF);
+        crc[0] = (byte)(crcFull        & 0xFF);
 
         // result
         return crc;
@@ -61,8 +61,8 @@ public static class Utils {
     /// <returns>converted torque</returns>
     public static float ConvertToUnit(float value, UnitTypes src, UnitTypes dst) {
         // const value for unit N.m
-        const float nCm = 100.0f;
-        const float kgfM = 0.101971621f;
+        const float nCm   = 100.0f;
+        const float kgfM  = 0.101971621f;
         const float kgfCm = 10.1971621f;
         const float lbfIn = 8.85074579f;
         const float lbfFt = 0.737562149f;
@@ -78,24 +78,24 @@ public static class Utils {
         // convert source to N.m
         var valueInNm = src switch {
             UnitTypes.KgfCm => value / kgfCm,
-            UnitTypes.KgfM => value / kgfM,
-            UnitTypes.Nm => value,
-            UnitTypes.NCm => value / nCm,
+            UnitTypes.KgfM  => value / kgfM,
+            UnitTypes.Nm    => value,
+            UnitTypes.NCm   => value / nCm,
             UnitTypes.LbfIn => value / lbfIn,
             UnitTypes.OzfIn => value / ozfIn,
             UnitTypes.LbfFt => value / lbfFt,
-            _ => value
+            _               => value
         };
         // convert N.m to destination
         return dst switch {
             UnitTypes.KgfCm => valueInNm * kgfCm,
-            UnitTypes.KgfM => valueInNm * kgfM,
-            UnitTypes.Nm => valueInNm,
-            UnitTypes.NCm => valueInNm * nCm,
+            UnitTypes.KgfM  => valueInNm * kgfM,
+            UnitTypes.Nm    => valueInNm,
+            UnitTypes.NCm   => valueInNm * nCm,
             UnitTypes.LbfIn => valueInNm * lbfIn,
             UnitTypes.OzfIn => valueInNm * ozfIn,
             UnitTypes.LbfFt => valueInNm * lbfFt,
-            _ => valueInNm
+            _               => valueInNm
         };
     }
 

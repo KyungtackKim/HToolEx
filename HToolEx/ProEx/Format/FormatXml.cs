@@ -12,7 +12,8 @@ public class FormatXml {
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [20];
+    [PublicAPI]
+    public static readonly int[] Size = [20];
 
     /// <summary>
     ///     Constructor

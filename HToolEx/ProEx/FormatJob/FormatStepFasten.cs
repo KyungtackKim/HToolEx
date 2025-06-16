@@ -39,6 +39,7 @@ public sealed class FormatStepFasten : FormatStep {
             // add encoder
             Encoders[i] = new FormatEncoder();
         }
+
         // set values
         Set(values, revision);
     }

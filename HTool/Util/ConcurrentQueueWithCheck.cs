@@ -9,10 +9,10 @@ namespace HTool.Util;
 /// <typeparam name="T"></typeparam>
 [PublicAPI]
 public class ConcurrentQueueWithCheck<T> where T : notnull {
-    private const int Timeout = 50;
-    private readonly ConcurrentDictionary<T, LinkedListNode<T>> _hash = new();
-    private readonly LinkedList<T> _list = [];
-    private readonly object _lockObject = new();
+    private const    int                                        Timeout     = 50;
+    private readonly ConcurrentDictionary<T, LinkedListNode<T>> _hash       = new();
+    private readonly LinkedList<T>                              _list       = [];
+    private readonly object                                     _lockObject = new();
 
     /// <summary>
     ///     Enqueue item
@@ -35,8 +35,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
                 // remote item
                 _list.RemoveLast();
             }
-        }
-        finally {
+        } finally {
             // exit
             Monitor.Exit(_lockObject);
         }
@@ -69,8 +68,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
                 // add first
                 _list.AddFirst(item);
             }
-        }
-        finally {
+        } finally {
             // exit
             Monitor.Exit(_lockObject);
         }
@@ -98,8 +96,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
                 // result
                 return true;
             }
-        }
-        finally {
+        } finally {
             // exit
             Monitor.Exit(_lockObject);
         }
@@ -133,8 +130,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
                 // clear items
                 _list.Clear();
                 _hash.Clear();
-            }
-            finally {
+            } finally {
                 // exit
                 Monitor.Exit(_lockObject);
             }
@@ -170,8 +166,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
             try {
                 // set count
                 count = _list.Count;
-            }
-            finally {
+            } finally {
                 // exit
                 Monitor.Exit(_lockObject);
             }
@@ -198,8 +193,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
         try {
             // check items
             items.AddRange(_list);
-        }
-        finally {
+        } finally {
             // exit
             Monitor.Exit(_lockObject);
         }
@@ -236,8 +230,7 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
             try {
                 // check compare
                 result = _list.Contains(item, comparer);
-            }
-            finally {
+            } finally {
                 // exit
                 Monitor.Exit(_lockObject);
             }

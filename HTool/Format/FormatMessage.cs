@@ -19,11 +19,11 @@ public class FormatMessage {
     /// <param name="retry">retry</param>
     public FormatMessage(CodeTypes code, int addr, IReadOnlyCollection<byte> packet, int retry = 1) {
         // set message values
-        Code = code;
-        Address = addr;
-        Retry = retry;
+        Code     = code;
+        Address  = addr;
+        Retry    = retry;
         CheckSum = Utils.CalculateCheckSum(packet);
-        Packet = [..packet];
+        Packet   = [..packet];
     }
 
     /// <summary>

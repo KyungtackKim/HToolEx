@@ -82,8 +82,7 @@ namespace HComm {
                     return 0;
                 try {
                     return MsgQueue.Count;
-                }
-                finally {
+                } finally {
                     // unlock
                     Monitor.Exit(MsgQueue);
                 }
@@ -283,8 +282,7 @@ namespace HComm {
 
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -318,8 +316,7 @@ namespace HComm {
 
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -347,8 +344,7 @@ namespace HComm {
                 MsgQueue.Add(new HCommMsg(Command.Info, 0, 0, Comm.PacketGetInfo()));
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -378,8 +374,7 @@ namespace HComm {
                 MsgQueue.Add(new HCommMsg(Command.Write, addr, state, Comm.PacketSetParam(addr, state)));
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -409,8 +404,7 @@ namespace HComm {
                 MsgQueue.Add(new HCommMsg(Command.Write, addr, state, Comm.PacketSetParam(addr, state)));
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -445,8 +439,7 @@ namespace HComm {
                     MsgQueue.Add(new HCommMsg(Command.Mor, addr, count, Comm.PacketGetState(addr, count)));
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -476,8 +469,7 @@ namespace HComm {
                 MsgQueue.Add(new HCommMsg(Command.GraphAd, addr, count, Comm.PacketGetGraph(addr, count)));
                 // result
                 return true;
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -529,8 +521,7 @@ namespace HComm {
                         // active waiting
                         msg.Time = DateTime.Now;
                         msg.Active = true;
-                    }
-                    else {
+                    } else {
                         // laps
                         var laps = DateTime.Now - msg.Time;
                         // check time
@@ -548,8 +539,7 @@ namespace HComm {
                         // error
                         ReceivedMsg?.Invoke(Command.Error, 0, new[] { 0x00 });
                     }
-                }
-                else if (AutoRequestInfo && (DateTime.Now - InfoTime).TotalSeconds > 1) {
+                } else if (AutoRequestInfo && (DateTime.Now - InfoTime).TotalSeconds > 1) {
                     /*
                     // add queue request information
                     GetInfo();
@@ -559,8 +549,7 @@ namespace HComm {
                         // add queue
                         MsgQueue.Add(new HCommMsg(Command.Info, 0, 0, Comm.PacketGetInfo()));
                 }
-            }
-            finally {
+            } finally {
                 // unlock msg queue
                 Monitor.Exit(MsgQueue);
             }
@@ -740,8 +729,7 @@ namespace HComm {
                     return;
                 // clear first queue
                 MsgQueue.RemoveAt(0);
-            }
-            finally {
+            } finally {
                 // unlock
                 Monitor.Exit(MsgQueue);
             }
@@ -841,9 +829,10 @@ namespace HComm {
             /// <summary>
             ///     Device version
             /// </summary>
-            public string Version => Values.Count > 8
-                ? ((Values[6] << 8) | Values[7]).ToString("D4").Insert(3, ".").Insert(1, ".")
-                : @"0.00.0";
+            public string Version =>
+                Values.Count > 8
+                    ? ((Values[6] << 8) | Values[7]).ToString("D4").Insert(3, ".").Insert(1, ".")
+                    : @"0.00.0";
 
             /// <summary>
             ///     Driver serial number
@@ -853,8 +842,7 @@ namespace HComm {
             /// <summary>
             ///     Driver used count
             /// </summary>
-            public int UsedCount =>
-                Values.Count > 16 ? (Values[13] << 24) | (Values[14] << 16) | (Values[15] << 8) | Values[16] : 0;
+            public int UsedCount => Values.Count > 16 ? (Values[13] << 24) | (Values[14] << 16) | (Values[15] << 8) | Values[16] : 0;
 
             /// <summary>
             ///     Set data information

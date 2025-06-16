@@ -24,7 +24,6 @@ public class HcRtu : IHComm {
     private bool IsStopTimer { get; set; }
     private DateTime AnalyzeTimeout { get; set; }
 
-
     /// <summary>
     ///     Received message event
     /// </summary>
@@ -99,8 +98,7 @@ public class HcRtu : IHComm {
 
             // result ok
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // console
             Console.WriteLine(e.Message);
         }
@@ -124,8 +122,7 @@ public class HcRtu : IHComm {
             Port.DataReceived -= PortOnDataReceived;
             // connection changed event
             ConnectedMsg?.Invoke(false);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -148,8 +145,7 @@ public class HcRtu : IHComm {
             Port.Write(packet, 0, length);
             // result ok
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             // console
             Console.WriteLine(ex.Message);
         }
@@ -167,7 +163,8 @@ public class HcRtu : IHComm {
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            (byte)id, (byte)CodeTypes.ReadHoldingReg,
+            (byte)id,
+            (byte)CodeTypes.ReadHoldingReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -189,7 +186,8 @@ public class HcRtu : IHComm {
     public byte[] GetReadInputRegPacket(ushort addr, ushort count, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            (byte)id, (byte)CodeTypes.ReadInputReg,
+            (byte)id,
+            (byte)CodeTypes.ReadInputReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -211,7 +209,8 @@ public class HcRtu : IHComm {
     public byte[] SetSingleRegPacket(ushort addr, ushort value, int id = 1) {
         // create packet
         var packet = new List<byte> {
-            (byte)id, (byte)CodeTypes.WriteSingleReg,
+            (byte)id,
+            (byte)CodeTypes.WriteSingleReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((value >> 8) & 0xFF),
@@ -235,7 +234,8 @@ public class HcRtu : IHComm {
         var count = values.Length;
         // create packet
         var packet = new List<byte> {
-            (byte)id, (byte)CodeTypes.WriteMultiReg,
+            (byte)id,
+            (byte)CodeTypes.WriteMultiReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -271,7 +271,8 @@ public class HcRtu : IHComm {
         var count = length / 2;
         // create packet
         var packet = new List<byte> {
-            (byte)id, (byte)CodeTypes.WriteMultiReg,
+            (byte)id,
+            (byte)CodeTypes.WriteMultiReg,
             (byte)((addr >> 8) & 0xFF),
             (byte)(addr & 0xFF),
             (byte)((count >> 8) & 0xFF),
@@ -360,13 +361,10 @@ public class HcRtu : IHComm {
                 // get error code
                 var code = AnalyzeBuf.Count > 3 ? AnalyzeBuf[3] : (byte)0x00;
                 // error invoke
-                ReceivedMsg?.Invoke(CodeTypes.Error, new[] {
-                    DeviceId, (byte)cmd, (byte)0x02, (byte)0x00, code, (byte)0x00, (byte)0x00
-                });
+                ReceivedMsg?.Invoke(CodeTypes.Error, new[] { DeviceId, (byte)cmd, (byte)0x02, (byte)0x00, code, (byte)0x00, (byte)0x00 });
                 // clear buffer
                 AnalyzeBuf.Clear();
-            }
-            else {
+            } else {
                 int frame;
                 // check function code
                 switch (cmd) {
@@ -418,8 +416,7 @@ public class HcRtu : IHComm {
                 // reset analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
-        }
-        finally {
+        } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);
         }

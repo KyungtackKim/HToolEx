@@ -6,6 +6,8 @@ namespace HToolEx.Type;
 ///     Motor direction types
 /// </summary>
 public enum DirectionTypes {
-    [Description("Fastening")] Fastening,
-    [Description("Loosening")] Loosening
+    [Description("Fastening")]
+    Fastening,
+    [Description("Loosening")]
+    Loosening
 }

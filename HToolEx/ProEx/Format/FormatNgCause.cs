@@ -12,12 +12,14 @@ public class FormatNgCause {
     /// <summary>
     ///     NG cause comment count
     /// </summary>
-    [PublicAPI] public static readonly int[] CommentCount = [10];
+    [PublicAPI]
+    public static readonly int[] CommentCount = [10];
 
     /// <summary>
     ///     NG cause setting size each version
     /// </summary>
-    [PublicAPI] public static readonly int[] Size = [1280];
+    [PublicAPI]
+    public static readonly int[] Size = [1280];
 
     /// <summary>
     ///     Constructor

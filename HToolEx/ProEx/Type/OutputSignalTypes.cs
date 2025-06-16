@@ -3,7 +3,4 @@
 /// <summary>
 ///     Output signal types for ParaMon-Pro X
 /// </summary>
-public enum OutputSignalTypes {
-    Impulse,
-    StatusHigh
-}
+public enum OutputSignalTypes { Impulse, StatusHigh }

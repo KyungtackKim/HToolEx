@@ -16,13 +16,25 @@ public static class ProPacket {
     public static byte[] GetReadHoldingRegPacketFromPro(ushort addr, ushort count, byte id) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */0x00, 0x00,
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */id,
-            /*FC    */(byte)CodeTypes.ReadHoldingReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            0x00,
+            0x00,
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            id,
+            /*FC    */
+            (byte)CodeTypes.ReadHoldingReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -38,13 +50,25 @@ public static class ProPacket {
     public static byte[] GetReadInputRegPacketFromPro(ushort addr, ushort count, byte id = 1) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */0x00, 0x00,
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */id,
-            /*FC    */(byte)CodeTypes.ReadInputReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF)
+            /*TID   */
+            0x00,
+            0x00,
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            id,
+            /*FC    */
+            (byte)CodeTypes.ReadInputReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -60,13 +84,25 @@ public static class ProPacket {
     public static byte[] SetSingleRegPacketFromPro(ushort addr, ushort value, byte id = 1) {
         // create packet
         var packet = new List<byte> {
-            /*TID   */0x00, 0x00,
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */id,
-            /*FC    */(byte)CodeTypes.WriteSingleReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((value >> 8) & 0xFF), (byte)(value & 0xFF)
+            /*TID   */
+            0x00,
+            0x00,
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            id,
+            /*FC    */
+            (byte)CodeTypes.WriteSingleReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((value >> 8) & 0xFF),
+            (byte)(value & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -84,14 +120,27 @@ public static class ProPacket {
         var count = values.Length;
         // create packet
         var packet = new List<byte> {
-            /*TID   */0x00, 0x00,
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x00,
-            /*UID   */id,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)(count * 2)
+            /*TID   */
+            0x00,
+            0x00,
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x00,
+            /*UID   */
+            id,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
@@ -126,14 +175,27 @@ public static class ProPacket {
         var count = length / 2;
         // create packet
         var packet = new List<byte> {
-            /*TID   */0x00, 0x00,
-            /*PID   */0x00, 0x00,
-            /*LENGTH*/0x00, 0x06,
-            /*UID   */id,
-            /*FC    */(byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */(byte)((addr >> 8) & 0xFF), (byte)(addr & 0xFF),
-            /*COUNT */(byte)((count >> 8) & 0xFF), (byte)(count & 0xFF),
-            /*LENGTH*/(byte)length
+            /*TID   */
+            0x00,
+            0x00,
+            /*PID   */
+            0x00,
+            0x00,
+            /*LENGTH*/
+            0x00,
+            0x06,
+            /*UID   */
+            id,
+            /*FC    */
+            (byte)CodeTypes.WriteMultiReg,
+            /*ADDR  */
+            (byte)((addr >> 8) & 0xFF),
+            (byte)(addr & 0xFF),
+            /*COUNT */
+            (byte)((count >> 8) & 0xFF),
+            (byte)(count & 0xFF),
+            /*LENGTH*/
+            (byte)length
         };
         // add string
         packet.AddRange(str.Select(c => (byte)c));

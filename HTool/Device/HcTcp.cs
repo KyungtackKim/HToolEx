@@ -92,13 +92,13 @@ public class HcTcp : ITool {
             // create client
             Client = new SimpleTcpClient(ip, option);
             // set event
-            Client.Events.Connected += ClientOnConnectionChanged;
+            Client.Events.Connected    += ClientOnConnectionChanged;
             Client.Events.Disconnected += ClientOnConnectionChanged;
             Client.Events.DataReceived += ClientOnDataReceived;
             // set keep alive
-            Client.Keepalive.EnableTcpKeepAlives = true;
-            Client.Keepalive.TcpKeepAliveInterval = 5;
-            Client.Keepalive.TcpKeepAliveTime = 5;
+            Client.Keepalive.EnableTcpKeepAlives    = true;
+            Client.Keepalive.TcpKeepAliveInterval   = 5;
+            Client.Keepalive.TcpKeepAliveTime       = 5;
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
             // connect
             Client.Connect();
@@ -111,9 +111,9 @@ public class HcTcp : ITool {
             // create process timer
             ProcessTimer = new Timer();
             // set timer options
-            ProcessTimer.AutoReset = true;
-            ProcessTimer.Interval = Constants.ProcessPeriod;
-            ProcessTimer.Elapsed += ProcessTimerOnElapsed;
+            ProcessTimer.AutoReset =  true;
+            ProcessTimer.Interval  =  Constants.ProcessPeriod;
+            ProcessTimer.Elapsed   += ProcessTimerOnElapsed;
             // start timer
             ProcessTimer.Start();
 
@@ -191,7 +191,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -204,10 +204,10 @@ public class HcTcp : ITool {
             (byte)CodeTypes.ReadHoldingReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -224,7 +224,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -237,10 +237,10 @@ public class HcTcp : ITool {
             (byte)CodeTypes.ReadInputReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -257,7 +257,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -270,10 +270,10 @@ public class HcTcp : ITool {
             (byte)CodeTypes.WriteSingleReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
+            (byte)(value        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -292,7 +292,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -305,24 +305,24 @@ public class HcTcp : ITool {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
             packet.Add((byte)((value >> 8) & 0xFF));
-            packet.Add((byte)(value & 0xFF));
+            packet.Add((byte)(value        & 0xFF));
         }
 
         // get the length
         var len = packet.Count - 6;
         // set the length
         packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len & 0xFF);
+        packet[5] = (byte)(len        & 0xFF);
         // packet
         return packet.ToArray();
     }
@@ -345,7 +345,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -358,10 +358,10 @@ public class HcTcp : ITool {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)length
         };
@@ -375,7 +375,7 @@ public class HcTcp : ITool {
         var len = packet.Count - 6;
         // set the length
         packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len & 0xFF);
+        packet[5] = (byte)(len        & 0xFF);
         // packet
         return packet.ToArray();
     }
@@ -389,7 +389,7 @@ public class HcTcp : ITool {
         var packet = new List<byte> {
             /*TID   */
             (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId & 0xFF),
+            (byte)(DeviceId        & 0xFF),
             /*PID   */
             0x00,
             0x00,

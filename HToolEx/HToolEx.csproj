@@ -21,7 +21,7 @@
         <PlatformTarget>x86</PlatformTarget>
         <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
         <NoWarn>$(NoWarn);0618</NoWarn>
-        <Platforms>AnyCPU;x86</Platforms>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,18 +33,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentFTP" Version="49.0.1"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0"/>
-        <PackageReference Include="SuperSimpleTcp" Version="3.0.13"/>
-        <PackageReference Include="System.IO.Ports" Version="8.0.0"/>
+        <PackageReference Include="FluentFTP" Version="49.0.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+        <PackageReference Include="SuperSimpleTcp" Version="3.0.13" />
+        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="README.md" Pack="true" PackagePath="\"/>
-        <None Update="HToolEx.png" Pack="true" PackagePath="\"/>
+        <None Update="README.md" Pack="true" PackagePath="\" />
+        <None Update="HToolEx.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="ProEx\"/>
+        <Folder Include="ProEx\" />
     </ItemGroup>
 </Project>

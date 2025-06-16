@@ -7,10 +7,8 @@ using System.Threading;
 using HComm.Common;
 using HidLibrary;
 
-namespace HComm.Device
-{
-    public class HcUsb : IHComm
-    {
+namespace HComm.Device {
+    public class HcUsb : IHComm {
         private const int ProcessTime = 10;
         private const int UsbTimeout = 100;
         private const int Vid = 0x0483;
@@ -53,10 +51,8 @@ namespace HComm.Device
         /// <param name="option">not use: option</param>
         /// <param name="id">id</param>
         /// <returns>result</returns>
-        public bool Connect(string target, int option, byte id = 2)
-        {
-            try
-            {
+        public bool Connect(string target, int option, byte id = 2) {
+            try {
                 // check id
                 if (id > 0x0F)
                     return false;
@@ -64,8 +60,7 @@ namespace HComm.Device
                 // get devices
                 var devices = HidDevices.Enumerate(Vid, Pid).ToArray();
                 // check devices
-                for (var i = 0; i < devices.Length; i++)
-                {
+                for (var i = 0; i < devices.Length; i++) {
                     // get product data
                     if (!devices[i].ReadProduct(out var data))
                         continue;
@@ -102,9 +97,7 @@ namespace HComm.Device
 
                 // result
                 return true;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 // error
                 Console.WriteLine($@"{this}_Connect: {e.Message}");
             }
@@ -116,8 +109,7 @@ namespace HComm.Device
         ///     HComm usb close
         /// </summary>
         /// <returns>result</returns>
-        public bool Close()
-        {
+        public bool Close() {
             // stop timer
             ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
             // check empty
@@ -128,8 +120,7 @@ namespace HComm.Device
             AnalyzeBuf.Clear();
 
             // check device
-            if (UsbDevice != null)
-            {
+            if (UsbDevice != null) {
                 // check state
                 if (UsbDevice.IsOpen)
                     // disconnect
@@ -155,22 +146,18 @@ namespace HComm.Device
         /// <param name="packet">packet</param>
         /// <param name="length">length</param>
         /// <returns>result</returns>
-        public bool Write(byte[] packet, int length)
-        {
+        public bool Write(byte[] packet, int length) {
             // check connection
             if (UsbDevice == null || !UsbDevice.IsConnected || !UsbDevice.IsOpen)
                 return false;
 
-            try
-            {
+            try {
                 // write packet
                 var res = UsbDevice.Write(packet, UsbTimeout);
 
                 // result
                 return res;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Console.WriteLine($@"{e.Message}");
             }
 
@@ -183,11 +170,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>result</returns>
-        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Read,
+        public IEnumerable<byte> PacketGetParam(ushort addr, ushort count) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Read,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((count >> 8) & 0xFF),
@@ -205,11 +191,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="value">value</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Write,
+        public IEnumerable<byte> PacketSetParam(ushort addr, ushort value) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Write,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((value >> 8) & 0xFF),
@@ -227,11 +212,10 @@ namespace HComm.Device
         /// <param name="addr">address</param>
         /// <param name="count">count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetState(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Mor,
+        public IEnumerable<byte> PacketGetState(ushort addr, ushort count) {
+            var packet = new List<byte> {
+                Id,
+                (byte)Command.Mor,
                 (byte)((addr >> 8) & 0xFF),
                 (byte)(addr & 0xFF),
                 (byte)((count >> 8) & 0xFF),
@@ -247,12 +231,8 @@ namespace HComm.Device
         ///     HComm usb get info packet make
         /// </summary>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetInfo()
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.Info
-            };
+        public IEnumerable<byte> PacketGetInfo() {
+            var packet = new List<byte> { Id, (byte)Command.Info };
             // add dummy
             packet.AddRange(new byte[64 - packet.Count]);
             // packet
@@ -265,12 +245,8 @@ namespace HComm.Device
         /// <param name="addr">not use: address</param>
         /// <param name="count">not use: count</param>
         /// <returns>packet</returns>
-        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count)
-        {
-            var packet = new List<byte>
-            {
-                Id, (byte)Command.GraphAd, 0x00
-            };
+        public IEnumerable<byte> PacketGetGraph(ushort addr, ushort count) {
+            var packet = new List<byte> { Id, (byte)Command.GraphAd, 0x00 };
             // add dummy
             packet.AddRange(new byte[64 - packet.Count]);
             // packet
@@ -281,15 +257,13 @@ namespace HComm.Device
         ///     HComm usb get device list
         /// </summary>
         /// <returns>list</returns>
-        public static List<string> GetDeviceNames()
-        {
+        public static List<string> GetDeviceNames() {
             // name buf
             var names = new List<string>();
             // get devices
             var devices = HidDevices.Enumerate(Vid, Pid).ToArray();
             // check devices count
-            foreach (var device in devices)
-            {
+            foreach (var device in devices) {
                 // read product data
                 if (!device.ReadProduct(out var data))
                     continue;
@@ -304,8 +278,7 @@ namespace HComm.Device
             return names;
         }
 
-        private void UsbDevice_DataReceived(HidReport report)
-        {
+        private void UsbDevice_DataReceived(HidReport report) {
             // check connection state
             if (UsbDevice == null || !UsbDevice.IsConnected)
                 return;
@@ -319,14 +292,12 @@ namespace HComm.Device
             UsbDevice?.ReadReport(UsbDevice_DataReceived, UsbTimeout);
         }
 
-        private void ProcessTimerCallback(object state)
-        {
+        private void ProcessTimerCallback(object state) {
             // check state
             if (state == null)
                 return;
             // try catch finally
-            try
-            {
+            try {
                 // pause timer
                 ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 // enter monitor
@@ -346,8 +317,7 @@ namespace HComm.Device
                 var cmd = (Command)AnalyzeBuf[0];
                 var error = (byte)cmd & 0x80;
                 // check error
-                if (error == 0x80 && cmd != Command.GraphAd)
-                {
+                if (error == 0x80 && cmd != Command.GraphAd) {
                     // error
                     AckReceived?.Invoke(Command.Error, AnalyzeBuf.Skip(2).Take(1).ToArray());
                     // remove analyze buffer
@@ -358,8 +328,7 @@ namespace HComm.Device
 
                 var length = 0;
                 // check command
-                switch (cmd)
-                {
+                switch (cmd) {
                     case Command.Write:
                         // set length
                         length = 4;
@@ -397,14 +366,10 @@ namespace HComm.Device
                 if (AnalyzeBuf.Count >= UsbDevice.Capabilities.OutputReportByteLength - 1)
                     // remove analyze buffer
                     AnalyzeBuf.RemoveRange(0, UsbDevice.Capabilities.OutputReportByteLength - 1);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 // clear buffer
                 AnalyzeBuf.Clear();
-            }
-            finally
-            {
+            } finally {
                 // exit monitor
                 Monitor.Exit(AnalyzeBuf);
                 // resume timer

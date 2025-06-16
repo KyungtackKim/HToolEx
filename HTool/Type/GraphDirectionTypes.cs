@@ -8,8 +8,12 @@ namespace HTool.Type;
 /// </summary>
 [PublicAPI]
 public enum GraphDirectionTypes {
-    [Description("All")] All,
-    [Description("Fasten Only")] FastenOnly,
-    [Description("Loosen Only")] LoosenOnly,
-    [Description("Both")] Both
+    [Description("All")]
+    All,
+    [Description("Fasten Only")]
+    FastenOnly,
+    [Description("Loosen Only")]
+    LoosenOnly,
+    [Description("Both")]
+    Both
 }
