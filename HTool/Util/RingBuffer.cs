@@ -106,5 +106,6 @@ public class RingBuffer {
         // reset positions
         _readPos  = 0;
         _writePos = 0;
+        Available = 0;
     }
 }

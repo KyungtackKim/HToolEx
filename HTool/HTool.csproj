@@ -11,8 +11,8 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
 
         <Title>HTool</Title>
-        <Version>1.1.7</Version>
-        <PackageVersion>1.1.7</PackageVersion>
+        <Version>1.1.8</Version>
+        <PackageVersion>1.1.8</PackageVersion>
         <PackageIcon>HTool.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>
@@ -28,7 +28,7 @@
             <Version>3.0.17</Version>
         </PackageReference>
         <PackageReference Include="System.IO.Ports">
-            <Version>9.0.6</Version>
+            <Version>9.0.7</Version>
         </PackageReference>
     </ItemGroup>
 
