@@ -100,6 +100,8 @@ public class HcTcp : ITool {
             Client.Keepalive.TcpKeepAliveInterval   = 5;
             Client.Keepalive.TcpKeepAliveTime       = 5;
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
+            // set the settings (WARNING: 반드시 아래 설정을 해줘야 하며, 안할 경우 데이터 수신시 데이터 오류가 발생할 수 있다)
+            Client.Settings.UseAsyncDataReceivedEvents = false;
             // connect
             Client.Connect();
 

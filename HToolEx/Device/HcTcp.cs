@@ -79,14 +79,16 @@ public class HcTcp : IHComm {
             // create client
             Client = new SimpleTcpClient(ip, option);
             // set event
-            Client.Events.Connected += ClientOnConnectionChanged;
+            Client.Events.Connected    += ClientOnConnectionChanged;
             Client.Events.Disconnected += ClientOnConnectionChanged;
             Client.Events.DataReceived += ClientOnDataReceived;
             // set keep alive
-            Client.Keepalive.EnableTcpKeepAlives = true;
-            Client.Keepalive.TcpKeepAliveInterval = 5;
-            Client.Keepalive.TcpKeepAliveTime = 5;
+            Client.Keepalive.EnableTcpKeepAlives    = true;
+            Client.Keepalive.TcpKeepAliveInterval   = 5;
+            Client.Keepalive.TcpKeepAliveTime       = 5;
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
+            // set the setting WARNING:해당 기능을 비활성화 하지 않으면 수신 데이터에 오류가 발생할 수 있음
+            Client.Settings.UseAsyncDataReceivedEvents = false;
             // connect
             Client.Connect();
 
@@ -98,9 +100,9 @@ public class HcTcp : IHComm {
             // create process timer
             ProcessTimer = new Timer();
             // set timer options
-            ProcessTimer.AutoReset = true;
-            ProcessTimer.Interval = ProcessPeriod;
-            ProcessTimer.Elapsed += ProcessTimerOnElapsed;
+            ProcessTimer.AutoReset =  true;
+            ProcessTimer.Interval  =  ProcessPeriod;
+            ProcessTimer.Elapsed   += ProcessTimerOnElapsed;
             // start timer
             ProcessTimer.Start();
 
@@ -177,7 +179,7 @@ public class HcTcp : IHComm {
         var packet = new List<byte> {
             /*TID   */
             (byte)((id >> 8) & 0xFF),
-            (byte)(id & 0xFF),
+            (byte)(id        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -190,10 +192,10 @@ public class HcTcp : IHComm {
             (byte)CodeTypes.ReadHoldingReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -211,7 +213,7 @@ public class HcTcp : IHComm {
         var packet = new List<byte> {
             /*TID   */
             (byte)((id >> 8) & 0xFF),
-            (byte)(id & 0xFF),
+            (byte)(id        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -224,10 +226,10 @@ public class HcTcp : IHComm {
             (byte)CodeTypes.ReadInputReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -245,7 +247,7 @@ public class HcTcp : IHComm {
         var packet = new List<byte> {
             /*TID   */
             (byte)((id >> 8) & 0xFF),
-            (byte)(id & 0xFF),
+            (byte)(id        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -258,10 +260,10 @@ public class HcTcp : IHComm {
             (byte)CodeTypes.WriteSingleReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
+            (byte)(value        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -281,7 +283,7 @@ public class HcTcp : IHComm {
         var packet = new List<byte> {
             /*TID   */
             (byte)((id >> 8) & 0xFF),
-            (byte)(id & 0xFF),
+            (byte)(id        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -294,24 +296,24 @@ public class HcTcp : IHComm {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
             packet.Add((byte)((value >> 8) & 0xFF));
-            packet.Add((byte)(value & 0xFF));
+            packet.Add((byte)(value        & 0xFF));
         }
 
         // get total length
         var len = packet.Count - 6;
         // change length
         packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len & 0xFF);
+        packet[5] = (byte)(len        & 0xFF);
 
         // packet
         return packet.ToArray();
@@ -336,7 +338,7 @@ public class HcTcp : IHComm {
         var packet = new List<byte> {
             /*TID   */
             (byte)((id >> 8) & 0xFF),
-            (byte)(id & 0xFF),
+            (byte)(id        & 0xFF),
             /*PID   */
             0x00,
             0x00,
@@ -349,10 +351,10 @@ public class HcTcp : IHComm {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)length
         };
@@ -408,6 +410,7 @@ public class HcTcp : IHComm {
             return;
         // try finally
         try {
+#if NOT_USE
             // check empty for receive buffer
             while (!ReceiveBuf.IsEmpty) {
                 // get data
@@ -417,6 +420,15 @@ public class HcTcp : IHComm {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
+#else
+            // get the data
+            while (ReceiveBuf.TryDequeue(out var d)) {
+                // add the data
+                AnalyzeBuf.Add(d);
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
+            }
+#endif
 
             // check analyze count
             if (AnalyzeBuf.Count > 0)
@@ -478,8 +490,15 @@ public class HcTcp : IHComm {
                 if (AnalyzeBuf.Count < frame)
                     return;
 
+#if NOT_USE
                 // get packet
                 var packet = AnalyzeBuf.Take(frame).ToArray();
+#else
+                // create the message buffer
+                var packet = new byte[frame];
+                // copy to the buffer
+                AnalyzeBuf.CopyTo(0, packet, 0, frame);
+#endif
                 // check length
                 if (AnalyzeBuf.Count >= frame)
                     // remove analyze buffer

@@ -49,7 +49,7 @@ public class HCommEx {
     }
 
     private static int MessagePeriod => 50;
-    private static int MessageLockTime => 5;
+    private static int MessageLockTime => 500;
     private static int MessageTimeout => 1000;
     private IHComm? Comm { get; set; }
     private Timer MessageTimer { get; } = new();

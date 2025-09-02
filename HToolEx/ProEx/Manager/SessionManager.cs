@@ -94,7 +94,7 @@ public class SessionManager {
             // create client
             Client = new SimpleTcpClient(address, port);
             // set event
-            Client.Events.Connected += ClientOnConnectionChanged;
+            Client.Events.Connected    += ClientOnConnectionChanged;
             Client.Events.Disconnected += ClientOnConnectionChanged;
             Client.Events.DataReceived += ClientOnDataReceived;
             // set keep alive
@@ -102,6 +102,8 @@ public class SessionManager {
             Client.Keepalive.TcpKeepAliveInterval = 5;
             Client.Keepalive.TcpKeepAliveTime = 5;
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
+            // set the setting WARNING:해당 기능을 비활성화 하지 않으면 수신 데이터에 오류가 발생할 수 있음
+            Client.Settings.UseAsyncDataReceivedEvents = false;
             // connect
             Client.Connect();
 
@@ -112,9 +114,9 @@ public class SessionManager {
             // create process timer
             ProcessTimer = new Timer();
             // set timer options
-            ProcessTimer.AutoReset = true;
-            ProcessTimer.Interval = ProcessPeriod;
-            ProcessTimer.Elapsed += ProcessTimerOnElapsed;
+            ProcessTimer.AutoReset =  true;
+            ProcessTimer.Interval  =  ProcessPeriod;
+            ProcessTimer.Elapsed   += ProcessTimerOnElapsed;
             // start timer
             ProcessTimer.Start();
             // set result
@@ -228,6 +230,7 @@ public class SessionManager {
             return;
         // try finally
         try {
+#if NOT_USE
             // check empty for receive buffer
             while (!ReceiveBuf.IsEmpty) {
                 // set analyze time
@@ -237,6 +240,15 @@ public class SessionManager {
                     // add data
                     AnalyzeBuf.Add(d);
             }
+#else
+            // get the data
+            while (ReceiveBuf.TryDequeue(out var d)) {
+                // add the data
+                AnalyzeBuf.Add(d);
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
+            }
+#endif
 
             // check analyze count
             if (AnalyzeBuf.Count > 0)
@@ -248,10 +260,20 @@ public class SessionManager {
             // check data header length    [LEN[2) MID(2) REV(2) RESERVE(10)]
             if (AnalyzeBuf.Count < FormatMessageInfo.Size)
                 return;
+#if NOT_USE
             // get packet values
             var packet = AnalyzeBuf.ToArray();
+#else
+            // create the header span
+            Span<byte> headerSpan = stackalloc byte[FormatMessageInfo.Size];
+            // check the header size
+            for (var i = 0; i < FormatMessageInfo.Size; i++) {
+                // set the data
+                headerSpan[i] = AnalyzeBuf[i];
+            }
+#endif
             // get frame header
-            var header = new FormatMessageInfo(packet);
+            var header = new FormatMessageInfo(headerSpan.ToArray());
             // check frame length
             if (header.Length > AnalyzeBuf.Count)
                 return;
@@ -259,8 +281,18 @@ public class SessionManager {
             if (header.Id == MessageIdTypes.None)
                 return;
 
+#if NOT_USE
             // get message data
             var msg = new FormatMessage(AnalyzeBuf.Take(header.Length).ToArray());
+#else
+            // create the message buffer
+            var buf = new byte[header.Length];
+            // copy to the buffer
+            AnalyzeBuf.CopyTo(0, buf, 0, header.Length);
+
+            // get message data
+            var msg = new FormatMessage(buf);
+#endif
             // check frame length
             if (header.Length <= AnalyzeBuf.Count)
                 // remove analyze buffer

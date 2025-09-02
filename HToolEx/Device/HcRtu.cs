@@ -87,9 +87,9 @@ public class HcRtu : IHComm {
             // create process timer
             ProcessTimer = new Timer();
             // set timer options
-            ProcessTimer.AutoReset = true;
-            ProcessTimer.Interval = ProcessPeriod;
-            ProcessTimer.Elapsed += ProcessTimerOnElapsed;
+            ProcessTimer.AutoReset =  true;
+            ProcessTimer.Interval  =  ProcessPeriod;
+            ProcessTimer.Elapsed   += ProcessTimerOnElapsed;
             // start timer
             ProcessTimer.Start();
 
@@ -165,10 +165,10 @@ public class HcRtu : IHComm {
         var packet = new List<byte> {
             (byte)id,
             (byte)CodeTypes.ReadHoldingReg,
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)((addr >> 8)  & 0xFF),
+            (byte)(addr         & 0xFF),
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // get crc
         packet.AddRange(GetCrc(packet.ToArray()));
@@ -188,10 +188,10 @@ public class HcRtu : IHComm {
         var packet = new List<byte> {
             (byte)id,
             (byte)CodeTypes.ReadInputReg,
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)((addr >> 8)  & 0xFF),
+            (byte)(addr         & 0xFF),
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // get crc
         packet.AddRange(GetCrc(packet.ToArray()));
@@ -211,10 +211,10 @@ public class HcRtu : IHComm {
         var packet = new List<byte> {
             (byte)id,
             (byte)CodeTypes.WriteSingleReg,
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)((addr >> 8)  & 0xFF),
+            (byte)(addr         & 0xFF),
             (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
+            (byte)(value        & 0xFF)
         };
         // get crc
         packet.AddRange(GetCrc(packet.ToArray()));
@@ -236,16 +236,16 @@ public class HcRtu : IHComm {
         var packet = new List<byte> {
             (byte)id,
             (byte)CodeTypes.WriteMultiReg,
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)((addr >> 8)  & 0xFF),
+            (byte)(addr         & 0xFF),
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
             packet.Add((byte)((value >> 8) & 0xFF));
-            packet.Add((byte)(value & 0xFF));
+            packet.Add((byte)(value        & 0xFF));
         }
 
         // get crc
@@ -273,10 +273,10 @@ public class HcRtu : IHComm {
         var packet = new List<byte> {
             (byte)id,
             (byte)CodeTypes.WriteMultiReg,
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)((addr >> 8)  & 0xFF),
+            (byte)(addr         & 0xFF),
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             (byte)length
         };
         // add string
@@ -325,6 +325,7 @@ public class HcRtu : IHComm {
             return;
         // try finally
         try {
+#if NOT_USE
             // check empty for receive buffer
             while (!ReceiveBuf.IsEmpty) {
                 // get data
@@ -334,7 +335,15 @@ public class HcRtu : IHComm {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
-
+#else
+            // get the data
+            while (ReceiveBuf.TryDequeue(out var d)) {
+                // add the data
+                AnalyzeBuf.Add(d);
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
+            }
+#endif
             // check analyze count
             if (AnalyzeBuf.Count > 0)
                 // check analyze timeout
@@ -395,15 +404,30 @@ public class HcRtu : IHComm {
                 if (AnalyzeBuf.Count < frame)
                     return;
 
+#if NOT_USE
                 // get packet
                 var packet = AnalyzeBuf.Take(frame).ToArray();
+#else
+                // create the message buffer
+                var packet = new byte[frame];
+                // copy to the buffer
+                AnalyzeBuf.CopyTo(0, packet, 0, frame);
+#endif
                 // check length
                 if (AnalyzeBuf.Count >= frame)
                     // remove analyze buffer
                     AnalyzeBuf.RemoveRange(0, frame);
+                else
+                    // clear analyze buffer
+                    AnalyzeBuf.Clear();
 
+#if NOT_USE
                 // get crc
                 var crc = GetCrc(packet.Take(frame - 2)).ToArray();
+#else
+                // get crc
+                var crc = GetCrc(packet[..^2]).ToArray();
+#endif
                 // check crc
                 if (crc[0] != packet[^2] || crc[1] != packet[^1]) {
                     // debug
@@ -429,7 +453,7 @@ public class HcRtu : IHComm {
     /// <returns>result</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static IEnumerable<byte> GetCrc(IEnumerable<byte> packet) {
-        var crc = new byte[] { 0xFF, 0xFF };
+        var    crc     = new byte[] { 0xFF, 0xFF };
         ushort crcFull = 0xFFFF;
         // check total packet
         foreach (var data in packet) {
@@ -450,7 +474,7 @@ public class HcRtu : IHComm {
 
         // set CRC
         crc[1] = (byte)((crcFull >> 8) & 0xFF);
-        crc[0] = (byte)(crcFull & 0xFF);
+        crc[0] = (byte)(crcFull        & 0xFF);
 
         return crc;
     }
