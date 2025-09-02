@@ -448,6 +448,7 @@ public class HcTcp : ITool {
             return;
         // try finally
         try {
+#if NOT_USE
             // check empty for receive buffer
             while (!ReceiveBuf.IsEmpty) {
                 // get data
@@ -457,6 +458,15 @@ public class HcTcp : ITool {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
+#else
+            // get the data
+            while (ReceiveBuf.TryDequeue(out var d)) {
+                // add data
+                AnalyzeBuf.Write(d);
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
+            }
+#endif
 
             // check analyze count
             if (AnalyzeBuf.Available > 0)

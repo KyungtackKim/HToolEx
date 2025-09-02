@@ -20,7 +20,7 @@ public static class Constants {
     /// <summary>
     ///     Process period
     /// </summary>
-    public static int ProcessPeriod => 100;
+    public static int ProcessPeriod => 50;
 
     /// <summary>
     ///     Keep alive request period
@@ -35,7 +35,7 @@ public static class Constants {
     /// <summary>
     ///     Process timeout
     /// </summary>
-    public static int ProcessTimeout => 1000;
+    public static int ProcessTimeout => 500;
 
     /// <summary>
     ///     Connect timeout

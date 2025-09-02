@@ -68,11 +68,11 @@ public static class Utils {
         const float lbfFt = 0.737562149f;
         const float ozfIn = 141.611932f;
         // check defined source types
-        if (Enum.IsDefined(typeof(UnitTypes), src) == false)
+        if (!Enum.IsDefined(typeof(UnitTypes), src))
             // throw exception
             throw new ArgumentOutOfRangeException(nameof(src), src, null);
         // check defined destination types
-        if (Enum.IsDefined(typeof(UnitTypes), dst) == false)
+        if (!Enum.IsDefined(typeof(UnitTypes), dst))
             // throw exception
             throw new ArgumentOutOfRangeException(nameof(dst), dst, null);
         // convert source to N.m

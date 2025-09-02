@@ -89,9 +89,9 @@ public class HcRtu : ITool {
         // try catch
         try {
             // set com port
-            Port.PortName               = target;
-            Port.BaudRate               = option;
-            Port.Encoding               = Encoding.GetEncoding(@"iso-8859-1");
+            Port.PortName = target;
+            Port.BaudRate = option;
+            Port.Encoding = Encoding.GetEncoding(@"iso-8859-1");
             // open
             Port.Open();
 
@@ -390,6 +390,7 @@ public class HcRtu : ITool {
             return;
         // try finally
         try {
+#if NOT_USE
             // check empty for receive buffer
             while (!ReceiveBuf.IsEmpty) {
                 // get data
@@ -399,6 +400,15 @@ public class HcRtu : ITool {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
+#else
+            // get the data
+            while (ReceiveBuf.TryDequeue(out var d)) {
+                // add data
+                AnalyzeBuf.Write(d);
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
+            }
+#endif
 
             // check analyze count
             if (AnalyzeBuf.Available > 0)
