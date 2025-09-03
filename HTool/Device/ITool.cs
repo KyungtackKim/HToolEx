@@ -34,11 +34,6 @@ public interface ITool {
     int FunctionPos { get; }
 
     /// <summary>
-    ///     Tool connection state
-    /// </summary>
-    bool Connected { get; set; }
-
-    /// <summary>
     ///     Tool device identifier number
     /// </summary>
     byte DeviceId { get; set; }

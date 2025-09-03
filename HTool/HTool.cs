@@ -118,7 +118,7 @@ public class HTool {
         // check communication tool
         if (Tool != null) {
             // check connection state
-            if (Tool.Connected)
+            if (ConnectionState == ConnectionTypes.Connected)
                 return;
             // reset event
             Tool.ChangedConnect -= OnChangedConnect;

@@ -14,8 +14,9 @@ namespace HTool.Device;
 /// </summary>
 [PublicAPI]
 public class HcRtu : ITool {
-    private const           int   ErrorFrameSize = 5;
-    private static readonly int[] BaudRates      = [9600, 19200, 38400, 57600, 115200, 230400];
+    private const           int    ErrorFrameSize = 5;
+    private static readonly int[]  BaudRates      = [9600, 19200, 38400, 57600, 115200, 230400];
+    private readonly        byte[] _receiveBuffer = new byte[8 * 1024];
     private SerialPort Port { get; } = new();
     private ConcurrentQueue<byte> ReceiveBuf { get; } = [];
     private RingBuffer AnalyzeBuf { get; } = new(16 * 1024);
@@ -32,11 +33,6 @@ public class HcRtu : ITool {
     ///     Function code position
     /// </summary>
     public int FunctionPos { get; } = 1;
-
-    /// <summary>
-    ///     Tool connection state
-    /// </summary>
-    public bool Connected { get; set; }
 
     /// <summary>
     ///     Tool device id
@@ -181,6 +177,7 @@ public class HcRtu : ITool {
     /// <param name="count">count</param>
     /// <returns>packet</returns>
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
+#if NOT_USE
         // create packet
         var packet = new List<byte> {
             DeviceId,
@@ -190,8 +187,23 @@ public class HcRtu : ITool {
             (byte)((count >> 8) & 0xFF),
             (byte)(count        & 0xFF)
         };
+        // 
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        // allocation the packet
+        Span<byte> packet = stackalloc byte[8];
+        // set values
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.ReadHoldingReg;
+        packet[2] = (byte)((addr >> 8)  & 0xFF);
+        packet[3] = (byte)(addr         & 0xFF);
+        packet[4] = (byte)((count >> 8) & 0xFF);
+        packet[5] = (byte)(count        & 0xFF);
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+#endif
         // packet
         return packet.ToArray();
     }
@@ -203,6 +215,7 @@ public class HcRtu : ITool {
     /// <param name="count">count</param>
     /// <returns>packet</returns>
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
+#if NOT_USE
         // create packet
         var packet = new List<byte> {
             DeviceId,
@@ -214,6 +227,20 @@ public class HcRtu : ITool {
         };
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        // allocation the packet
+        Span<byte> packet = stackalloc byte[8];
+        // set values
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.ReadInputReg;
+        packet[2] = (byte)((addr >> 8)  & 0xFF);
+        packet[3] = (byte)(addr         & 0xFF);
+        packet[4] = (byte)((count >> 8) & 0xFF);
+        packet[5] = (byte)(count        & 0xFF);
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+#endif
         // packet
         return packet.ToArray();
     }
@@ -225,6 +252,7 @@ public class HcRtu : ITool {
     /// <param name="value">value</param>
     /// <returns>packet</returns>
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
+#if NOT_USE
         // create packet
         var packet = new List<byte> {
             DeviceId,
@@ -236,6 +264,21 @@ public class HcRtu : ITool {
         };
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        // allocation the packet
+        Span<byte> packet = stackalloc byte[8];
+        // set values
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.WriteSingleReg;
+        packet[2] = (byte)((addr >> 8)  & 0xFF);
+        packet[3] = (byte)(addr         & 0xFF);
+        packet[4] = (byte)((value >> 8) & 0xFF);
+        packet[5] = (byte)(value        & 0xFF);
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+
+#endif
         // packet
         return packet.ToArray();
     }
@@ -249,6 +292,7 @@ public class HcRtu : ITool {
     public byte[] SetMultiRegPacket(ushort addr, ushort[] values) {
         // get count
         var count = values.Length;
+#if NOT_USE
         // create packet
         var packet = new List<byte> {
             DeviceId,
@@ -267,6 +311,31 @@ public class HcRtu : ITool {
 
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        var index = 7;
+        // get the packet size
+        var size = index + count * 2 + 2;
+        // allocation the packet
+        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        // set the header
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.WriteMultiReg;
+        packet[2] = (byte)((addr >> 8)  & 0xFF);
+        packet[3] = (byte)(addr         & 0xFF);
+        packet[4] = (byte)((count >> 8) & 0xFF);
+        packet[5] = (byte)(count        & 0xFF);
+        packet[6] = (byte)(count * 2);
+
+        // check the values
+        foreach (var value in values) {
+            // set the value
+            packet[index++] = (byte)((value >> 8) & 0xFF);
+            packet[index++] = (byte)(value        & 0xFF);
+        }
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..^2], packet[^2..]);
+#endif
         // packet
         return packet.ToArray();
     }
@@ -285,6 +354,8 @@ public class HcRtu : ITool {
             length = str.Length;
         // get count
         var count = length / 2;
+
+#if NOT_USE
         // create packet
         var packet = new List<byte> {
             DeviceId,
@@ -304,6 +375,33 @@ public class HcRtu : ITool {
 
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        var index = 7;
+        // get the packet size
+        var size = index + count * 2 + 2;
+        // allocation the packet
+        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        // set the header
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.WriteMultiReg;
+        packet[2] = (byte)((addr >> 8)  & 0xFF);
+        packet[3] = (byte)(addr         & 0xFF);
+        packet[4] = (byte)((count >> 8) & 0xFF);
+        packet[5] = (byte)(count        & 0xFF);
+        packet[6] = (byte)length;
+        // set the string values
+        foreach (var c in str)
+            // set the value
+            packet[index++] = (byte)c;
+
+        // set the padding zeros
+        while (index < 7 + length)
+            // set the padding value
+            packet[index++] = 0;
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..^2], packet[^2..]);
+#endif
         // packet
         return packet.ToArray();
     }
@@ -313,10 +411,21 @@ public class HcRtu : ITool {
     /// </summary>
     /// <returns>result</returns>
     public byte[] GetInfoRegPacket() {
+#if NOT_USE
         // create packet
         var packet = new List<byte> { DeviceId, (byte)CodeTypes.ReadInfoReg };
         // get crc
         packet.AddRange(Utils.CalculateCrc(packet));
+#else
+        // allocation the packet
+        Span<byte> packet = stackalloc byte[4];
+        // set values
+        packet[0] = DeviceId;
+        packet[1] = (byte)CodeTypes.ReadInfoReg;
+
+        // set the crc
+        Utils.CalculateCrcTo(packet[..2], packet[2..]);
+#endif
         // packet
         return packet.ToArray();
     }
@@ -353,6 +462,7 @@ public class HcRtu : ITool {
         // check length
         if (length == 0)
             return;
+#if NOT_USE
         // create the buffer
         var buffer = new byte[length];
         // read all data
@@ -366,6 +476,24 @@ public class HcRtu : ITool {
             ReceiveBuf.Enqueue(buffer[i]);
         // received raw data
         ReceivedRaw?.Invoke(read == buffer.Length ? buffer : buffer.Take(read).ToArray());
+#else
+        // read all data
+        var read = Port.Read(_receiveBuffer, 0, Math.Min(length, _receiveBuffer.Length));
+        // check the read length
+        if (read == 0)
+            return;
+        // check the length
+        for (var i = 0; i < read; i++)
+            // enqueue the data
+            ReceiveBuf.Enqueue(_receiveBuffer[i]);
+
+        // create the raw data buffer
+        var buffer = new byte[read];
+        // copy the data
+        Array.Copy(_receiveBuffer, 0, buffer, 0, read);
+        // received raw data
+        ReceivedRaw?.Invoke(buffer);
+#endif
     }
 
     private void ProcessTimerOnElapsed(object? sender, ElapsedEventArgs e) {
@@ -401,10 +529,18 @@ public class HcRtu : ITool {
                 AnalyzeTimeout = DateTime.Now;
             }
 #else
+            var count = 0;
+            // allocation the buffer
+            Span<byte> buffer = stackalloc byte[1024];
             // get the data
-            while (ReceiveBuf.TryDequeue(out var d)) {
-                // add data
-                AnalyzeBuf.Write(d);
+            while (count < buffer.Length && ReceiveBuf.TryDequeue(out var d))
+                // add the data
+                buffer[count++] = d;
+
+            // check the count
+            if (count > 0) {
+                // add the data
+                AnalyzeBuf.WriteBytes(buffer[..count]);
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
@@ -451,10 +587,15 @@ public class HcRtu : ITool {
                 return;
             // get packet
             var packet = AnalyzeBuf.ReadBytes(frame);
+#if NOT_USE
             // get crc
             var crc = Utils.CalculateCrc(packet[..^2]).ToArray();
             // check crc
             if (crc[0] == packet[^2] && crc[1] == packet[^1])
+#else
+            // validate the crc
+            if (Utils.ValidateCrc(packet))
+#endif
                 // update event
                 ReceivedData?.Invoke(cmd, packet);
             // update analyze time
