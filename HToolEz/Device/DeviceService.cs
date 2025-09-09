@@ -11,14 +11,14 @@ namespace HToolEz.Device;
 ///     Device service class
 /// </summary>
 public sealed class DeviceService : IAsyncDisposable {
-    private const int MessageTimeout = 1000;
-    private readonly IDeviceConnection _comm;
-    private readonly IDeviceController _con;
-    private readonly CancellationTokenSource _messageCts = new();
-    private readonly Timer _processTimer = new();
-    private readonly MessageQueue<MessageData> _queue = new();
-    private bool _isDisposed;
-    private bool _isProcessing;
+    private const    int                       MessageTimeout = 1000;
+    private readonly IDeviceConnection         _comm;
+    private readonly IDeviceController         _con;
+    private readonly CancellationTokenSource   _messageCts   = new();
+    private readonly Timer                     _processTimer = new();
+    private readonly MessageQueue<MessageData> _queue        = new();
+    private          bool                      _isDisposed;
+    private          bool                      _isProcessing;
 
     /// <summary>
     ///     Constructor
@@ -26,11 +26,11 @@ public sealed class DeviceService : IAsyncDisposable {
     public DeviceService(IDeviceConnection comm, IDeviceController con) {
         // inject
         _comm = comm;
-        _con = con;
+        _con  = con;
         // set timer option
-        _processTimer.Interval = 100;
-        _processTimer.AutoReset = true;
-        _processTimer.Elapsed += ProcessTimerOnElapsed;
+        _processTimer.Interval  =  100;
+        _processTimer.AutoReset =  true;
+        _processTimer.Elapsed   += ProcessTimerOnElapsed;
         // reset disposed
         _isDisposed = false;
         // start timer
@@ -114,10 +114,10 @@ public sealed class DeviceService : IAsyncDisposable {
             if (_queue.IsEmpty)
                 return;
             // try peek
-            if (_queue.TryPeek(out var msg) == false || msg == null)
+            if (!_queue.TryPeek(out var msg) || msg == null)
                 return;
             // check activated
-            if (msg.Activated == false) {
+            if (!msg.Activated) {
                 // send async
                 if (await _comm.SendAsync(msg.Packet, _messageCts.Token))
                     // set the activated state

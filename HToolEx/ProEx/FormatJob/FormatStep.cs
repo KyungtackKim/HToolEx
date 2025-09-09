@@ -41,7 +41,7 @@ public class FormatStep {
 
         // create values and data
         Values = new byte[Size[revision]];
-        Data = new byte[DataSize[revision]];
+        Data   = new byte[DataSize[revision]];
         // check data size
         for (var i = 0; i < DataSize[revision]; i++)
             // set value
@@ -116,7 +116,7 @@ public class FormatStep {
             return false;
         // create values and data
         Values = new byte[Size[revision]];
-        Data = new byte[DataSize[revision]];
+        Data   = new byte[DataSize[revision]];
         // check size
         for (var i = 0; i < Size[revision]; i++)
             // set value

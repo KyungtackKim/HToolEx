@@ -35,10 +35,10 @@ namespace HComm {
         /// <param name="packet">packet</param>
         public delegate void SendReceiveData(byte[] packet, bool send = false);
 
-        private const int ProcessTime = 10;
-        private const int MonitorTimeout = 100;
-        private bool _autoDisconnect = true;
-        private bool _autoRequestInfo = true;
+        private const int  ProcessTime      = 10;
+        private const int  MonitorTimeout   = 100;
+        private       bool _autoDisconnect  = true;
+        private       bool _autoRequestInfo = true;
 
         /// <summary>
         ///     HComm interface constructor
@@ -203,7 +203,7 @@ namespace HComm {
                 return false;
             // set time state
             ConnectionTime = DateTime.Now;
-            InfoTime = DateTime.Now;
+            InfoTime       = DateTime.Now;
             // set state
             State = ConnectionState.Connecting;
             // clear message queue
@@ -262,9 +262,9 @@ namespace HComm {
                     // fixed size
                     blockSize = 30;
                 // block / remain
-                var block = (ushort)(count / blockSize);
+                var block  = (ushort)(count / blockSize);
                 var remain = (ushort)(count % blockSize);
-                var limit = block + (remain > 0 || block == 0 ? 1 : 0);
+                var limit  = block + (remain > 0 || block == 0 ? 1 : 0);
                 // check merge block
                 if (!merge)
                     // check block
@@ -499,7 +499,7 @@ namespace HComm {
                     // disconnect
                     Comm.Close();
                     // reset event
-                    Comm.AckReceived = null;
+                    Comm.AckReceived    = null;
                     Comm.AckRawReceived = null;
                     // clear communicator
                     Comm = null;
@@ -519,7 +519,7 @@ namespace HComm {
                         // write event
                         SendReceiveMsg?.Invoke(msg.Packet.ToArray(), true);
                         // active waiting
-                        msg.Time = DateTime.Now;
+                        msg.Time   = DateTime.Now;
                         msg.Active = true;
                     } else {
                         // laps
@@ -528,9 +528,9 @@ namespace HComm {
                         if (laps.TotalMilliseconds < 1000)
                             return;
                         // reset timer
-                        msg.Active = false;
-                        msg.Retry -= 1;
-                        msg.Time = DateTime.Now;
+                        msg.Active =  false;
+                        msg.Retry  -= 1;
+                        msg.Time   =  DateTime.Now;
                         // check retry count
                         if (msg.Retry > 0)
                             return;
@@ -557,8 +557,8 @@ namespace HComm {
 
         private void AckReceivedCallback(Command cmd, byte[] packet) {
             int[] values = null;
-            var length = 0;
-            int count;
+            var   length = 0;
+            int   count;
 
             // reset connection time
             ConnectionTime = DateTime.Now;
@@ -571,7 +571,7 @@ namespace HComm {
                         length = packet[0];
                     // check length
                     if (length == packet.Length - 1) {
-                        count = length / 2;
+                        count  = length / 2;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++)
@@ -586,7 +586,7 @@ namespace HComm {
                         length = packet[0];
                     // check length
                     if (length == packet.Length - 1) {
-                        count = length / 2;
+                        count  = length / 2;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++)
@@ -601,7 +601,7 @@ namespace HComm {
                         length = 4;
                     // check length
                     if (length == packet.Length) {
-                        count = length / 2;
+                        count  = length / 2;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++)
@@ -616,7 +616,7 @@ namespace HComm {
                         length = packet[0];
                     // check length
                     if (length == packet.Length - 1) {
-                        count = length;
+                        count  = length;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++)
@@ -631,7 +631,7 @@ namespace HComm {
                         length = (packet[0] << 8) | packet[1];
                     // check length
                     if (length == packet.Length - 2) {
-                        count = length / 2;
+                        count  = length / 2;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++) {
@@ -651,7 +651,7 @@ namespace HComm {
                         length = (packet[0] << 8) | packet[1];
                     // check length
                     if (length == packet.Length - 2) {
-                        count = length / 2;
+                        count  = length / 2;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++) {
@@ -671,7 +671,7 @@ namespace HComm {
                         length = packet[0];
                     // check length
                     if (length > 1 && length == packet.Length - 1) {
-                        count = (length - 2) / 2 + 1;
+                        count  = (length - 2) / 2 + 1;
                         values = new int[count];
                         // set values
                         for (var i = 0; i < count; i++) {
@@ -690,7 +690,7 @@ namespace HComm {
                         length = 1;
                     // check length
                     if (length == packet.Length) {
-                        count = 1;
+                        count  = 1;
                         values = new int[count];
                         // set values
                         values[0] = packet[0];
@@ -709,7 +709,7 @@ namespace HComm {
                 // get message
                 var msg = MsgQueue.Count > 0 ? MsgQueue[0] : null;
                 // get address
-                var addr = msg == null ||
+                var addr = msg == null          ||
                            cmd == Command.Graph || cmd == Command.GraphRes ||
                            (cmd == Command.Mor && msg.Address < 3200 && msg.Address > 3237)
                     ? 0
@@ -723,8 +723,8 @@ namespace HComm {
                 // set info time
                 InfoTime = DateTime.Now;
                 // check passing
-                if (msg == null || MsgQueue.Count == 0 ||
-                    cmd == Command.Graph || cmd == Command.GraphRes ||
+                if (msg == null          || MsgQueue.Count == 0                ||
+                    cmd == Command.Graph || cmd            == Command.GraphRes ||
                     (cmd == Command.Mor && msg.Address < 3200 && msg.Address > 3237))
                     return;
                 // clear first queue
@@ -770,7 +770,7 @@ namespace HComm {
                         // change state
                         State = ConnectionState.Connected;
                         // set event
-                        Comm.AckReceived = AckReceivedCallback;
+                        Comm.AckReceived    = AckReceivedCallback;
                         Comm.AckRawReceived = AckRawReceived;
                         Comm.AckMorReceived = AckMorReceived;
                         // update event
@@ -786,7 +786,7 @@ namespace HComm {
                         // stop process timer
                         MsgTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         // reset event
-                        Comm.AckReceived = null;
+                        Comm.AckReceived    = null;
                         Comm.AckRawReceived = null;
                         Comm.AckMorReceived = null;
                         // clear communicator

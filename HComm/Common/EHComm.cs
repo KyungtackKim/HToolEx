@@ -25,15 +25,15 @@
     ///     Communicator command
     /// </summary>
     public enum Command {
-        None = 0x00,
-        Read = 0x03,
-        Mor = 0x04,
-        Write = 0x06,
-        Info = 0x11,
-        Graph = 0x64,
+        None     = 0x00,
+        Read     = 0x03,
+        Mor      = 0x04,
+        Write    = 0x06,
+        Info     = 0x11,
+        Graph    = 0x64,
         GraphRes = 0x65,
-        GraphAd = 0xC8,
-        Error = 0x80
+        GraphAd  = 0xC8,
+        Error    = 0x80
     }
 
     /// <summary>

@@ -285,24 +285,24 @@ public sealed class FormatStepFasten : FormatStep {
             case 1:
                 // set encoder option
                 EnableEncoder = Convert.ToBoolean(bin.ReadInt32());
-                EnableNonSeq = Convert.ToBoolean(bin.ReadInt32());
+                EnableNonSeq  = Convert.ToBoolean(bin.ReadInt32());
                 // check screw count
                 for (var i = 0; i < MaxScrewCount; i++) {
                     // get encoder
                     var enc = Encoders[i];
                     // set encoder values
-                    enc.SavePos[0] = bin.ReadInt32();
-                    enc.SavePos[1] = bin.ReadInt32();
-                    enc.SavePos[2] = bin.ReadInt32();
-                    enc.SavePos[3] = bin.ReadInt32();
-                    enc.ZoneTol[0] = bin.ReadInt32();
-                    enc.ZoneTol[1] = bin.ReadInt32();
-                    enc.ZoneTol[2] = bin.ReadInt32();
-                    enc.ZoneTol[3] = bin.ReadInt32();
-                    enc.OkTol[0] = bin.ReadInt32();
-                    enc.OkTol[1] = bin.ReadInt32();
-                    enc.OkTol[2] = bin.ReadInt32();
-                    enc.OkTol[3] = bin.ReadInt32();
+                    enc.SavePos[0]       = bin.ReadInt32();
+                    enc.SavePos[1]       = bin.ReadInt32();
+                    enc.SavePos[2]       = bin.ReadInt32();
+                    enc.SavePos[3]       = bin.ReadInt32();
+                    enc.ZoneTol[0]       = bin.ReadInt32();
+                    enc.ZoneTol[1]       = bin.ReadInt32();
+                    enc.ZoneTol[2]       = bin.ReadInt32();
+                    enc.ZoneTol[3]       = bin.ReadInt32();
+                    enc.OkTol[0]         = bin.ReadInt32();
+                    enc.OkTol[1]         = bin.ReadInt32();
+                    enc.OkTol[2]         = bin.ReadInt32();
+                    enc.OkTol[3]         = bin.ReadInt32();
                     enc.EnabledPickUp[0] = Convert.ToBoolean(bin.ReadInt32());
                     enc.EnabledPickUp[1] = Convert.ToBoolean(bin.ReadInt32());
                 }

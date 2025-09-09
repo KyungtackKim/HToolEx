@@ -14,7 +14,7 @@ public class FormatBarcode {
     /// </summary>
     public FormatBarcode() {
         // reset default value
-        Preset = 1;
+        Preset  = 1;
         Barcode = string.Empty;
     }
 

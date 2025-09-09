@@ -19,7 +19,7 @@ public class FormatEncPos {
     /// </summary>
     public FormatEncPos() {
         // create default values
-        Values = [0, 0, 0, 0];
+        Values       = [0, 0, 0, 0];
         ValuesOfPure = [0, 0, 0, 0];
     }
 

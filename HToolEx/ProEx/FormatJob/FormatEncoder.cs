@@ -11,9 +11,9 @@ public class FormatEncoder {
     /// </summary>
     public FormatEncoder() {
         // set default values
-        SavePos = [0, 0, 0, 0];
-        ZoneTol = [0, 0, 0, 0];
-        OkTol = [0, 0, 0, 0];
+        SavePos       = [0, 0, 0, 0];
+        ZoneTol       = [0, 0, 0, 0];
+        OkTol         = [0, 0, 0, 0];
         EnabledPickUp = [false, false];
     }
 

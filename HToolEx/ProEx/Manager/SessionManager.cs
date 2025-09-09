@@ -98,9 +98,9 @@ public class SessionManager {
             Client.Events.Disconnected += ClientOnConnectionChanged;
             Client.Events.DataReceived += ClientOnDataReceived;
             // set keep alive
-            Client.Keepalive.EnableTcpKeepAlives = true;
-            Client.Keepalive.TcpKeepAliveInterval = 5;
-            Client.Keepalive.TcpKeepAliveTime = 5;
+            Client.Keepalive.EnableTcpKeepAlives    = true;
+            Client.Keepalive.TcpKeepAliveInterval   = 5;
+            Client.Keepalive.TcpKeepAliveTime       = 5;
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
             // set the setting WARNING:해당 기능을 비활성화 하지 않으면 수신 데이터에 오류가 발생할 수 있음
             Client.Settings.UseAsyncDataReceivedEvents = false;
@@ -267,10 +267,9 @@ public class SessionManager {
             // create the header span
             Span<byte> headerSpan = stackalloc byte[FormatMessageInfo.Size];
             // check the header size
-            for (var i = 0; i < FormatMessageInfo.Size; i++) {
+            for (var i = 0; i < FormatMessageInfo.Size; i++)
                 // set the data
                 headerSpan[i] = AnalyzeBuf[i];
-            }
 #endif
             // get frame header
             var header = new FormatMessageInfo(headerSpan.ToArray());

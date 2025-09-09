@@ -20,20 +20,20 @@ public class FormatInfo {
         // binary reader
         using var bin = new BinaryReaderBigEndian(stream);
         // set information
-        DriverId = bin.ReadInt16();
-        DriverNo = bin.ReadInt16();
-        DriverName = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
-        DriverSerial = Encoding.ASCII.GetString(bin.ReadBytes(10)).TrimEnd('\0');
-        ControllerNo = bin.ReadInt16();
-        ControllerName = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
+        DriverId         = bin.ReadInt16();
+        DriverNo         = bin.ReadInt16();
+        DriverName       = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
+        DriverSerial     = Encoding.ASCII.GetString(bin.ReadBytes(10)).TrimEnd('\0');
+        ControllerNo     = bin.ReadInt16();
+        ControllerName   = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
         ControllerSerial = Encoding.ASCII.GetString(bin.ReadBytes(10)).TrimEnd('\0');
-        Firmware = $"{bin.ReadInt16()}.{bin.ReadInt16()}.{bin.ReadInt16()}";
+        Firmware         = $"{bin.ReadInt16()}.{bin.ReadInt16()}.{bin.ReadInt16()}";
         if (DateTime.TryParseExact($"{bin.ReadInt16():D4}-{bin.ReadByte():D2}-{bin.ReadByte():D2}",
                 "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
             // set production date
             ProductionDate = date;
         IsAdvanceMode = bin.ReadInt16() > 0;
-        Mac = string.Join(":", bin.ReadBytes(6).Select(v => $"{v:X2}"));
+        Mac           = string.Join(":", bin.ReadBytes(6).Select(v => $"{v:X2}"));
         // get check sum
         CheckSum = values.Sum(v => v);
 

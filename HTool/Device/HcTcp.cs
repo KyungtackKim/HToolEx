@@ -185,30 +185,6 @@ public class HcTcp : ITool {
     /// <param name="count">count</param>
     /// <returns>packet</returns>
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x06,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.ReadHoldingReg,
-            /*ADDR  */
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr        & 0xFF),
-            /*COUNT */
-            (byte)((count >> 8) & 0xFF),
-            (byte)(count        & 0xFF)
-        };
-#else
         // allocation the packet
         Span<byte> packet = stackalloc byte[12];
         // set the MBAP header
@@ -225,7 +201,6 @@ public class HcTcp : ITool {
         packet[9]  = (byte)(addr         & 0xFF);
         packet[10] = (byte)((count >> 8) & 0xFF);
         packet[11] = (byte)(count        & 0xFF);
-#endif
         // packet
         return packet.ToArray();
     }
@@ -237,30 +212,6 @@ public class HcTcp : ITool {
     /// <param name="count">count</param>
     /// <returns>packet</returns>
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x06,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.ReadInputReg,
-            /*ADDR  */
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr        & 0xFF),
-            /*COUNT */
-            (byte)((count >> 8) & 0xFF),
-            (byte)(count        & 0xFF)
-        };
-#else
         // allocation the packet
         Span<byte> packet = stackalloc byte[12];
         // set the MBAP header
@@ -277,7 +228,6 @@ public class HcTcp : ITool {
         packet[9]  = (byte)(addr         & 0xFF);
         packet[10] = (byte)((count >> 8) & 0xFF);
         packet[11] = (byte)(count        & 0xFF);
-#endif
         // packet
         return packet.ToArray();
     }
@@ -289,30 +239,6 @@ public class HcTcp : ITool {
     /// <param name="value">value</param>
     /// <returns>packet</returns>
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x06,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.WriteSingleReg,
-            /*ADDR  */
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr        & 0xFF),
-            /*COUNT */
-            (byte)((value >> 8) & 0xFF),
-            (byte)(value        & 0xFF)
-        };
-#else
         // allocation the packet
         Span<byte> packet = stackalloc byte[12];
         // set the MBAP header
@@ -329,7 +255,6 @@ public class HcTcp : ITool {
         packet[9]  = (byte)(addr         & 0xFF);
         packet[10] = (byte)((value >> 8) & 0xFF);
         packet[11] = (byte)(value        & 0xFF);
-#endif
         // packet
         return packet.ToArray();
     }
@@ -341,46 +266,9 @@ public class HcTcp : ITool {
     /// <param name="values">values</param>
     /// <returns>packet</returns>
     public byte[] SetMultiRegPacket(ushort addr, ushort[] values) {
+        var index = 13;
         // get count
         var count = values.Length;
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x00,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr        & 0xFF),
-            /*COUNT */
-            (byte)((count >> 8) & 0xFF),
-            (byte)(count        & 0xFF),
-            /*LENGTH*/
-            (byte)(count * 2)
-        };
-        // check values
-        foreach (var value in values) {
-            packet.Add((byte)((value >> 8) & 0xFF));
-            packet.Add((byte)(value        & 0xFF));
-        }
-
-        // get the length
-        var len = packet.Count - 6;
-        // set the length
-        packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len        & 0xFF);
-#else
-        var index = 13;
         // get the pdu size
         var pdu = 7 + count * 2;
         // get the packet size
@@ -409,7 +297,7 @@ public class HcTcp : ITool {
             packet[index++] = (byte)((value >> 8) & 0xFF);
             packet[index++] = (byte)(value        & 0xFF);
         }
-#endif
+
         // packet
         return packet.ToArray();
     }
@@ -422,52 +310,15 @@ public class HcTcp : ITool {
     /// <param name="length">length</param>
     /// <returns>result</returns>
     public byte[] SetMultiRegStrPacket(ushort addr, string str, int length) {
+        var index = 13;
         // check length
         if (length < str.Length)
             // set length
             length = str.Length;
         // get count
         var count = length / 2;
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x06,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.WriteMultiReg,
-            /*ADDR  */
-            (byte)((addr >> 8) & 0xFF),
-            (byte)(addr        & 0xFF),
-            /*COUNT */
-            (byte)((count >> 8) & 0xFF),
-            (byte)(count        & 0xFF),
-            /*LENGTH*/
-            (byte)length
-        };
-        // add string
-        packet.AddRange(str.Select(c => (byte)c));
-        // check string length
-        if (str.Length < length)
-            // add dummy data
-            packet.AddRange(new byte[length - str.Length]);
-        // get the length
-        var len = packet.Count - 6;
-        // set the length
-        packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len        & 0xFF);
-#else
-        var index = 13;
         // get the pdu size
-        var pdu = 7 + count * 2;
+        var pdu = index + count * 2;
         // get the packet size
         var size = 6 + pdu;
         // allocation the packet
@@ -496,7 +347,6 @@ public class HcTcp : ITool {
         while (index < 13 + length)
             // set the padding value
             packet[index++] = 0;
-#endif
         // packet
         return packet.ToArray();
     }
@@ -506,24 +356,6 @@ public class HcTcp : ITool {
     /// </summary>
     /// <returns>result</returns>
     public byte[] GetInfoRegPacket() {
-#if NOT_USE
-        // create packet
-        var packet = new List<byte> {
-            /*TID   */
-            (byte)((DeviceId >> 8) & 0xFF),
-            (byte)(DeviceId        & 0xFF),
-            /*PID   */
-            0x00,
-            0x00,
-            /*LENGTH*/
-            0x00,
-            0x06,
-            /*UID   */
-            0x00,
-            /*FC    */
-            (byte)CodeTypes.ReadInfoReg
-        };
-#else
         // allocation the packet
         Span<byte> packet = stackalloc byte[8];
         // set the MBAP header
@@ -536,7 +368,6 @@ public class HcTcp : ITool {
         packet[6] = 0x00;
         // set the PDU values
         packet[7] = (byte)CodeTypes.ReadInfoReg;
-#endif
         // packet
         return packet.ToArray();
     }
@@ -552,16 +383,6 @@ public class HcTcp : ITool {
     }
 
     private void ClientOnDataReceived(object? sender, DataReceivedEventArgs e) {
-#if NOT_USE
-        // get all data from buffer
-        var data = e.Data.ToArray();
-        // check data length
-        foreach (var b in data)
-            // enqueue data
-            ReceiveBuf.Enqueue(b);
-        // received raw data
-        ReceivedRaw?.Invoke(data);
-#else
         // get the data
         var data = e.Data;
         // check the length
@@ -579,13 +400,10 @@ public class HcTcp : ITool {
             ReceiveBuf.Enqueue(d);
         }
 
-        // create the raw data buffer
-        var buffer = new byte[length];
-        // copy the data
-        Array.Copy(_receiveBuffer, 0, buffer, 0, length);
+        // get the raw data
+        var raw = new ReadOnlySpan<byte>(_receiveBuffer, 0, length).ToArray();
         // received raw data
-        ReceivedRaw?.Invoke(buffer);
-#endif
+        ReceivedRaw?.Invoke(raw);
     }
 
     private void ProcessTimerOnElapsed(object? sender, ElapsedEventArgs e) {
@@ -610,17 +428,6 @@ public class HcTcp : ITool {
             return;
         // try finally
         try {
-#if NOT_USE
-            // check empty for receive buffer
-            while (!ReceiveBuf.IsEmpty) {
-                // get data
-                if (ReceiveBuf.TryDequeue(out var d))
-                    // add data
-                    AnalyzeBuf.Write(d);
-                // set analyze time
-                AnalyzeTimeout = DateTime.Now;
-            }
-#else
             var count = 0;
             // allocation the buffer
             Span<byte> buffer = stackalloc byte[1024];
@@ -636,7 +443,6 @@ public class HcTcp : ITool {
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
             }
-#endif
 
             // check analyze count
             if (AnalyzeBuf.Available > 0)

@@ -209,36 +209,26 @@ public class ConcurrentQueueWithCheck<T> where T : notnull {
     /// <param name="retry">retry count</param>
     /// <returns>result</returns>
     public bool Contains(T item, IEqualityComparer<T> comparer, int retry = 3) {
-        var result = false;
-        // Define the condition for ending the spin loop.
-        var func = () => !Monitor.TryEnter(_lockObject, Timeout);
-        // check retry count
+        // check the retry count
         for (var i = 0; i < retry; i++) {
-            // try enter
-            if (!Monitor.TryEnter(_lockObject, Timeout)) {
-                // check retry count
-                if (i == retry)
-                    // throw exception
-                    throw new InvalidOperationException("Failed to check the queue.");
-                // spin wait
-                SpinWait.SpinUntil(func, Timeout);
-                // continue
-                continue;
-            }
+            // enter the monitor
+            if (Monitor.TryEnter(_lockObject, Timeout))
+                // try finally
+                try {
+                    // return the contains
+                    return _list.Contains(item, comparer);
+                } finally {
+                    // exit monitor
+                    Monitor.Exit(_lockObject);
+                }
 
-            // try finally
-            try {
-                // check compare
-                result = _list.Contains(item, comparer);
-            } finally {
-                // exit
-                Monitor.Exit(_lockObject);
-            }
-
-            // exit
-            break;
+            // check the retry count
+            if (i < retry - 1)
+                // sleep the thread
+                Thread.Sleep(Math.Min(10 * (i + 1), 50));
         }
 
-        return result;
+        // throw the exception
+        throw new InvalidOperationException("Failed to check the queue.");
     }
 }

@@ -12,13 +12,13 @@ namespace HToolEz.Device;
 ///     Device connection class using RS-232
 /// </summary>
 public sealed class DeviceSerialConnection : IDeviceConnection {
-    private const int ReceivePeriod = 10;
+    private const    int                           ReceivePeriod = 10;
     private readonly Channel<ReadOnlyMemory<byte>> _channel;
-    private readonly CancellationTokenSource _cts;
-    private readonly SerialPort _port;
-    private bool _isDisconnected;
-    private Task? _processTask;
-    private Task? _receiveTask;
+    private readonly CancellationTokenSource       _cts;
+    private readonly SerialPort                    _port;
+    private          bool                          _isDisconnected;
+    private          Task?                         _processTask;
+    private          Task?                         _receiveTask;
 
     /// <summary>
     ///     Constructor
@@ -121,7 +121,7 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
     /// <inheritdoc />
     public async ValueTask<bool> SendAsync(ReadOnlyMemory<byte> data, CancellationToken token = default) {
         // check open
-        if (_port.IsOpen == false)
+        if (!_port.IsOpen)
             return false;
         // try catch
         try {
@@ -146,7 +146,7 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
         // try catch
         try {
             // check open and cancellation state
-            while (_port.IsOpen && _cts.IsCancellationRequested == false)
+            while (_port.IsOpen && !_cts.IsCancellationRequested)
                 // check the bytes to read
                 if (_port.BytesToRead > 0) {
                     // read the data
@@ -209,7 +209,7 @@ public sealed class DeviceSerialConnection : IDeviceConnection {
 
                     // get length
                     var length = buffer[2] | (buffer[3] << 8);
-                    var frame = length + DeviceProtocolConstants.Header.Length + 2;
+                    var frame  = length + DeviceProtocolConstants.Header.Length + 2;
                     // check length
                     if (buffer.Count < frame)
                         break;

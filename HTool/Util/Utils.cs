@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using HTool.Type;
 using JetBrains.Annotations;
 
@@ -12,7 +13,7 @@ public static class Utils {
     /// <summary>
     ///     MODBUS-RTU CRC-16 lookup table
     /// </summary>
-    public static readonly ushort[] ModbusCrc16Table = {
+    public static readonly ushort[] ModbusCrc16Table = [
         0x0000,
         0xC0C1,
         0xC181,
@@ -269,43 +270,8 @@ public static class Utils {
         0x81C1,
         0x8081,
         0x4040
-    };
+    ];
 
-#if NOT_USE
-    /// <summary>
-    ///     Calculate CRC value for the packet
-    /// </summary>
-    /// <param name="packet">packet</param>
-    /// <returns>result</returns>
-    // ReSharper disable once MemberCanBePrivate.Global
-    public static IEnumerable<byte> CalculateCrc(IEnumerable<byte> packet) {
-        var    crc = new byte[] { 0xFF, 0xFF };
-        ushort crcFull = 0xFFFF;
-        // check total packet
-        foreach (var data in packet) {
-            // XOR 1 byte
-            crcFull = (ushort)(crcFull ^ data);
-            // cyclic redundancy check
-            for (var j = 0; j < 8; j++) {
-                // get LSB
-                var lsb = (ushort)(crcFull & 0x0001);
-                // check AND
-                crcFull = (ushort)((crcFull >> 1) & 0x7FFF);
-                // check LSB
-                if (lsb == 0x01)
-                    // XOR
-                    crcFull = (ushort)(crcFull ^ 0xA001);
-            }
-        }
-
-        // set CRC
-        crc[1] = (byte)((crcFull >> 8) & 0xFF);
-        crc[0] = (byte)(crcFull        & 0xFF);
-
-        // result
-        return crc;
-    }
-#else
     /// <summary>
     ///     Calculate CRC value for the packet
     /// </summary>
@@ -372,16 +338,53 @@ public static class Utils {
         // result
         return receivedLow == low && receivedHigh == high;
     }
-#endif
 
     /// <summary>
-    ///     Calculate check-sum value for the packet
+    ///     Calculate the check sum
     /// </summary>
     /// <param name="packet">packet</param>
-    /// <returns>result</returns>
+    /// <returns>sum</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CalculateCheckSum(IEnumerable<byte> packet) {
-        // get 
-        return packet.Sum(x => x);
+        // sum the packet values
+        return packet switch {
+            byte[] array    => CalculateCheckSumFast(array.AsSpan()),
+            List<byte> list => CalculateCheckSumFast(CollectionsMarshal.AsSpan(list)),
+            _               => packet.Sum(x => x) // 기존 방식 유지
+        };
+    }
+
+    /// <summary>
+    ///     Calculate the check sum (fast)
+    /// </summary>
+    /// <param name="span">span</param>
+    /// <returns>sum</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int CalculateCheckSumFast(ReadOnlySpan<byte> span) {
+        var sum = 0;
+
+        // get the 4-byte values
+        var intSpan = MemoryMarshal.Cast<byte, int>(span);
+        // check the int span
+        foreach (var intVal in intSpan)
+            // add the value
+            sum += (intVal & 0xFF) + ((intVal >> 8)  & 0xFF) +
+                   ((intVal                   >> 16) & 0xFF) + ((intVal >> 24) & 0xFF);
+
+        // get the remain length
+        var remaining = span.Length % 4;
+        // check the remain length
+        if (remaining < 1)
+            // return the sum
+            return sum;
+        // get the offset
+        var offset = span.Length - remaining;
+        // check the length
+        for (var i = 0; i < remaining; i++)
+            // add the value
+            sum += span[offset + i];
+        // return the sum
+        return sum;
     }
 
     /// <summary>
@@ -391,6 +394,7 @@ public static class Utils {
     /// <param name="src">source unit</param>
     /// <param name="dst">destination unit</param>
     /// <returns>converted torque</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float ConvertToUnit(float value, UnitTypes src, UnitTypes dst) {
         // const value for unit N.m
         const float nCm   = 100.0f;
@@ -399,14 +403,6 @@ public static class Utils {
         const float lbfIn = 8.85074579f;
         const float lbfFt = 0.737562149f;
         const float ozfIn = 141.611932f;
-        // check defined source types
-        if (!Enum.IsDefined(typeof(UnitTypes), src))
-            // throw exception
-            throw new ArgumentOutOfRangeException(nameof(src), src, null);
-        // check defined destination types
-        if (!Enum.IsDefined(typeof(UnitTypes), dst))
-            // throw exception
-            throw new ArgumentOutOfRangeException(nameof(dst), dst, null);
         // convert source to N.m
         var valueInNm = src switch {
             UnitTypes.KgfCm => value / kgfCm,
@@ -432,12 +428,20 @@ public static class Utils {
     }
 
     /// <summary>
+    ///     Get the current tick
+    /// </summary>
+    /// <returns></returns>
+    public static long GetCurrentTicks() {
+        return Environment.TickCount64;
+    }
+
+    /// <summary>
     ///     Get the time laps for milliseconds
     /// </summary>
     /// <param name="from">from time</param>
     /// <returns>total milliseconds</returns>
-    public static double TimeLapsMs(DateTime from) {
-        return (DateTime.Now - from).TotalMilliseconds;
+    public static long TimeLapsMs(DateTime from) {
+        return (long)(DateTime.Now - from).TotalMilliseconds;
     }
 
     /// <summary>
@@ -445,8 +449,8 @@ public static class Utils {
     /// </summary>
     /// <param name="from">from time</param>
     /// <returns>total seconds</returns>
-    public static double TimeLapsSec(DateTime from) {
-        return (DateTime.Now - from).TotalSeconds;
+    public static long TimeLapsSec(DateTime from) {
+        return (long)(DateTime.Now - from).TotalSeconds;
     }
 
     /// <summary>
@@ -457,7 +461,7 @@ public static class Utils {
     /// <returns>second</returns>
     public static ulong TimeLapsDifference(DateTime src, DateTime dst) {
         // get time laps
-        return Convert.ToUInt64(Math.Abs((src - dst).TotalSeconds));
+        return (ulong)Math.Abs((long)(src - dst).TotalSeconds);
     }
 
     /// <summary>
@@ -465,14 +469,18 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
-    public static void ConvertValue(byte[] values, out float value) {
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
-
-        // set value
-        value = bin.ReadSingle();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(ReadOnlySpan<byte> values, out float value) {
+        // check the length
+        if (values.Length < 4) {
+            // reset the value
+            value = 0;
+        } else {
+            // get the int value
+            var intValue = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
+            // set the value
+            value = BitConverter.Int32BitsToSingle(intValue);
+        }
     }
 
     /// <summary>
@@ -480,14 +488,10 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">ushort value</param>
-    public static void ConvertValue(byte[] values, out ushort value) {
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
-
-        // set value
-        value = bin.ReadUInt16();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(ReadOnlySpan<byte> values, out ushort value) {
+        // set the value
+        value = values.Length >= 2 ? (ushort)((values[0] << 8) | values[1]) : (ushort)0;
     }
 
     /// <summary>
@@ -495,14 +499,40 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
-    public static void ConvertValue(byte[] values, out int value) {
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(ReadOnlySpan<byte> values, out int value) {
+        // set the value
+        value = values.Length >= 4 ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3] : 0;
+    }
 
-        // set value
-        value = bin.ReadInt32();
+    /// <summary>
+    ///     Set value for single type
+    /// </summary>
+    /// <param name="values">values</param>
+    /// <param name="value">float value</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(byte[] values, out float value) {
+        ConvertValue(values.AsSpan(), out value);
+    }
+
+    /// <summary>
+    ///     Set value for ushort type
+    /// </summary>
+    /// <param name="values">values</param>
+    /// <param name="value">ushort value</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(byte[] values, out ushort value) {
+        ConvertValue(values.AsSpan(), out value);
+    }
+
+    /// <summary>
+    ///     Set value for int type
+    /// </summary>
+    /// <param name="values">values</param>
+    /// <param name="value">int value</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ConvertValue(byte[] values, out int value) {
+        ConvertValue(values.AsSpan(), out value);
     }
 
     /// <summary>
@@ -510,24 +540,30 @@ public static class Utils {
     /// </summary>
     /// <param name="text">value</param>
     /// <returns>values</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort[] GetWordValuesFromText(string text) {
-        var values = new List<ushort>();
-        // get text array
-        var array = text.ToCharArray();
-        // get array length
-        var length = array.Length / 2;
-        // get remain offset
-        var remain = array.Length % 2 > 0;
+        // check the text
+        if (string.IsNullOrEmpty(text))
+            return [];
+
+        // get the text span
+        var span = text.AsSpan();
+        // get the length
+        var length = span.Length / 2;
+        // get the remain length
+        var remain = span.Length % 2;
+        // create the result array
+        var result = new ushort[length + remain];
         // check array length
         for (var i = 0; i < length; i++)
-            // add values
-            values.Add((ushort)((array[i * 2] << 8) | array[i * 2 + 1]));
+            // set the value
+            result[i] = (ushort)((span[i * 2] << 8) | span[i * 2 + 1]);
         // check remain offset
-        if (remain)
-            // add value
-            values.Add(Convert.ToUInt16(text[^1] << 8));
+        if (remain > 0)
+            // set the value
+            result[length] = (ushort)(span[^1] << 8);
         // result
-        return values.ToArray();
+        return result;
     }
 
     /// <summary>
@@ -535,14 +571,28 @@ public static class Utils {
     /// </summary>
     /// <param name="text">value</param>
     /// <returns>values</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort[] GetIntValuesFromText(string text) {
-        var values = new List<ushort>();
-        // check length
-        for (var i = 0; i < text.Length / 2; i++)
-            // set values
-            values.Add(Convert.ToUInt16(text.Substring(i * 2, 2)));
-        // result
-        return values.ToArray();
+        // check the text
+        if (string.IsNullOrEmpty(text))
+            return [];
+        // get the length
+        var len = text.Length >> 1;
+        // create the space
+        var result = new ushort[len];
+        // get the span
+        var span = text.AsSpan();
+        // check the length
+        for (int i = 0, j = 0; i < len; i++, j += 2) {
+            // get the data
+            var d1 = span[j]     - '0';
+            var d2 = span[j + 1] - '0';
+            // set the result
+            result[i] = (ushort)(d1 * 10 + d2);
+        }
+
+        // return the values
+        return result;
     }
 
     /// <summary>
@@ -550,13 +600,33 @@ public static class Utils {
     /// </summary>
     /// <param name="addr">address</param>
     /// <returns>values</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort[] GetValuesFromAddr(string addr) {
-        // split data
-        var data = addr.Split('.');
-        // check length
-        var values = data.Select(x => Convert.ToUInt16(x)).ToList();
-        // result
-        return values.ToArray();
+        var count = 0;
+        var acc   = 0;
+        // get the span
+        var span = addr.AsSpan();
+        // allocate the space
+        Span<ushort> values = stackalloc ushort[8];
+        // check the length
+        for (var i = 0; i <= span.Length; i++)
+            // check the length and comma
+            if (i == span.Length || span[i] == '.') {
+                // set the value
+                values[count++] = (ushort)acc;
+                // reset the acc
+                acc = 0;
+            } else {
+                // set the acc
+                acc = acc * 10 + (span[i] - '0');
+            }
+
+        // create the space
+        var result = new ushort[count];
+        // copy the data
+        values[..count].CopyTo(result);
+        // return the data
+        return result;
     }
 
     /// <summary>
@@ -564,11 +634,12 @@ public static class Utils {
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ushort[] GetValuesFromSingle(float value) {
-        // get values
-        var values = BitConverter.GetBytes(value).Reverse().ToArray();
+        // get the bits
+        var bits = BitConverter.SingleToInt32Bits(value);
         // result
-        return [(ushort)((values[0] << 8) | values[1]), (ushort)((values[2] << 8) | values[3])];
+        return [(ushort)(bits >> 16), (ushort)bits];
     }
 
     /// <summary>
@@ -579,6 +650,7 @@ public static class Utils {
     /// <param name="dest">destination</param>
     /// <typeparam name="T">type of item</typeparam>
     /// <returns>result</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Swap<T>(List<T> list, int source, int dest) {
         // check list
         ArgumentNullException.ThrowIfNull(list);

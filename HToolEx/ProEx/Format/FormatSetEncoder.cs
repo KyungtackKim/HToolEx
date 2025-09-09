@@ -124,12 +124,12 @@ public class FormatSetEncoder {
             values.Add(Convert.ToByte(UseAndTolerance[i].use));
             values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 24) & 0xFF));
             values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 16) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 8) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 0) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].ok >> 24) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].ok >> 16) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].ok >> 8) & 0xFF));
-            values.Add(Convert.ToByte((UseAndTolerance[i].ok >> 0) & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 8)  & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].zone >> 0)  & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].ok   >> 24) & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].ok   >> 16) & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].ok   >> 8)  & 0xFF));
+            values.Add(Convert.ToByte((UseAndTolerance[i].ok   >> 0)  & 0xFF));
         }
 
         // check feeder count
@@ -145,12 +145,12 @@ public class FormatSetEncoder {
                 values.Add(Convert.ToByte(feeder[j].use));
                 values.Add(Convert.ToByte((feeder[j].ch1 >> 24) & 0xFF));
                 values.Add(Convert.ToByte((feeder[j].ch1 >> 16) & 0xFF));
-                values.Add(Convert.ToByte((feeder[j].ch1 >> 8) & 0xFF));
-                values.Add(Convert.ToByte((feeder[j].ch1 >> 0) & 0xFF));
+                values.Add(Convert.ToByte((feeder[j].ch1 >> 8)  & 0xFF));
+                values.Add(Convert.ToByte((feeder[j].ch1 >> 0)  & 0xFF));
                 values.Add(Convert.ToByte((feeder[j].ch2 >> 24) & 0xFF));
                 values.Add(Convert.ToByte((feeder[j].ch2 >> 16) & 0xFF));
-                values.Add(Convert.ToByte((feeder[j].ch2 >> 8) & 0xFF));
-                values.Add(Convert.ToByte((feeder[j].ch2 >> 0) & 0xFF));
+                values.Add(Convert.ToByte((feeder[j].ch2 >> 8)  & 0xFF));
+                values.Add(Convert.ToByte((feeder[j].ch2 >> 0)  & 0xFF));
             }
         }
 
@@ -159,8 +159,8 @@ public class FormatSetEncoder {
             // add values for zero position
             values.Add(Convert.ToByte((ZeroPos[i] >> 24) & 0xFF));
             values.Add(Convert.ToByte((ZeroPos[i] >> 16) & 0xFF));
-            values.Add(Convert.ToByte((ZeroPos[i] >> 8) & 0xFF));
-            values.Add(Convert.ToByte((ZeroPos[i] >> 0) & 0xFF));
+            values.Add(Convert.ToByte((ZeroPos[i] >> 8)  & 0xFF));
+            values.Add(Convert.ToByte((ZeroPos[i] >> 0)  & 0xFF));
         }
 
         // check channel count
@@ -168,8 +168,8 @@ public class FormatSetEncoder {
             // add values for rest position
             values.Add(Convert.ToByte((RestPos[i] >> 24) & 0xFF));
             values.Add(Convert.ToByte((RestPos[i] >> 16) & 0xFF));
-            values.Add(Convert.ToByte((RestPos[i] >> 8) & 0xFF));
-            values.Add(Convert.ToByte((RestPos[i] >> 0) & 0xFF));
+            values.Add(Convert.ToByte((RestPos[i] >> 8)  & 0xFF));
+            values.Add(Convert.ToByte((RestPos[i] >> 0)  & 0xFF));
         }
 
         return values.ToArray();

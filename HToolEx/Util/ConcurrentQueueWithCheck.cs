@@ -7,10 +7,10 @@ namespace HToolEx.Util;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class ConcurrentQueueWithCheck<T> where T : notnull {
-    private const int Timeout = 100;
-    private readonly ConcurrentDictionary<T, LinkedListNode<T>> _hash = new();
-    private readonly LinkedList<T> _list = [];
-    private readonly object _lockObject = new();
+    private const    int                                        Timeout     = 100;
+    private readonly ConcurrentDictionary<T, LinkedListNode<T>> _hash       = new();
+    private readonly LinkedList<T>                              _list       = [];
+    private readonly object                                     _lockObject = new();
 
     /// <summary>
     ///     Enqueue item

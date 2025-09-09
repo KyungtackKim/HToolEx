@@ -144,9 +144,9 @@ public class HCommProEx {
                 // create process timer
                 ProcessTimer = new Timer();
                 // set timer options
-                ProcessTimer.AutoReset = true;
-                ProcessTimer.Interval = ProcessPeriod;
-                ProcessTimer.Elapsed += ProcessTimerOnElapsed;
+                ProcessTimer.AutoReset =  true;
+                ProcessTimer.Interval  =  ProcessPeriod;
+                ProcessTimer.Elapsed   += ProcessTimerOnElapsed;
                 // start timer
                 ProcessTimer.Start();
                 // set connection state
@@ -219,7 +219,7 @@ public class HCommProEx {
         if (ToolManager.SelectedTool < 0 || ToolManager.SelectedTool >= 0xFF)
             return false;
 
-        var res = false;
+        var res     = false;
         var address = addr;
         // check split count
         if (split == 0)
@@ -263,7 +263,7 @@ public class HCommProEx {
         if (ToolManager.SelectedTool < 0 || ToolManager.SelectedTool >= 0xFF)
             return false;
 
-        var res = false;
+        var res     = false;
         var address = addr;
         // check split count
         if (split == 0)
@@ -327,8 +327,8 @@ public class HCommProEx {
         if (ToolManager.SelectedTool < 0 || ToolManager.SelectedTool >= 0xFF)
             return false;
 
-        var res = false;
-        var count = values.Length;
+        var res    = false;
+        var count  = values.Length;
         var offset = 0;
         // get block
         var block = count / (HCommEx.WriteRegMaxSize + 1) + 1;
@@ -412,13 +412,13 @@ public class HCommProEx {
                 if (!Session.Write(values))
                     return;
                 // set activation status
-                msg.IsActive = true;
+                msg.IsActive   = true;
                 msg.ActiveTime = DateTime.Now;
             }
             // check activation timeout
             else if ((DateTime.Now - msg.ActiveTime).TotalMilliseconds > MessageTimeout) {
                 // reset activation status
-                msg.IsActive = false;
+                msg.IsActive   = false;
                 msg.ActiveTime = DateTime.Now;
                 // change retry count
                 if (--msg.Retry == 0)
@@ -447,9 +447,9 @@ public class HCommProEx {
                 // check header
                 if (request.Message.Header != null)
                     // check id
-                    if (msg.Header.Id == request.Message.Header.Id + 1 ||
+                    if (msg.Header.Id == request.Message.Header.Id + 1  ||
                         msg.Header.Id == MessageIdTypes.CommandAccepted ||
-                        msg.Header.Id == MessageIdTypes.CommandError ||
+                        msg.Header.Id == MessageIdTypes.CommandError    ||
                         msg.Header.Id == MessageIdTypes.KeepAlive) {
                         // check modbus id
                         if (msg.Header.Id == MessageIdTypes.ModbusReply)
@@ -572,8 +572,8 @@ public class HCommProEx {
                         values: [
                             (byte)((jobData.Id >> 24) & 0xFF),
                             (byte)((jobData.Id >> 16) & 0xFF),
-                            (byte)((jobData.Id >> 8) & 0xFF),
-                            (byte)(jobData.Id & 0xFF)
+                            (byte)((jobData.Id >> 8)  & 0xFF),
+                            (byte)(jobData.Id         & 0xFF)
                         ]));
 
                 break;
@@ -591,8 +591,8 @@ public class HCommProEx {
                         values: [
                             (byte)((eventData.Id >> 24) & 0xFF),
                             (byte)((eventData.Id >> 16) & 0xFF),
-                            (byte)((eventData.Id >> 8) & 0xFF),
-                            (byte)(eventData.Id & 0xFF)
+                            (byte)((eventData.Id >> 8)  & 0xFF),
+                            (byte)(eventData.Id         & 0xFF)
                         ]);
                     // not acknowledge state
                     ackEvent.IsNotAck = true;
@@ -640,13 +640,13 @@ public class HCommProEx {
             Message = new FormatMessage([
                 // length
                 (byte)((length >> 8) & 0xFF),
-                (byte)(length & 0xFF),
+                (byte)(length        & 0xFF),
                 // message id
                 (byte)(((int)id >> 8) & 0xFF),
-                (byte)((int)id & 0xFF),
+                (byte)((int)id        & 0xFF),
                 // revision
                 (byte)((revision >> 8) & 0xFF),
-                (byte)(revision & 0xFF),
+                (byte)(revision        & 0xFF),
                 // dummy
                 0x00,
                 0x00,
@@ -671,7 +671,7 @@ public class HCommProEx {
             // get address
             var address = (values[8] << 8) | values[9];
             // set code and address
-            message.Code = code;
+            message.Code    = code;
             message.Address = address;
         }
 

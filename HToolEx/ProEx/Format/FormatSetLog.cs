@@ -65,10 +65,10 @@ public class FormatSetLog {
         for (var i = 0; i < DataFieldCount[0]; i++)
             // set data field
             DataField[i] = Convert.ToInt32(bin.ReadByte());
-        Graph = Convert.ToInt32(bin.ReadByte());
+        Graph          = Convert.ToInt32(bin.ReadByte());
         TypeOfChannel1 = bin.ReadByte();
         TypeOfChannel2 = bin.ReadByte();
-        SampleTime = bin.ReadByte();
+        SampleTime     = bin.ReadByte();
         // check revision.1 information
         if (revision < 1)
             return;
@@ -82,12 +82,12 @@ public class FormatSetLog {
             return;
         // set revision.2 information
         JobLoggingUnit = bin.ReadByte();
-        WithId1 = bin.ReadByte();
-        WithId2 = bin.ReadByte();
-        WithId3 = bin.ReadByte();
-        WithId4 = bin.ReadByte();
-        WithId5 = bin.ReadByte();
-        WithId6 = bin.ReadByte();
+        WithId1        = bin.ReadByte();
+        WithId2        = bin.ReadByte();
+        WithId3        = bin.ReadByte();
+        WithId4        = bin.ReadByte();
+        WithId5        = bin.ReadByte();
+        WithId6        = bin.ReadByte();
     }
 
     /// <summary>

@@ -36,11 +36,11 @@ public interface IMessageRequest {
 ///     Message queue utility class for transmission with retry and duplicate prevention.
 /// </summary>
 public sealed class MessageQueue<TRequest> : IDisposable where TRequest : IMessageRequest {
-    private readonly ConcurrentQueue<TRequest> _queue = new();
-    private readonly int _retries;
+    private readonly ConcurrentQueue<TRequest>       _queue = new();
+    private readonly int                             _retries;
     private readonly ConcurrentDictionary<int, byte> _sumSet = new();
-    private int _count;
-    private bool _isDisposed;
+    private          int                             _count;
+    private          bool                            _isDisposed;
 
     /// <summary>
     ///     Constructor
@@ -226,7 +226,7 @@ public sealed class MessageQueue<TRequest> : IDisposable where TRequest : IMessa
     private static int ComputeChecksum(byte[] packet) {
         unchecked {
             const uint fnvOffset = 2166136261u;
-            const uint fnvPrime = 16777619u;
+            const uint fnvPrime  = 16777619u;
             // get the hash offset
             var hash = fnvOffset;
             // check the packet

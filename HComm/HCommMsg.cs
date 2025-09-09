@@ -18,11 +18,11 @@ namespace HComm {
         public HCommMsg(Command cmd, int addr, int count, IEnumerable<byte> packet, int retry = 1) {
             Command = cmd;
             Address = addr;
-            Count = count;
-            Active = false;
-            Time = DateTime.Now;
-            Retry = retry;
-            Packet = new List<byte>(packet);
+            Count   = count;
+            Active  = false;
+            Time    = DateTime.Now;
+            Retry   = retry;
+            Packet  = new List<byte>(packet);
         }
 
         public Command Command { get; }

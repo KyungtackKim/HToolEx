@@ -39,12 +39,12 @@ public class FormatMessage {
 
         // get header values
         var values = new List<byte> {
-            (byte)((Header.Length >> 8) & 0xFF),
-            (byte)(Header.Length & 0xFF),
-            (byte)(((int)Header.Id >> 8) & 0xFF),
-            (byte)((int)Header.Id & 0xFF),
+            (byte)((Header.Length >> 8)   & 0xFF),
+            (byte)(Header.Length          & 0xFF),
+            (byte)(((int)Header.Id >> 8)  & 0xFF),
+            (byte)((int)Header.Id         & 0xFF),
             (byte)((Header.Revision >> 8) & 0xFF),
-            (byte)(Header.Revision & 0xFF)
+            (byte)(Header.Revision        & 0xFF)
         };
         // get reserved
         values.AddRange(new byte[FormatMessageInfo.Size - 6]);

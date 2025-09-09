@@ -42,8 +42,8 @@ public class FormatSetBarcode {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0 information
-        Tool = Convert.ToInt32(bin.ReadByte());
-        Enable = Convert.ToInt32(bin.ReadByte());
+        Tool     = Convert.ToInt32(bin.ReadByte());
+        Enable   = Convert.ToInt32(bin.ReadByte());
         FilePath = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
     }
 

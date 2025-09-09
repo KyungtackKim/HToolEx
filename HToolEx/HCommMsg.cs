@@ -15,11 +15,11 @@ public class HCommMsg {
     /// <param name="retry">retry count</param>
     public HCommMsg(CodeTypes codeTypes, int addr, IReadOnlyCollection<byte> packet, int retry = 1) {
         // set information
-        CodeTypes = codeTypes;
-        Address = addr;
+        CodeTypes  = codeTypes;
+        Address    = addr;
         RetryCount = retry;
-        CheckSum = GetCheckSum(packet);
-        Packet = new List<byte>(packet);
+        CheckSum   = GetCheckSum(packet);
+        Packet     = new List<byte>(packet);
     }
 
     /// <summary>

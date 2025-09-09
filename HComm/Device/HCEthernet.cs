@@ -26,12 +26,12 @@ namespace HComm.Device {
         /// </summary>
         public HcEthernet() {
             // set session general event
-            Session.Connected += Session_Connected;
-            Session.Closed += Session_Closed;
-            Session.Error += Session_Error;
+            Session.Connected    += Session_Connected;
+            Session.Closed       += Session_Closed;
+            Session.Error        += Session_Error;
             MorSession.Connected += Session_Connected;
-            MorSession.Closed += Session_Closed;
-            MorSession.Error += Session_Error;
+            MorSession.Closed    += Session_Closed;
+            MorSession.Error     += Session_Error;
         }
 
         private AsyncTcpSession Session { get; } = new AsyncTcpSession();
@@ -152,7 +152,7 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 // transaction id
                 (byte)((Transaction >> 8) & 0xFF),
-                (byte)(Transaction & 0xFF),
+                (byte)(Transaction        & 0xFF),
                 // protocol id
                 0x00,
                 (byte)Id,
@@ -164,10 +164,10 @@ namespace HComm.Device {
                 // command
                 (byte)Command.Read,
                 // values
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // packet
             return packet.ToArray();
@@ -186,7 +186,7 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 // transaction id
                 (byte)((Transaction >> 8) & 0xFF),
-                (byte)(Transaction & 0xFF),
+                (byte)(Transaction        & 0xFF),
                 // protocol id
                 0x00,
                 (byte)Id,
@@ -198,10 +198,10 @@ namespace HComm.Device {
                 // command
                 (byte)Command.Write,
                 // values
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((value >> 8) & 0xFF),
-                (byte)(value & 0xFF)
+                (byte)(value        & 0xFF)
             };
             // packet
             return packet.ToArray();
@@ -220,7 +220,7 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 // transaction id
                 (byte)((Transaction >> 8) & 0xFF),
-                (byte)(Transaction & 0xFF),
+                (byte)(Transaction        & 0xFF),
                 // protocol id
                 0x00,
                 (byte)Id,
@@ -232,10 +232,10 @@ namespace HComm.Device {
                 // command
                 (byte)Command.Mor,
                 // values
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // packet
             return packet.ToArray();
@@ -252,7 +252,7 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 // transaction id
                 (byte)((Transaction >> 8) & 0xFF),
-                (byte)(Transaction & 0xFF),
+                (byte)(Transaction        & 0xFF),
                 // protocol id
                 0x00,
                 (byte)Id,
@@ -330,7 +330,7 @@ namespace HComm.Device {
             ProcessTimer.Change(Timeout.Infinite, Timeout.Infinite);
             MorTimer.Change(Timeout.Infinite, Timeout.Infinite);
             // reset event
-            Session.DataReceived -= SessionDataReceived;
+            Session.DataReceived    -= SessionDataReceived;
             MorSession.DataReceived -= MorSessionDataReceived;
             // check empty
             while (!ReceiveBuf.IsEmpty)
@@ -394,8 +394,8 @@ namespace HComm.Device {
                 if (AnalyzeBuf.Count < 8)
                     return;
                 // set frame length
-                var frame = ((AnalyzeBuf[4] << 8) | AnalyzeBuf[5]) + 6;
-                var length = frame - 8;
+                var frame  = ((AnalyzeBuf[4] << 8) | AnalyzeBuf[5]) + 6;
+                var length = frame                                  - 8;
                 // check frame length
                 if (frame < 8)
                     // clear analyze buffer
@@ -456,8 +456,8 @@ namespace HComm.Device {
                 if (MorAnalyzeBuf.Count < 8)
                     return;
                 // set frame length
-                var frame = ((MorAnalyzeBuf[4] << 8) | MorAnalyzeBuf[5]) + 6;
-                var length = frame - 8;
+                var frame  = ((MorAnalyzeBuf[4] << 8) | MorAnalyzeBuf[5]) + 6;
+                var length = frame                                        - 8;
                 // check frame length
                 if (frame < 8)
                     // clear analyze buffer

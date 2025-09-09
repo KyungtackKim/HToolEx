@@ -10,13 +10,13 @@
         <Copyright>Copyright 2022. Hantas all right reserved.</Copyright>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageIconUrl />
+        <PackageIconUrl/>
         <AssemblyVersion>1.0.0.6</AssemblyVersion>
         <FileVersion>1.0.0.6</FileVersion>
         <Description>Hantas torque meter device communication library</Description>
         <PackageVersion>1.0.0.6</PackageVersion>
         <ApplicationIcon>icon.ico</ApplicationIcon>
-        <Win32Resource />
+        <Win32Resource/>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
@@ -28,12 +28,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Device\" />
-        <Folder Include="WCL\" />
+        <Folder Include="Device\"/>
+        <Folder Include="WCL\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.IO.Ports" Version="9.0.6" />
+        <PackageReference Include="System.IO.Ports" Version="9.0.6"/>
     </ItemGroup>
 
     <ItemGroup>

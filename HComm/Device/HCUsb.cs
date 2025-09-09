@@ -10,9 +10,9 @@ using HidLibrary;
 namespace HComm.Device {
     public class HcUsb : IHComm {
         private const int ProcessTime = 10;
-        private const int UsbTimeout = 100;
-        private const int Vid = 0x0483;
-        private const int Pid = 0x5710;
+        private const int UsbTimeout  = 100;
+        private const int Vid         = 0x0483;
+        private const int Pid         = 0x5710;
         private HidDevice UsbDevice { get; set; }
         private Timer ProcessTimer { get; set; }
         private ConcurrentQueue<byte> ReceiveBuf { get; } = new ConcurrentQueue<byte>();
@@ -174,10 +174,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Read,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // add dummy
             packet.AddRange(new byte[64 - packet.Count]);
@@ -195,10 +195,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Write,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((value >> 8) & 0xFF),
-                (byte)(value & 0xFF)
+                (byte)(value        & 0xFF)
             };
             // add dummy
             packet.AddRange(new byte[64 - packet.Count]);
@@ -216,10 +216,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Mor,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // add dummy
             packet.AddRange(new byte[64 - packet.Count]);
@@ -314,7 +314,7 @@ namespace HComm.Device {
                 if (AnalyzeBuf.Count < UsbDevice.Capabilities.OutputReportByteLength - 1)
                     return;
                 // set command
-                var cmd = (Command)AnalyzeBuf[0];
+                var cmd   = (Command)AnalyzeBuf[0];
                 var error = (byte)cmd & 0x80;
                 // check error
                 if (error == 0x80 && cmd != Command.GraphAd) {

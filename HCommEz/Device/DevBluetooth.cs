@@ -14,9 +14,9 @@ namespace HCommEz.Device {
     ///     Device bluetooth class
     /// </summary>
     public class DevBluetooth : IDevice {
-        private const int TimerInterval = 100;
-        private wclGattCharacteristic[] _charList;
-        private wclGattService[] _serviceList;
+        private const int                     TimerInterval = 100;
+        private       wclGattCharacteristic[] _charList;
+        private       wclGattService[]        _serviceList;
 
         /// <summary>
         ///     Constructor
@@ -24,7 +24,7 @@ namespace HCommEz.Device {
         public DevBluetooth() {
             // bluetooth
             Manager = new wclBluetoothManager();
-            Client = new wclGattClient();
+            Client  = new wclGattClient();
             // connect timer
             ConnectTimer = new Timer(ConnectTimerCallback);
             // work timer
@@ -133,7 +133,7 @@ namespace HCommEz.Device {
             if (Client.State != wclClientState.csConnected)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -148,7 +148,7 @@ namespace HCommEz.Device {
                 // get character
                 var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF2);
                 // write
-                if (character >= 0 &&
+                if (character                                                     >= 0 &&
                     Client.WriteCharacteristicValue(_charList[character], packet) == wclErrors.WCL_E_SUCCESS) {
                     // change mode
                     Mode = WorkMode.Calibration;
@@ -172,7 +172,7 @@ namespace HCommEz.Device {
             if (Client.State != wclClientState.csConnected)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -187,7 +187,7 @@ namespace HCommEz.Device {
                 // get character
                 var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF2);
                 // write
-                if (character >= 0 &&
+                if (character                                                     >= 0 &&
                     Client.WriteCharacteristicValue(_charList[character], packet) == wclErrors.WCL_E_SUCCESS) {
                     // change mode
                     Mode = WorkMode.Torque;
@@ -211,7 +211,7 @@ namespace HCommEz.Device {
             if (Client.State != wclClientState.csConnected)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -226,7 +226,7 @@ namespace HCommEz.Device {
                 // get character
                 var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF2);
                 // write
-                if (character >= 0 &&
+                if (character                                                     >= 0 &&
                     Client.WriteCharacteristicValue(_charList[character], packet) == wclErrors.WCL_E_SUCCESS) {
                     // change mode
                     Mode = WorkMode.Torque;
@@ -251,7 +251,7 @@ namespace HCommEz.Device {
             if (Client.State != wclClientState.csConnected)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[37];
             // header
             packet[index++] = 0x5A;
@@ -264,23 +264,23 @@ namespace HCommEz.Device {
             // body type
             packet[index++] = Convert.ToByte(data.Type);
             // model
-            packet[index++] = Convert.ToByte(data.Model & 0xFF);
-            packet[index++] = Convert.ToByte((data.Model >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.Model         & 0xFF);
+            packet[index++] = Convert.ToByte((data.Model >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.Model >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.Model >> 24) & 0xFF);
             // max torque
-            packet[index++] = Convert.ToByte(data.TorqueUInt32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.TorqueUInt32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 24) & 0xFF);
             // body serial
-            packet[index++] = Convert.ToByte(data.BodySerialUint32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.BodySerialUint32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 24) & 0xFF);
             // sensor serial
-            packet[index++] = Convert.ToByte(data.SensorSerialUInt32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.SensorSerialUInt32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 24) & 0xFF);
             // unit
@@ -288,7 +288,7 @@ namespace HCommEz.Device {
             // point
             packet[index++] = Convert.ToByte(data.Point);
             // offset
-            packet[index++] = Convert.ToByte(data.Offset & 0xFF);
+            packet[index++] = Convert.ToByte(data.Offset        & 0xFF);
             packet[index++] = Convert.ToByte((data.Offset >> 8) & 0xFF);
             // check type
             if (data.Type == BodyTypes.Separation) {
@@ -298,7 +298,7 @@ namespace HCommEz.Device {
 
             // positive data
             for (var i = 0; i < 5; i++) {
-                packet[index++] = Convert.ToByte(data.Positive[i] & 0xFF);
+                packet[index++] = Convert.ToByte(data.Positive[i]        & 0xFF);
                 packet[index++] = Convert.ToByte((data.Positive[i] >> 8) & 0xFF);
                 // check type
                 if (data.Type != BodyTypes.Separation)
@@ -309,7 +309,7 @@ namespace HCommEz.Device {
 
             // negative data
             for (var i = 0; i < 5; i++) {
-                packet[index++] = Convert.ToByte(data.Negative[i] & 0xFF);
+                packet[index++] = Convert.ToByte(data.Negative[i]        & 0xFF);
                 packet[index++] = Convert.ToByte((data.Negative[i] >> 8) & 0xFF);
                 // check type
                 if (data.Type != BodyTypes.Separation)
@@ -322,7 +322,7 @@ namespace HCommEz.Device {
                 // get character
                 var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF2);
                 // write
-                if (character >= 0 &&
+                if (character                                                     >= 0 &&
                     Client.WriteCharacteristicValue(_charList[character], packet) == wclErrors.WCL_E_SUCCESS)
                     return true;
             } catch (Exception ex) {
@@ -344,7 +344,7 @@ namespace HCommEz.Device {
             if (Client.State != wclClientState.csConnected)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[7];
             // header
             packet[index++] = 0x5A;
@@ -363,7 +363,7 @@ namespace HCommEz.Device {
                 // get character
                 var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF2);
                 // write
-                if (character >= 0 &&
+                if (character                                                     >= 0 &&
                     Client.WriteCharacteristicValue(_charList[character], packet) == wclErrors.WCL_E_SUCCESS)
                     return true;
             } catch (Exception ex) {
@@ -412,7 +412,7 @@ namespace HCommEz.Device {
             if (Manager.Count == 0)
                 return false;
             // set discover event
-            Manager.OnDiscoveringStarted += OnDiscoveringStarted;
+            Manager.OnDiscoveringStarted   += OnDiscoveringStarted;
             Manager.OnDiscoveringCompleted += OnDiscoveringCompleted;
             // discover
             return Manager[0].Discover(10, wclBluetoothDiscoverKind.dkBle) == wclErrors.WCL_E_SUCCESS;
@@ -421,7 +421,7 @@ namespace HCommEz.Device {
         private void OnConnect(object sender, int error) {
             // reset list
             _serviceList = null;
-            _charList = null;
+            _charList    = null;
             // read service
             if (Client.ReadServices(wclGattOperationFlag.goReadFromDevice, out _serviceList) == wclErrors.WCL_E_SUCCESS) {
                 // find service
@@ -433,7 +433,7 @@ namespace HCommEz.Device {
                     // find characteristic
                     var character = Array.FindIndex(_charList, x => x.Uuid.ShortUuid == 0xFFF1);
                     // subscribe and configuration
-                    if (character >= 0 &&
+                    if (character                              >= 0                       &&
                         Client.Subscribe(_charList[character]) == wclErrors.WCL_E_SUCCESS &&
                         Client.WriteClientConfiguration(_charList[character], true,
                             wclGattOperationFlag.goReadFromDevice) == wclErrors.WCL_E_SUCCESS) {
@@ -444,7 +444,7 @@ namespace HCommEz.Device {
                         // clear buffer
                         AnalyzeBuf.Clear();
                         // set event
-                        Client.OnDisconnect += OnDisconnect;
+                        Client.OnDisconnect            += OnDisconnect;
                         Client.OnCharacteristicChanged += OnCharacteristicChanged;
                         // start timer
                         ConnectTimer.Change(TimerInterval, TimerInterval);
@@ -464,8 +464,8 @@ namespace HCommEz.Device {
                 // unsubscribe
                 Client.Unsubscribe(_charList[character]);
             // reset event
-            Client.OnConnect -= OnConnect;
-            Client.OnDisconnect -= OnDisconnect;
+            Client.OnConnect               -= OnConnect;
+            Client.OnDisconnect            -= OnDisconnect;
             Client.OnCharacteristicChanged -= OnCharacteristicChanged;
             // change state
             IsConnected = false;
@@ -484,7 +484,7 @@ namespace HCommEz.Device {
 
         private void OnBeforeClose(object sender, EventArgs e) {
             // reset open/close event
-            Manager.AfterOpen -= OnAfterOpen;
+            Manager.AfterOpen   -= OnAfterOpen;
             Manager.BeforeClose -= OnBeforeClose;
             // debug
             Debug.WriteLine(@"Bluetooth closed");
@@ -501,7 +501,7 @@ namespace HCommEz.Device {
 
         private void OnDiscoveringCompleted(object sender, wclBluetoothRadio radio, int error) {
             // reset device event
-            Manager.OnDiscoveringStarted -= OnDiscoveringStarted;
+            Manager.OnDiscoveringStarted   -= OnDiscoveringStarted;
             Manager.OnDiscoveringCompleted -= OnDiscoveringCompleted;
             // reset device found event
             Manager.OnDeviceFound -= OnDeviceFound;

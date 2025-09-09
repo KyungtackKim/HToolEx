@@ -59,7 +59,7 @@ public class HCommRtuData : IHCommData {
     public void Create(IReadOnlyList<byte> values) {
         var pos = 0;
         // set header
-        DeviceId = values[pos++];
+        DeviceId  = values[pos++];
         CodeTypes = (CodeTypes)values[pos++];
 
         // check function code

@@ -607,16 +607,16 @@ namespace HCommEz.Device {
     ///     Working command types
     /// </summary>
     public enum WorkCommand {
-        ReqCalData = 0x00,
-        ReqCalSetPoint = 0x01,
-        ReqCalSave = 0x02,
+        ReqCalData      = 0x00,
+        ReqCalSetPoint  = 0x01,
+        ReqCalSave      = 0x02,
         ReqCalTerminate = 0x03,
-        ReqSetting = 0x04,
-        ResCalData = 0x80,
-        ResCalSetPoint = 0x81,
-        ResCalSave = 0x82,
-        ResSetting = 0x84,
-        RepCurAdc = 0xA0
+        ReqSetting      = 0x04,
+        ResCalData      = 0x80,
+        ResCalSetPoint  = 0x81,
+        ResCalSave      = 0x82,
+        ResSetting      = 0x84,
+        RepCurAdc       = 0xA0
     }
 
     /// <summary>

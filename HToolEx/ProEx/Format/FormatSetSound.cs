@@ -42,8 +42,8 @@ public class FormatSetSound {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0 information
-        OkPath = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        NgPath = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        OkPath  = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        NgPath  = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         EtcPath = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         TapPath = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
     }
@@ -88,13 +88,13 @@ public class FormatSetSound {
     public byte[] GetValues(int revision = 0) {
         var values = new List<byte>();
         // get string values
-        var ok = Encoding.ASCII.GetBytes(OkPath).ToList();
-        var ng = Encoding.ASCII.GetBytes(NgPath).ToList();
+        var ok  = Encoding.ASCII.GetBytes(OkPath).ToList();
+        var ng  = Encoding.ASCII.GetBytes(NgPath).ToList();
         var etc = Encoding.ASCII.GetBytes(EtcPath).ToList();
         var tap = Encoding.ASCII.GetBytes(TapPath).ToList();
         // string length offset
-        ok.AddRange(new byte[128 - OkPath.Length]);
-        ng.AddRange(new byte[128 - NgPath.Length]);
+        ok.AddRange(new byte[128  - OkPath.Length]);
+        ng.AddRange(new byte[128  - NgPath.Length]);
         etc.AddRange(new byte[128 - EtcPath.Length]);
         tap.AddRange(new byte[128 - TapPath.Length]);
         // get revision.0 values

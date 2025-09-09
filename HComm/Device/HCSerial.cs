@@ -9,8 +9,8 @@ using HComm.Common;
 
 namespace HComm.Device {
     public class HcSerial : IHComm {
-        private const int ProcessTime = 10;
-        private static readonly int[] BaudRates = { 9600, 19200, 38400, 57600, 115200, 230400 };
+        private const           int   ProcessTime = 10;
+        private static readonly int[] BaudRates   = { 9600, 19200, 38400, 57600, 115200, 230400 };
         private SerialPort Port { get; } = new SerialPort();
 
         private Timer ProcessTimer { get; set; }
@@ -145,10 +145,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Read,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // crc
             packet.AddRange(GetCrc(packet.ToArray()));
@@ -166,10 +166,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Write,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((value >> 8) & 0xFF),
-                (byte)(value & 0xFF)
+                (byte)(value        & 0xFF)
             };
             // crc
             packet.AddRange(GetCrc(packet.ToArray()));
@@ -187,10 +187,10 @@ namespace HComm.Device {
             var packet = new List<byte> {
                 Id,
                 (byte)Command.Mor,
-                (byte)((addr >> 8) & 0xFF),
-                (byte)(addr & 0xFF),
+                (byte)((addr >> 8)  & 0xFF),
+                (byte)(addr         & 0xFF),
                 (byte)((count >> 8) & 0xFF),
-                (byte)(count & 0xFF)
+                (byte)(count        & 0xFF)
             };
             // crc
             packet.AddRange(GetCrc(packet.ToArray()));
@@ -241,7 +241,7 @@ namespace HComm.Device {
         }
 
         private static IEnumerable<byte> GetCrc(IEnumerable<byte> packet) {
-            var crc = new byte[] { 0xFF, 0xFF };
+            var    crc     = new byte[] { 0xFF, 0xFF };
             ushort crcFull = 0xFFFF;
             // check total packet
             foreach (var data in packet) {
@@ -262,7 +262,7 @@ namespace HComm.Device {
 
             // set CRC
             crc[1] = (byte)((crcFull >> 8) & 0xFF);
-            crc[0] = (byte)(crcFull & 0xFF);
+            crc[0] = (byte)(crcFull        & 0xFF);
 
             return crc;
         }
@@ -303,7 +303,7 @@ namespace HComm.Device {
                     return;
 
                 // set command
-                var cmd = (Command)AnalyzeBuf[1];
+                var cmd   = (Command)AnalyzeBuf[1];
                 var error = (byte)cmd & 0x80;
                 // check error
                 if (error == 0x80 && cmd != Command.GraphAd)

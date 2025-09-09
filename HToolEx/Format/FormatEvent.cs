@@ -19,7 +19,7 @@ public partial class FormatEvent {
     public FormatEvent() {
         // reset string properties
         Revision = "0.0";
-        Barcode = string.Empty;
+        Barcode  = string.Empty;
         // check graph step length
         for (var i = 0; i < GraphSteps.Length; i++)
             // add step value
@@ -37,12 +37,12 @@ public partial class FormatEvent {
         using var bin = new BinaryReaderBigEndian(stream);
         // set information
         Revision = $"{bin.ReadByte()}.{bin.ReadByte()}";
-        Id = bin.ReadUInt16();
+        Id       = bin.ReadUInt16();
         Date = new DateTime(bin.ReadUInt16(), bin.ReadByte(), bin.ReadByte(),
             bin.ReadByte(), bin.ReadByte(), bin.ReadByte(), bin.ReadByte());
-        Time = Date;
+        Time       = Date;
         FastenTime = bin.ReadUInt16();
-        Preset = bin.ReadUInt16();
+        Preset     = bin.ReadUInt16();
         // get unit value
         var unit = bin.ReadUInt16();
         // check defined unit
@@ -63,17 +63,17 @@ public partial class FormatEvent {
         if (Enum.IsDefined(typeof(EventTypes), (int)status))
             // set event status
             Event = (EventTypes)status;
-        TargetTorque = bin.ReadSingle();
-        Torque = bin.ReadSingle();
-        SeatingTorque = bin.ReadSingle();
-        ClampTorque = bin.ReadSingle();
+        TargetTorque     = bin.ReadSingle();
+        Torque           = bin.ReadSingle();
+        SeatingTorque    = bin.ReadSingle();
+        ClampTorque      = bin.ReadSingle();
         PrevailingTorque = bin.ReadSingle();
-        SnugTorque = bin.ReadSingle();
-        Speed = bin.ReadUInt16();
-        Angle1 = bin.ReadUInt16();
-        Angle2 = bin.ReadUInt16();
-        Angle = bin.ReadUInt16();
-        SnugAngle = bin.ReadUInt16();
+        SnugTorque       = bin.ReadSingle();
+        Speed            = bin.ReadUInt16();
+        Angle1           = bin.ReadUInt16();
+        Angle2           = bin.ReadUInt16();
+        Angle            = bin.ReadUInt16();
+        SnugAngle        = bin.ReadUInt16();
         // reserved
         bin.ReadBytes(16);
         // barcode
@@ -92,11 +92,11 @@ public partial class FormatEvent {
             TypeOfChannel2 = (GraphTypes)ch2;
         CountOfChannel1 = bin.ReadUInt16();
         CountOfChannel2 = bin.ReadUInt16();
-        SamplingRate = bin.ReadUInt16();
+        SamplingRate    = bin.ReadUInt16();
         // check count
         for (var i = 0; i < GraphSteps.Length; i++) {
             // get id/index
-            var id = (GraphStepTypes)bin.ReadUInt16();
+            var id    = (GraphStepTypes)bin.ReadUInt16();
             var index = bin.ReadUInt16();
             // check defined id
             if (Enum.IsDefined(typeof(GraphStepTypes), id))
@@ -239,39 +239,39 @@ public partial class FormatEvent {
                 if (!int.TryParse(steps[i * 2 + 1], out var stepIndex))
                     throw new Exception($"Invalid value : Graph step index {i}");
                 // set step value
-                GraphSteps[i].Id = stepId.type;
+                GraphSteps[i].Id    = stepId.type;
                 GraphSteps[i].Index = stepIndex;
             }
 
             // set values
-            Id = id;
-            Revision = data[1];
-            Date = dateTime;
-            Time = dateTime;
-            FastenTime = fastenTime;
-            Preset = preset;
-            Unit = unit.type;
-            RemainScrew = screw;
-            Direction = dir.type;
-            Error = error;
-            Event = status.type;
-            TargetTorque = target;
-            Torque = torque;
-            SeatingTorque = seating;
-            ClampTorque = clamp;
+            Id               = id;
+            Revision         = data[1];
+            Date             = dateTime;
+            Time             = dateTime;
+            FastenTime       = fastenTime;
+            Preset           = preset;
+            Unit             = unit.type;
+            RemainScrew      = screw;
+            Direction        = dir.type;
+            Error            = error;
+            Event            = status.type;
+            TargetTorque     = target;
+            Torque           = torque;
+            SeatingTorque    = seating;
+            ClampTorque      = clamp;
             PrevailingTorque = prevailing;
-            SnugTorque = snugTorque;
-            Speed = speed;
-            Angle1 = angle1;
-            Angle2 = angle2;
-            Angle = angle;
-            SnugAngle = snugAngle;
-            TypeOfChannel1 = ch1.type;
-            TypeOfChannel2 = ch2.type;
-            CountOfChannel1 = countCh1;
-            CountOfChannel2 = countCh2;
-            SamplingRate = sample;
-            Barcode = data[Count - 1];
+            SnugTorque       = snugTorque;
+            Speed            = speed;
+            Angle1           = angle1;
+            Angle2           = angle2;
+            Angle            = angle;
+            SnugAngle        = snugAngle;
+            TypeOfChannel1   = ch1.type;
+            TypeOfChannel2   = ch2.type;
+            CountOfChannel1  = countCh1;
+            CountOfChannel2  = countCh2;
+            SamplingRate     = sample;
+            Barcode          = data[Count - 1];
         } catch (Exception e) {
             // set error
             msg = e.Message;
@@ -546,12 +546,12 @@ public partial class FormatEvent {
     /// <returns>type</returns>
     public static GraphTypes ToGraphTypes(ProEx.Type.GraphTypes type) {
         return type switch {
-            ProEx.Type.GraphTypes.None => GraphTypes.None,
-            ProEx.Type.GraphTypes.Torque => GraphTypes.Torque,
-            ProEx.Type.GraphTypes.Speed => GraphTypes.Speed,
-            ProEx.Type.GraphTypes.Angle => GraphTypes.Angle,
+            ProEx.Type.GraphTypes.None        => GraphTypes.None,
+            ProEx.Type.GraphTypes.Torque      => GraphTypes.Torque,
+            ProEx.Type.GraphTypes.Speed       => GraphTypes.Speed,
+            ProEx.Type.GraphTypes.Angle       => GraphTypes.Angle,
             ProEx.Type.GraphTypes.TorqueAngle => GraphTypes.TorqueAngle,
-            _ => GraphTypes.None
+            _                                 => GraphTypes.None
         };
     }
 

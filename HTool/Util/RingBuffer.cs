@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace HTool.Util;
 
@@ -85,22 +86,6 @@ public class RingBuffer {
         // check the length
         if (data.Length == 0)
             return;
-#if NOT_USE
-        // check data length
-        foreach (var b in data) {
-            // set data
-            _buffer[_writePos] = b;
-            // update position
-            _writePos = (_writePos + 1) & _mask;
-            // check capacity
-            if (Available < Capacity)
-                // update available
-                Available++;
-            else
-                // overwritten data
-                _readPos = (_readPos + 1) & _mask;
-        }
-#else
         // get the data length
         var length = data.Length;
         var remain = Capacity - _writePos;
@@ -134,7 +119,6 @@ public class RingBuffer {
             // set the available
             Available = newAvailable;
         }
-#endif
     }
 
     /// <summary>
@@ -186,37 +170,43 @@ public class RingBuffer {
     /// </summary>
     /// <param name="offset">offset</param>
     /// <returns>data</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte Peek(int offset) {
+        // get the values
+        var available = Available;
+        var pos       = _readPos;
         // check offset
-        if (offset < 0)
-            // throw the exception
-            throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
-
-        // check offset
-        return offset < Available ? _buffer[(_readPos + offset) & _mask] : throw new IndexOutOfRangeException("Not enough data");
+        return (uint)offset < (uint)available ? _buffer[(pos + offset) & _mask] :
+            throw new ArgumentOutOfRangeException(nameof(offset), "Invalid offset");
     }
 
     /// <summary>
     ///     Read all peek data
     /// </summary>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<byte> PeekBytes() {
+        // get the values
+        var available = Available;
+        var pos       = _readPos;
         // check data
-        if (Available == 0)
+        if (available == 0)
             return ReadOnlySpan<byte>.Empty;
-        // check if all data is contiguous (no wrap around)
-        if (_readPos + Available <= _buffer.Length)
-            // get the all data
-            return new ReadOnlySpan<byte>(_buffer, _readPos, Available);
+        // get the length
+        var len = _buffer.Length;
+        // check the length
+        if (pos + available <= len)
+            return new ReadOnlySpan<byte>(_buffer, pos, available);
+
         // create the array
-        var data = new byte[Available];
+        var result = new byte[available];
         // get the first part length
-        var first = _buffer.Length - _readPos;
+        var first = len - pos;
         // copy the data
-        Array.Copy(_buffer, _readPos, data, 0, first);
-        Array.Copy(_buffer, 0, data, first, Available - first);
+        Array.Copy(_buffer, pos, result, 0, first);
+        Array.Copy(_buffer, 0, result, first, available - first);
         // get the all data
-        return data;
+        return result;
     }
 
     /// <summary>
@@ -224,59 +214,48 @@ public class RingBuffer {
     /// </summary>
     /// <param name="length">length</param>
     /// <returns>data</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] ReadBytes(int length) {
         // check length
         if (length < 0)
             throw new ArgumentOutOfRangeException(nameof(length), "Length cannot be negative");
-#if NOT_USE
-        // check data
-        if (length > Available)
-            // exception
-            throw new IndexOutOfRangeException("Not enough data");
-        // check length
-        if (length == 0)
-            return [];
-        // create the buffer
-        var result = new byte[length];
-        // check length
-        for (var i = 0; i < length; i++) {
-            // set data
-            result[i] = _buffer[_readPos];
-            // update position
-            _readPos = (_readPos + 1) & _mask;
-        }
-
-        // reset available
-        Available -= length;
-        // result
-        return result;
-#else
+        // get the values
+        var available = Available;
+        var pos       = _readPos;
         // get the actual length
-        var actual = Math.Min(length, Available);
+        var actual = Math.Min(length, available);
         // check the actual length
         if (actual == 0)
             return [];
+        // get the length
+        var len = _buffer.Length;
         // create the buffer
         var result = new byte[actual];
         // check the length
-        for (var i = 0; i < actual; i++) {
-            // set the data
-            result[i] = _buffer[_readPos];
-            // update the position
-            _readPos = (_readPos + 1) & _mask;
+        if (pos + actual <= len) {
+            // copy the single block
+            Buffer.BlockCopy(_buffer, pos, result, 0, actual);
+        } else {
+            // get the first block index
+            var first = len - pos;
+            // copy the two blocks
+            Buffer.BlockCopy(_buffer, pos, result, 0, first);
+            Buffer.BlockCopy(_buffer, 0, result, first, actual - first);
         }
 
+        // update the position
+        _readPos = (pos + actual) & _mask;
         // reset available
-        Available -= actual;
+        Available = available - actual;
         // result
         return result;
-#endif
     }
 
     /// <summary>
     ///     Remove the data
     /// </summary>
     /// <param name="length">length</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveBytes(int length) {
         // check length
         if (length < 0)
@@ -296,6 +275,7 @@ public class RingBuffer {
     /// <summary>
     ///     Clear all data
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear() {
         // reset positions
         _readPos  = 0;

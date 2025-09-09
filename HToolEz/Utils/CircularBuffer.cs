@@ -6,8 +6,8 @@
 /// <typeparam name="T">type</typeparam>
 public sealed class CircularBuffer<T> {
     private readonly T[] _buffer;
-    private int _head;
-    private int _tail;
+    private          int _head;
+    private          int _tail;
 
     /// <summary>
     ///     Constructor
@@ -16,8 +16,8 @@ public sealed class CircularBuffer<T> {
     public CircularBuffer(int capacity) {
         // initialize
         _buffer = new T[capacity];
-        _head = 0;
-        _tail = 0;
+        _head   = 0;
+        _tail   = 0;
     }
 
     /// <summary>

@@ -26,12 +26,12 @@ public class FormatToolInfo {
         // check size
         if (values.Length >= ScanSize) {
             // set information
-            ToolType = bin.ReadByte();
-            Model = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
-            Serial = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
-            Version = bin.ReadUInt16();
+            ToolType  = bin.ReadByte();
+            Model     = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
+            Serial    = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
+            Version   = bin.ReadUInt16();
             IpAddress = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-            Port = bin.ReadUInt16();
+            Port      = bin.ReadUInt16();
             Mac =
                 $"{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}";
         }
@@ -39,7 +39,7 @@ public class FormatToolInfo {
         // check size
         if (values.Length != MemberSize)
             return;
-        Name = Encoding.ASCII.GetString(bin.ReadBytes(32)).Replace("\0", "");
+        Name   = Encoding.ASCII.GetString(bin.ReadBytes(32)).Replace("\0", "");
         Status = Convert.ToBoolean(bin.ReadByte());
     }
 

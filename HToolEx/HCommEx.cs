@@ -34,9 +34,9 @@ public class HCommEx {
     /// </summary>
     public HCommEx() {
         // set timer option
-        MessageTimer.Interval = MessagePeriod;
-        MessageTimer.AutoReset = true;
-        MessageTimer.Elapsed += MessageTimerOnElapsed;
+        MessageTimer.Interval  =  MessagePeriod;
+        MessageTimer.AutoReset =  true;
+        MessageTimer.Elapsed   += MessageTimerOnElapsed;
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public class HCommEx {
         if (Comm != null) {
             // reset event
             Comm.ReceivedData -= OnReceivedData;
-            Comm.ReceivedMsg -= OnReceivedMsg;
+            Comm.ReceivedMsg  -= OnReceivedMsg;
             Comm.ConnectedMsg -= CommOnConnectedMsg;
             // disable communication
             Comm = null;
@@ -152,7 +152,7 @@ public class HCommEx {
             // set connection time
             ConnectionTime = DateTime.Now;
             // set event
-            Comm.ReceivedMsg += OnReceivedMsg;
+            Comm.ReceivedMsg  += OnReceivedMsg;
             Comm.ReceivedData += OnReceivedData;
             // start timer
             MessageTimer.Start();
@@ -176,7 +176,7 @@ public class HCommEx {
         if (Comm == null)
             return;
         // reset event
-        Comm.ReceivedMsg -= OnReceivedMsg;
+        Comm.ReceivedMsg  -= OnReceivedMsg;
         Comm.ReceivedData -= OnReceivedData;
         // close
         Comm.Close();
@@ -197,7 +197,7 @@ public class HCommEx {
         if (CommState != ConnectionStateTypes.Connected)
             return false;
 
-        var res = false;
+        var res     = false;
         var address = addr;
         // check split count
         if (split == 0)
@@ -240,7 +240,7 @@ public class HCommEx {
         if (CommState != ConnectionStateTypes.Connected)
             return false;
 
-        var res = false;
+        var res     = false;
         var address = addr;
         // check split count
         if (split == 0)
@@ -300,8 +300,8 @@ public class HCommEx {
         if (CommState != ConnectionStateTypes.Connected)
             return false;
 
-        var res = false;
-        var count = values.Length;
+        var res    = false;
+        var count  = values.Length;
         var offset = 0;
         // get block
         var block = count / (WriteRegMaxSize + 1) + 1;

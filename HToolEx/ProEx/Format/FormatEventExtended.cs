@@ -16,17 +16,17 @@ public class FormatEventExtended : FormatEvent {
     /// </summary>
     public FormatEventExtended() {
         // reset id and name
-        Id1 = string.Empty;
+        Id1     = string.Empty;
         IdName1 = string.Empty;
-        Id2 = string.Empty;
+        Id2     = string.Empty;
         IdName2 = string.Empty;
-        Id3 = string.Empty;
+        Id3     = string.Empty;
         IdName3 = string.Empty;
-        Id4 = string.Empty;
+        Id4     = string.Empty;
         IdName4 = string.Empty;
-        Id5 = string.Empty;
+        Id5     = string.Empty;
         IdName5 = string.Empty;
-        Id6 = string.Empty;
+        Id6     = string.Empty;
         IdName6 = string.Empty;
     }
 
@@ -64,9 +64,9 @@ public class FormatEventExtended : FormatEvent {
             Time = dateTime;
         }
 
-        Id = bin.ReadUInt32();
+        Id         = bin.ReadUInt32();
         FastenTime = bin.ReadUInt16();
-        Preset = bin.ReadUInt16();
+        Preset     = bin.ReadUInt16();
         // get unit value
         var unit = bin.ReadUInt16();
         // check defined unit
@@ -87,32 +87,32 @@ public class FormatEventExtended : FormatEvent {
         if (Enum.IsDefined(typeof(EventTypes), (int)status))
             // set event status
             Event = (EventTypes)status;
-        TargetTorque = bin.ReadSingle();
-        Torque = bin.ReadSingle();
-        SeatingTorque = bin.ReadSingle();
-        ClampTorque = bin.ReadSingle();
+        TargetTorque     = bin.ReadSingle();
+        Torque           = bin.ReadSingle();
+        SeatingTorque    = bin.ReadSingle();
+        ClampTorque      = bin.ReadSingle();
         PrevailingTorque = bin.ReadSingle();
-        SnugTorque = bin.ReadSingle();
-        Speed = bin.ReadUInt16();
-        Angle1 = bin.ReadUInt16();
-        Angle2 = bin.ReadUInt16();
-        Angle = bin.ReadUInt16();
-        SnugAngle = bin.ReadUInt16();
+        SnugTorque       = bin.ReadSingle();
+        Speed            = bin.ReadUInt16();
+        Angle1           = bin.ReadUInt16();
+        Angle2           = bin.ReadUInt16();
+        Angle            = bin.ReadUInt16();
+        SnugAngle        = bin.ReadUInt16();
         // reserved
         bin.ReadBytes(16);
         // set ids
         IdName1 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id1 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id1     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName2 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id2 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id2     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName3 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id3 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id3     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName4 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id4 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id4     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName5 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id5 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id5     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName6 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id6 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id6     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         // get type of channel 1
         var ch1 = bin.ReadUInt16();
         // check type of channel 1
@@ -134,12 +134,12 @@ public class FormatEventExtended : FormatEvent {
         };
         CountOfChannel1 = bin.ReadUInt16();
         CountOfChannel2 = bin.ReadUInt16();
-        SamplingRate = bin.ReadUInt16();
+        SamplingRate    = bin.ReadUInt16();
 
         // check count
         for (var i = 0; i < GraphSteps.Length; i++) {
             // get id/index
-            var id = (GraphStepTypes)bin.ReadUInt16();
+            var id    = (GraphStepTypes)bin.ReadUInt16();
             var index = bin.ReadUInt16();
             // check defined id
             if (Enum.IsDefined(typeof(GraphStepTypes), id))

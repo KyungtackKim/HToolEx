@@ -41,19 +41,19 @@ public class FormatJob {
     /// </summary>
     /// <param name="source">source</param>
     public FormatJob(FormatJob source) : this() {
-        Major = source.Major;
-        Minor = source.Minor;
-        Index = source.Index;
-        Name = source.Name;
-        CountOfStep = source.CountOfStep;
-        CountOfScrew = source.CountOfScrew;
-        CountOfFasten = source.CountOfFasten;
-        CountOfInput = source.CountOfInput;
-        CountOfOutput = source.CountOfOutput;
-        CountOfDelay = source.CountOfDelay;
+        Major          = source.Major;
+        Minor          = source.Minor;
+        Index          = source.Index;
+        Name           = source.Name;
+        CountOfStep    = source.CountOfStep;
+        CountOfScrew   = source.CountOfScrew;
+        CountOfFasten  = source.CountOfFasten;
+        CountOfInput   = source.CountOfInput;
+        CountOfOutput  = source.CountOfOutput;
+        CountOfDelay   = source.CountOfDelay;
         CountOfMessage = source.CountOfMessage;
-        CountOfId = source.CountOfId;
-        FileName = source.FileName;
+        CountOfId      = source.CountOfId;
+        FileName       = source.FileName;
         // set revision
         Revision = Major >= 1 ? 1 : 0;
     }
@@ -252,7 +252,7 @@ public class FormatJob {
         // message step
         CountOfMessage = bin.ReadInt32();
         // check version
-        if (headerOnly == false && (Major >= 1 || (Major == 0 && Minor >= 3)))
+        if (!headerOnly && (Major >= 1 || (Major == 0 && Minor >= 3)))
             // id step
             CountOfId = bin.ReadInt32();
         // set revision

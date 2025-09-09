@@ -149,7 +149,7 @@ public sealed class FormatStepId : FormatStep {
 
         // get text value
         var txtNameOfId = Encoding.ASCII.GetBytes(NameOfId);
-        var txtText = Encoding.ASCII.GetBytes(Text);
+        var txtText     = Encoding.ASCII.GetBytes(Text);
         // update step data values
         bin.Write(Id);
         bin.Write(Operation);
@@ -188,17 +188,17 @@ public sealed class FormatStepId : FormatStep {
         Name = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
 
         // set values
-        Id = bin.ReadInt32();
-        Operation = bin.ReadInt32();
-        NameOfId = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Length = bin.ReadInt32();
-        LengthOption = bin.ReadInt32();
-        PositionString = Encoding.ASCII.GetString(bin.ReadBytes(512)).TrimEnd('\0');
-        Text = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        SourceForUsb = bin.ReadInt32();
-        SourceForTool = bin.ReadInt32();
+        Id                  = bin.ReadInt32();
+        Operation           = bin.ReadInt32();
+        NameOfId            = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Length              = bin.ReadInt32();
+        LengthOption        = bin.ReadInt32();
+        PositionString      = Encoding.ASCII.GetString(bin.ReadBytes(512)).TrimEnd('\0');
+        Text                = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        SourceForUsb        = bin.ReadInt32();
+        SourceForTool       = bin.ReadInt32();
         SourceForVirtualKey = bin.ReadInt32();
-        AutoResetEndOfJob = bin.ReadInt32();
-        AutoSkipIfEmptyId = bin.ReadInt32();
+        AutoResetEndOfJob   = bin.ReadInt32();
+        AutoSkipIfEmptyId   = bin.ReadInt32();
     }
 }

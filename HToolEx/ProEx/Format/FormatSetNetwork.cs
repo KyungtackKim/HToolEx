@@ -42,12 +42,12 @@ public class FormatSetNetwork {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0 information
-        Ssid = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
-        Password = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
-        BandBy5G = Convert.ToInt32(bin.ReadByte());
-        CountryType = Convert.ToInt32(bin.ReadByte());
+        Ssid          = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
+        Password      = Encoding.ASCII.GetString(bin.ReadBytes(32)).TrimEnd('\0');
+        BandBy5G      = Convert.ToInt32(bin.ReadByte());
+        CountryType   = Convert.ToInt32(bin.ReadByte());
         ManualChannel = Convert.ToInt32(bin.ReadByte());
-        Channel = Convert.ToInt32(bin.ReadUInt16());
+        Channel       = Convert.ToInt32(bin.ReadUInt16());
         // check revision.1 information
         if (revision < 1)
             return;
@@ -71,10 +71,10 @@ public class FormatSetNetwork {
     public byte[] GetValues(int revision = 0) {
         var values = new List<byte>();
         // get string values
-        var ssid = Encoding.ASCII.GetBytes(Ssid).ToList();
+        var ssid     = Encoding.ASCII.GetBytes(Ssid).ToList();
         var password = Encoding.ASCII.GetBytes(Password).ToList();
         // string length offset
-        ssid.AddRange(new byte[32 - Ssid.Length]);
+        ssid.AddRange(new byte[32     - Ssid.Length]);
         password.AddRange(new byte[32 - Password.Length]);
         // get revision.0 values
         values.AddRange(ssid);
@@ -83,7 +83,7 @@ public class FormatSetNetwork {
         values.Add(Convert.ToByte(CountryType));
         values.Add(Convert.ToByte(ManualChannel));
         values.Add(Convert.ToByte((Channel >> 8) & 0xFF));
-        values.Add(Convert.ToByte(Channel & 0xFF));
+        values.Add(Convert.ToByte(Channel        & 0xFF));
         // check revision.1
         if (revision < 1)
             // values

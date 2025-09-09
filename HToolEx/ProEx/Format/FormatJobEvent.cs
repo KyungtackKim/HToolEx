@@ -16,24 +16,24 @@ public class FormatJobEvent {
     /// </summary>
     public FormatJobEvent() {
         // reset string properties
-        Date = DateTime.MinValue;
-        Time = DateTime.MinValue;
-        JobName = string.Empty;
+        Date     = DateTime.MinValue;
+        Time     = DateTime.MinValue;
+        JobName  = string.Empty;
         StepName = string.Empty;
 #if NOT_USE
         Barcode = string.Empty;
 #else
-        Id1 = string.Empty;
+        Id1     = string.Empty;
         IdName1 = string.Empty;
-        Id2 = string.Empty;
+        Id2     = string.Empty;
         IdName2 = string.Empty;
-        Id3 = string.Empty;
+        Id3     = string.Empty;
         IdName3 = string.Empty;
-        Id4 = string.Empty;
+        Id4     = string.Empty;
         IdName4 = string.Empty;
-        Id5 = string.Empty;
+        Id5     = string.Empty;
         IdName5 = string.Empty;
-        Id6 = string.Empty;
+        Id6     = string.Empty;
         IdName6 = string.Empty;
         NgCause = string.Empty;
 #endif
@@ -68,13 +68,13 @@ public class FormatJobEvent {
         if (Enum.IsDefined(typeof(JobEventTypes), (int)eventType))
             // set event type
             EventType = (JobEventTypes)eventType;
-        JobNo = bin.ReadUInt16();
-        JobName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        JobNo          = bin.ReadUInt16();
+        JobName        = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         TotalJobScrews = bin.ReadUInt16();
-        JobScrews = bin.ReadUInt16();
+        JobScrews      = bin.ReadUInt16();
         TotalStepCount = bin.ReadUInt16();
-        StepNo = bin.ReadUInt16();
-        StepName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        StepNo         = bin.ReadUInt16();
+        StepName       = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         // get step type value
         var stepType = bin.ReadByte();
         // check defined unit
@@ -82,23 +82,23 @@ public class FormatJobEvent {
             // set step type
             StepType = (JobStepTypes)stepType;
         TotalStepScrews = bin.ReadUInt16();
-        StepScrews = bin.ReadUInt16();
+        StepScrews      = bin.ReadUInt16();
 #if NOT_USE
         Barcode = Encoding.ASCII.GetString(bin.ReadBytes(64)).TrimEnd('\0');
 #else
         // set ids
         IdName1 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id1 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id1     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName2 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id2 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id2     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName3 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id3 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id3     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName4 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id4 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id4     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName5 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id5 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id5     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName6 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        Id6 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        Id6     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         NgCause = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
 #endif
         Id = bin.ReadUInt32();

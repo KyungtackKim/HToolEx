@@ -20,16 +20,16 @@ public class FormatStatus {
         // binary reader
         using var bin = new BinaryReaderBigEndian(stream);
         // set information
-        Torque = bin.ReadSingle();
-        Speed = bin.ReadUInt16();
-        Current = bin.ReadSingle();
-        Preset = bin.ReadUInt16();
-        Model = bin.ReadUInt16();
+        Torque   = bin.ReadSingle();
+        Speed    = bin.ReadUInt16();
+        Current  = bin.ReadSingle();
+        Preset   = bin.ReadUInt16();
+        Model    = bin.ReadUInt16();
         TorqueUp = Convert.ToBoolean(bin.ReadUInt16());
         FastenOk = Convert.ToBoolean(bin.ReadUInt16());
-        Ready = Convert.ToBoolean(bin.ReadUInt16());
-        Run = Convert.ToBoolean(bin.ReadUInt16());
-        Alarm = bin.ReadUInt16();
+        Ready    = Convert.ToBoolean(bin.ReadUInt16());
+        Run      = Convert.ToBoolean(bin.ReadUInt16());
+        Alarm    = bin.ReadUInt16();
         // get direction value
         var dir = bin.ReadUInt16();
         // check defined direction
@@ -38,10 +38,10 @@ public class FormatStatus {
             Direction = (DirectionTypes)dir;
         RemainScrew = bin.ReadUInt16();
         // get input/output value
-        var input = bin.ReadUInt16();
+        var input  = bin.ReadUInt16();
         var output = bin.ReadUInt16();
         // set input/output value
-        Input = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((input >> i) & 0x1)).ToArray();
+        Input  = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((input  >> i) & 0x1)).ToArray();
         Output = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((output >> i) & 0x1)).ToArray();
 
         // set temperature

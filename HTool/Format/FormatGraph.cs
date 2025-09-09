@@ -62,7 +62,7 @@ public class FormatGraph {
     ///     Values
     /// </summary>
 
-    public float[] Values { get; } = default!;
+    public float[] Values { get; } = null!;
 
     /// <summary>
     ///     Check sum

@@ -136,7 +136,7 @@ namespace HCommEz.Device {
             if (!Port.IsOpen)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -171,7 +171,7 @@ namespace HCommEz.Device {
             if (!Port.IsOpen)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -206,7 +206,7 @@ namespace HCommEz.Device {
             if (!Port.IsOpen)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[5];
             // header
             packet[index++] = 0x5A;
@@ -242,7 +242,7 @@ namespace HCommEz.Device {
             if (!Port.IsOpen)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[37];
             // header
             packet[index++] = 0x5A;
@@ -255,23 +255,23 @@ namespace HCommEz.Device {
             // body type
             packet[index++] = Convert.ToByte(data.Type);
             // model
-            packet[index++] = Convert.ToByte(data.Model & 0xFF);
-            packet[index++] = Convert.ToByte((data.Model >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.Model         & 0xFF);
+            packet[index++] = Convert.ToByte((data.Model >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.Model >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.Model >> 24) & 0xFF);
             // max torque
-            packet[index++] = Convert.ToByte(data.TorqueUInt32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.TorqueUInt32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.TorqueUInt32 >> 24) & 0xFF);
             // body serial
-            packet[index++] = Convert.ToByte(data.BodySerialUint32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.BodySerialUint32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.BodySerialUint32 >> 24) & 0xFF);
             // sensor serial
-            packet[index++] = Convert.ToByte(data.SensorSerialUInt32 & 0xFF);
-            packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 8) & 0xFF);
+            packet[index++] = Convert.ToByte(data.SensorSerialUInt32         & 0xFF);
+            packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 8)  & 0xFF);
             packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 16) & 0xFF);
             packet[index++] = Convert.ToByte((data.SensorSerialUInt32 >> 24) & 0xFF);
             // unit
@@ -279,7 +279,7 @@ namespace HCommEz.Device {
             // point
             packet[index++] = Convert.ToByte(data.Point);
             // offset
-            packet[index++] = Convert.ToByte(data.Offset & 0xFF);
+            packet[index++] = Convert.ToByte(data.Offset        & 0xFF);
             packet[index++] = Convert.ToByte((data.Offset >> 8) & 0xFF);
             // check type
             if (data.Type == BodyTypes.Separation) {
@@ -289,7 +289,7 @@ namespace HCommEz.Device {
 
             // positive data
             for (var i = 0; i < 5; i++) {
-                packet[index++] = Convert.ToByte(data.Positive[i] & 0xFF);
+                packet[index++] = Convert.ToByte(data.Positive[i]        & 0xFF);
                 packet[index++] = Convert.ToByte((data.Positive[i] >> 8) & 0xFF);
                 // check type
                 if (data.Type != BodyTypes.Separation)
@@ -300,7 +300,7 @@ namespace HCommEz.Device {
 
             // negative data
             for (var i = 0; i < 5; i++) {
-                packet[index++] = Convert.ToByte(data.Negative[i] & 0xFF);
+                packet[index++] = Convert.ToByte(data.Negative[i]        & 0xFF);
                 packet[index++] = Convert.ToByte((data.Negative[i] >> 8) & 0xFF);
                 // check type
                 if (data.Type != BodyTypes.Separation)
@@ -333,7 +333,7 @@ namespace HCommEz.Device {
             if (!Port.IsOpen)
                 return false;
             // packet
-            var index = 0;
+            var index  = 0;
             var packet = new byte[7];
             // header
             packet[index++] = 0x5A;

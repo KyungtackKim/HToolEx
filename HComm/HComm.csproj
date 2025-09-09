@@ -29,15 +29,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="icon.png" Pack="true" PackagePath="\" />
-        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="icon.png" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="hidlibrary" Version="3.3.40" />
-        <PackageReference Include="SuperSocket.ClientEngine" Version="0.10.0" />
-        <PackageReference Include="SuperSocket.ProtoBase" Version="1.7.0.17" />
-        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+        <PackageReference Include="hidlibrary" Version="3.3.40"/>
+        <PackageReference Include="SuperSocket.ClientEngine" Version="0.10.0"/>
+        <PackageReference Include="SuperSocket.ProtoBase" Version="1.7.0.17"/>
+        <PackageReference Include="System.IO.Ports" Version="8.0.0"/>
     </ItemGroup>
 
 </Project>

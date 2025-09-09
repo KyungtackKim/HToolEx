@@ -160,21 +160,21 @@ public class FormatSetInOut {
         for (var i = 0; i < Port; i++) {
             // get input function values
             values.Add(Convert.ToByte((FunctionForInput[i] >> 8) & 0xFF));
-            values.Add(Convert.ToByte(FunctionForInput[i] & 0xFF));
+            values.Add(Convert.ToByte(FunctionForInput[i]        & 0xFF));
         }
 
         // check output port count
         for (var i = 0; i < Port; i++) {
             // get output function values
             values.Add(Convert.ToByte((FunctionForOutput[i] >> 8) & 0xFF));
-            values.Add(Convert.ToByte(FunctionForOutput[i] & 0xFF));
+            values.Add(Convert.ToByte(FunctionForOutput[i]        & 0xFF));
         }
 
         // check output port count
         for (var i = 0; i < Port; i++) {
             // get output duration values
             values.Add(Convert.ToByte((DurationForOutput[i] >> 8) & 0xFF));
-            values.Add(Convert.ToByte(DurationForOutput[i] & 0xFF));
+            values.Add(Convert.ToByte(DurationForOutput[i]        & 0xFF));
         }
 
         // values

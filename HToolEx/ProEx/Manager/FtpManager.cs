@@ -114,10 +114,10 @@ public class FtpManager {
     /// <param name="block">block list</param>
     /// <returns>result</returns>
     public async Task<bool> DownloadFilesAsync(
-        string local,
-        string remote,
-        FtpFolderSyncMode mode = FtpFolderSyncMode.Mirror,
-        List<string>? block = null) {
+        string            local,
+        string            remote,
+        FtpFolderSyncMode mode  = FtpFolderSyncMode.Mirror,
+        List<string>?     block = null) {
         // check client
         if (Client == null)
             return false;
@@ -157,10 +157,10 @@ public class FtpManager {
     /// <param name="exists">exists</param>
     /// <returns>result</returns>
     public async Task<bool> UploadFilesAsync(
-        string local,
-        string remote,
-        FtpFolderSyncMode mode = FtpFolderSyncMode.Update,
-        FtpRemoteExists exists = FtpRemoteExists.Overwrite) {
+        string            local,
+        string            remote,
+        FtpFolderSyncMode mode   = FtpFolderSyncMode.Update,
+        FtpRemoteExists   exists = FtpRemoteExists.Overwrite) {
         // check client
         if (Client == null)
             return false;
@@ -193,8 +193,8 @@ public class FtpManager {
     /// <param name="exists">exists</param>
     /// <returns>result</returns>
     public async Task<bool> UploadFileAsync(
-        string local,
-        string remote,
+        string          local,
+        string          remote,
         FtpRemoteExists exists = FtpRemoteExists.Overwrite) {
         // check client
         if (Client == null)

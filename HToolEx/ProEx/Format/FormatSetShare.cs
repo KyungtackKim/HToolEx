@@ -42,26 +42,26 @@ public class FormatSetShare {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0 information
-        FtpServer = Convert.ToInt32(bin.ReadByte());
-        FtpUserName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        FtpPassword = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
-        BackupData = Convert.ToInt32(bin.ReadByte());
-        BackupDataIp = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-        BackupDataPort = Convert.ToInt32(bin.ReadUInt16());
-        ModbusProxy = Convert.ToInt32(bin.ReadByte());
+        FtpServer       = Convert.ToInt32(bin.ReadByte());
+        FtpUserName     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        FtpPassword     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        BackupData      = Convert.ToInt32(bin.ReadByte());
+        BackupDataIp    = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        BackupDataPort  = Convert.ToInt32(bin.ReadUInt16());
+        ModbusProxy     = Convert.ToInt32(bin.ReadByte());
         ModbusProxyPort = Convert.ToInt32(bin.ReadUInt16());
-        TcpClient = Convert.ToInt32(bin.ReadByte());
-        TcpClientIp = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-        TcpClientPort = Convert.ToInt32(bin.ReadUInt16());
-        TcpServer = Convert.ToInt32(bin.ReadByte());
-        TcpServerPort = Convert.ToInt32(bin.ReadUInt16());
-        RemoteJob = Convert.ToInt32(bin.ReadByte());
-        RemoteJobPort = Convert.ToInt32(bin.ReadUInt16());
+        TcpClient       = Convert.ToInt32(bin.ReadByte());
+        TcpClientIp     = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        TcpClientPort   = Convert.ToInt32(bin.ReadUInt16());
+        TcpServer       = Convert.ToInt32(bin.ReadByte());
+        TcpServerPort   = Convert.ToInt32(bin.ReadUInt16());
+        RemoteJob       = Convert.ToInt32(bin.ReadByte());
+        RemoteJobPort   = Convert.ToInt32(bin.ReadUInt16());
         // check revision.1 information
         if (revision < 1)
             return;
         // get revision.1 information
-        OpenProtocol = Convert.ToInt32(bin.ReadByte());
+        OpenProtocol     = Convert.ToInt32(bin.ReadByte());
         OpenProtocolPort = Convert.ToInt32(bin.ReadUInt16());
     }
 
@@ -183,10 +183,10 @@ public class FormatSetShare {
     public byte[] GetValues(int revision = 0) {
         var values = new List<byte>();
         // get string values
-        var user = Encoding.ASCII.GetBytes(FtpUserName).ToList();
+        var user     = Encoding.ASCII.GetBytes(FtpUserName).ToList();
         var password = Encoding.ASCII.GetBytes(FtpPassword).ToList();
         // string length offset
-        user.AddRange(new byte[128 - FtpUserName.Length]);
+        user.AddRange(new byte[128     - FtpUserName.Length]);
         password.AddRange(new byte[128 - FtpPassword.Length]);
         // get ip values
         var backupIp = BackupDataIp.Split('.').Select(byte.Parse);
@@ -198,27 +198,27 @@ public class FormatSetShare {
         values.Add(Convert.ToByte(BackupData));
         values.AddRange(backupIp);
         values.Add(Convert.ToByte((BackupDataPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(BackupDataPort & 0xFF));
+        values.Add(Convert.ToByte(BackupDataPort        & 0xFF));
         values.Add(Convert.ToByte(ModbusProxy));
         values.Add(Convert.ToByte((ModbusProxyPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(ModbusProxyPort & 0xFF));
+        values.Add(Convert.ToByte(ModbusProxyPort        & 0xFF));
         values.Add(Convert.ToByte(TcpClient));
         values.AddRange(clientIp);
         values.Add(Convert.ToByte((TcpClientPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(TcpClientPort & 0xFF));
+        values.Add(Convert.ToByte(TcpClientPort        & 0xFF));
         values.Add(Convert.ToByte(TcpServer));
         values.Add(Convert.ToByte((TcpServerPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(TcpServerPort & 0xFF));
+        values.Add(Convert.ToByte(TcpServerPort        & 0xFF));
         values.Add(Convert.ToByte(RemoteJob));
         values.Add(Convert.ToByte((RemoteJobPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(RemoteJobPort & 0xFF));
+        values.Add(Convert.ToByte(RemoteJobPort        & 0xFF));
         // check revision.1 information
         if (revision < 1)
             return values.ToArray();
         // get revision.1 values
         values.Add(Convert.ToByte(OpenProtocol));
         values.Add(Convert.ToByte((OpenProtocolPort >> 8) & 0xFF));
-        values.Add(Convert.ToByte(OpenProtocolPort & 0xFF));
+        values.Add(Convert.ToByte(OpenProtocolPort        & 0xFF));
         // values
         return values.ToArray();
     }

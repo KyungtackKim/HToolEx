@@ -31,10 +31,10 @@ public static class ProPacket {
             (byte)CodeTypes.ReadHoldingReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -65,10 +65,10 @@ public static class ProPacket {
             (byte)CodeTypes.ReadInputReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF)
+            (byte)(count        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -99,10 +99,10 @@ public static class ProPacket {
             (byte)CodeTypes.WriteSingleReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
+            (byte)(value        & 0xFF)
         };
         // packet
         return packet.ToArray();
@@ -135,24 +135,24 @@ public static class ProPacket {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)(count * 2)
         };
         // check values
         foreach (var value in values) {
             packet.Add((byte)((value >> 8) & 0xFF));
-            packet.Add((byte)(value & 0xFF));
+            packet.Add((byte)(value        & 0xFF));
         }
 
         // get total length
         var len = packet.Count - 6;
         // change length
         packet[4] = (byte)((len >> 8) & 0xFF);
-        packet[5] = (byte)(len & 0xFF);
+        packet[5] = (byte)(len        & 0xFF);
 
         // packet
         return packet.ToArray();
@@ -190,10 +190,10 @@ public static class ProPacket {
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
             (byte)((addr >> 8) & 0xFF),
-            (byte)(addr & 0xFF),
+            (byte)(addr        & 0xFF),
             /*COUNT */
             (byte)((count >> 8) & 0xFF),
-            (byte)(count & 0xFF),
+            (byte)(count        & 0xFF),
             /*LENGTH*/
             (byte)length
         };

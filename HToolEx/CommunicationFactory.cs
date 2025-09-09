@@ -15,9 +15,9 @@ public class CommunicationFactory {
     public static IHComm? Create(CommTypes type) {
         return type switch {
             CommTypes.None => null,
-            CommTypes.Rtu => new HcRtu(),
-            CommTypes.Tcp => new HcTcp(),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            CommTypes.Rtu  => new HcRtu(),
+            CommTypes.Tcp  => new HcTcp(),
+            _              => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
 }

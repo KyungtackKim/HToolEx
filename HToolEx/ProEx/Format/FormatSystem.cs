@@ -37,21 +37,21 @@ public class FormatSystem {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0
-        Version = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
-        Serial = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
+        Version          = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
+        Serial           = Encoding.ASCII.GetString(bin.ReadBytes(16)).Replace("\0", "");
         InternalCapacity = bin.ReadUInt32();
-        InternalFree = bin.ReadUInt32();
-        InternalUsed = bin.ReadUInt32();
-        SdCapacity = bin.ReadUInt32();
-        SdFree = bin.ReadUInt32();
-        SdUsed = bin.ReadUInt32();
-        IpAddress = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-        NetMask = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-        Gateway = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        InternalFree     = bin.ReadUInt32();
+        InternalUsed     = bin.ReadUInt32();
+        SdCapacity       = bin.ReadUInt32();
+        SdFree           = bin.ReadUInt32();
+        SdUsed           = bin.ReadUInt32();
+        IpAddress        = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        NetMask          = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        Gateway          = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
         Mac =
             $"{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}";
         WiFiIpAddress = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
-        WifiNetMask = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
+        WifiNetMask   = $"{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}.{bin.ReadByte()}";
         WifiMac =
             $"{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}:{bin.ReadByte():X2}";
         // check revision.1

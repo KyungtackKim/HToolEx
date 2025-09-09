@@ -68,11 +68,11 @@ public sealed class SettingData {
         // write values
         buf[0] = (byte)(UsingTargetTorque ? 1 : 0);
         BitConverter.TryWriteBytes(buf[1..5], TargetTorque);
-        buf[5] = (byte)ClearTime;
-        buf[6] = (byte)Tolerance;
-        buf[7] = (byte)Unit;
-        buf[8] = (byte)Mode;
-        buf[9] = (byte)Frequency;
+        buf[5]  = (byte)ClearTime;
+        buf[6]  = (byte)Tolerance;
+        buf[7]  = (byte)Unit;
+        buf[8]  = (byte)Mode;
+        buf[9]  = (byte)Frequency;
         buf[10] = (byte)Direction;
         buf[11] = (byte)_major;
         buf[12] = (byte)_minor;
@@ -88,15 +88,15 @@ public sealed class SettingData {
         var buf = buffer[5..];
         // read values
         UsingTargetTorque = buf[0] > 0;
-        TargetTorque = BitConverter.ToSingle(buf[1..5]);
-        ClearTime = (AutoClearTimeTypes)buf[5];
-        Tolerance = buf[6];
-        Unit = (UnitTypes)buf[7];
-        Mode = (OperationModeTypes)buf[8];
-        Frequency = (FreqTypes)buf[9];
-        Direction = (DirectionTypes)buf[10];
-        _major = buf[11];
-        _minor = buf[12];
-        _patch = buf[13];
+        TargetTorque      = BitConverter.ToSingle(buf[1..5]);
+        ClearTime         = (AutoClearTimeTypes)buf[5];
+        Tolerance         = buf[6];
+        Unit              = (UnitTypes)buf[7];
+        Mode              = (OperationModeTypes)buf[8];
+        Frequency         = (FreqTypes)buf[9];
+        Direction         = (DirectionTypes)buf[10];
+        _major            = buf[11];
+        _minor            = buf[12];
+        _patch            = buf[13];
     }
 }

@@ -15,8 +15,8 @@ public class FormatMessageInfo {
     /// <param name="revision">revision</param>
     public FormatMessageInfo(int length, MessageIdTypes id, int revision = 0) {
         // set information
-        Length = length;
-        Id = id;
+        Length   = length;
+        Id       = id;
         Revision = revision;
     }
 

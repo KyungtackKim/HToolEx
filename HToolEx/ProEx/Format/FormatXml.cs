@@ -37,7 +37,7 @@ public class FormatXml {
         // set check sum
         CheckSum = values.Sum(x => x);
         // get revision.0 values
-        Version = Encoding.ASCII.GetString(bin.ReadBytes(8)).TrimEnd('\0');
+        Version     = Encoding.ASCII.GetString(bin.ReadBytes(8)).TrimEnd('\0');
         ReleaseDate = Encoding.ASCII.GetString(bin.ReadBytes(12)).TrimEnd('\0');
     }
 

@@ -72,10 +72,10 @@ public class HCommTcpData : IHCommData {
         var pos = 0;
         // set header
         TransactionId = (values[pos++] << 8) | values[pos++];
-        ProtocolId = (values[pos++] << 8) | values[pos++];
-        FrameLength = (values[pos++] << 8) | values[pos++];
-        UnitId = values[pos++];
-        CodeTypes = (CodeTypes)values[pos++];
+        ProtocolId    = (values[pos++] << 8) | values[pos++];
+        FrameLength   = (values[pos++] << 8) | values[pos++];
+        UnitId        = values[pos++];
+        CodeTypes     = (CodeTypes)values[pos++];
 
         // check function code
         switch (CodeTypes) {
