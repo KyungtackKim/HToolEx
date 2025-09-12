@@ -11,8 +11,8 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
 
         <Title>HTool</Title>
-        <Version>1.1.12</Version>
-        <PackageVersion>1.1.12</PackageVersion>
+        <Version>1.1.13-beta.7</Version>
+        <PackageVersion>1.1.13-beta.7</PackageVersion>
         <PackageIcon>HTool.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>

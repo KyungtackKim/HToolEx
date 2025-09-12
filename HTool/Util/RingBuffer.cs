@@ -84,7 +84,7 @@ public class RingBuffer {
         // check the data
         ArgumentNullException.ThrowIfNull(data);
         // check the length
-        if (data.Length == 0)
+        if (data.Length == 0 || data.Length > Capacity)
             return;
         // get the data length
         var length = data.Length;
@@ -127,7 +127,7 @@ public class RingBuffer {
     /// <param name="data">data</param>
     public void WriteBytes(ReadOnlySpan<byte> data) {
         // check the length
-        if (data.Length == 0)
+        if (data.Length == 0 || data.Length > Capacity)
             return;
         // get the data length
         var length = data.Length;

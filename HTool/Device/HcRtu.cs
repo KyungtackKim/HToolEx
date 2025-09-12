@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.IO.Ports;
 using System.Text;
 using System.Timers;
@@ -14,11 +15,10 @@ namespace HTool.Device;
 /// </summary>
 [PublicAPI]
 public class HcRtu : ITool {
-    private const           int    ErrorFrameSize = 5;
-    private static readonly int[]  BaudRates      = [9600, 19200, 38400, 57600, 115200, 230400];
-    private readonly        byte[] _receiveBuffer = new byte[8 * 1024];
+    private const           int   ErrorFrameSize = 5;
+    private static readonly int[] BaudRates      = [9600, 19200, 38400, 57600, 115200, 230400];
     private SerialPort Port { get; } = new();
-    private ConcurrentQueue<byte> ReceiveBuf { get; } = [];
+    private ConcurrentQueue<(byte[] buf, int len)> ReceiveBuf { get; } = [];
     private RingBuffer AnalyzeBuf { get; } = new(16 * 1024);
     private Timer ProcessTimer { get; set; } = null!;
     private DateTime AnalyzeTimeout { get; set; }
@@ -55,6 +55,11 @@ public class HcRtu : ITool {
     public event ITool.PerformReceiveData? ReceivedData;
 
     /// <summary>
+    ///     Received error data event
+    /// </summary>
+    public event ITool.PerformReceiveError? ReceivedError;
+
+    /// <summary>
     ///     Received raw data event
     /// </summary>
     public event ITool.PerformRawData? ReceivedRaw;
@@ -84,18 +89,24 @@ public class HcRtu : ITool {
 
         // try catch
         try {
-            // set com port
-            Port.PortName = target;
-            Port.BaudRate = option;
-            Port.Encoding = Encoding.GetEncoding(@"iso-8859-1");
-            // open
-            Port.Open();
-
-            // set device id
-            DeviceId = id;
+            // check the received buffer
+            foreach (var value in ReceiveBuf)
+                // return the pool
+                ArrayPool<byte>.Shared.Return(value.buf);
             // clear receive buffer
             ReceiveBuf.Clear();
             AnalyzeBuf.Clear();
+            // set com port
+            Port.PortName               = target;
+            Port.BaudRate               = option;
+            Port.ReadBufferSize         = 16 * 1024;
+            Port.WriteBufferSize        = 16 * 1024;
+            Port.Handshake              = Handshake.None;
+            Port.Encoding               = Encoding.GetEncoding(@"iso-8859-1");
+            // open
+            Port.Open();
+            // set device id
+            DeviceId = id;
             // set event
             Port.DataReceived += PortOnDataReceived;
 
@@ -352,25 +363,37 @@ public class HcRtu : ITool {
     }
 
     private void PortOnDataReceived(object sender, SerialDataReceivedEventArgs e) {
-        // get the byte length
-        var length = Port.BytesToRead;
-        // check length
-        if (length == 0)
-            return;
-        // read all data
-        var read = Port.Read(_receiveBuffer, 0, Math.Min(length, _receiveBuffer.Length));
-        // check the read length
-        if (read == 0)
-            return;
-        // check the length
-        for (var i = 0; i < read; i++)
-            // enqueue the data
-            ReceiveBuf.Enqueue(_receiveBuffer[i]);
+        // loop the infinite
+        while (true) {
+            // get the length
+            var length = Port.BytesToRead;
+            // check the length
+            if (length < 1)
+                break;
+            // rent the pool
+            var chunk = ArrayPool<byte>.Shared.Rent(length);
+            // read all data
+            var read = Port.Read(chunk, 0, length);
+            // check length
+            if (read < 1) {
+                // return the pool
+                ArrayPool<byte>.Shared.Return(chunk);
+                // end of receive
+                break;
+            }
 
-        // get the raw data
-        var raw = new ReadOnlySpan<byte>(_receiveBuffer, 0, read).ToArray();
-        // received raw data
-        ReceivedRaw?.Invoke(raw);
+            // enqueue the data block
+            ReceiveBuf.Enqueue((chunk, read));
+            // check the received raw event
+            if (ReceivedRaw is null)
+                continue;
+            // create the space
+            var raw = GC.AllocateUninitializedArray<byte>(read);
+            // copy the data
+            Buffer.BlockCopy(chunk, 0, raw, 0, read);
+            // event
+            ReceivedRaw(raw);
+        }
     }
 
     private void ProcessTimerOnElapsed(object? sender, ElapsedEventArgs e) {
@@ -395,28 +418,34 @@ public class HcRtu : ITool {
             return;
         // try finally
         try {
-            var count = 0;
-            // allocation the buffer
-            Span<byte> buffer = stackalloc byte[1024];
-            // get the data
-            while (count < buffer.Length && ReceiveBuf.TryDequeue(out var d))
-                // add the data
-                buffer[count++] = d;
-
-            // check the count
-            if (count > 0) {
-                // add the data
-                AnalyzeBuf.WriteBytes(buffer[..count]);
-                // set analyze time
-                AnalyzeTimeout = DateTime.Now;
+            var isUpdateForAnalyzeBuf = false;
+            // get the data block
+            while (ReceiveBuf.TryDequeue(out var block)) {
+                // get the data block
+                var (buf, length) = block;
+                // write the data
+                AnalyzeBuf.WriteBytes(buf.AsSpan(0, length));
+                // return the data block
+                ArrayPool<byte>.Shared.Return(buf);
+                // set the update analyze buf
+                isUpdateForAnalyzeBuf = true;
             }
 
+            // check the analyze buf changed
+            if (isUpdateForAnalyzeBuf)
+                // set analyze time
+                AnalyzeTimeout = DateTime.Now;
             // check analyze count
             if (AnalyzeBuf.Available > 0)
                 // check analyze timeout
-                if ((DateTime.Now - AnalyzeTimeout).TotalMilliseconds > Constants.ProcessTimeout)
+                if ((DateTime.Now - AnalyzeTimeout).TotalMilliseconds > Constants.ProcessTimeout) {
+                    // get the cleared buffer length
+                    var len = AnalyzeBuf.Available;
                     // clear buffer
                     AnalyzeBuf.Clear();
+                    // error data
+                    ReceivedError?.Invoke(ComErrorTypes.Timeout, len);
+                }
 
             // check data header length    [ID(1) FUNC(1)]
             if (AnalyzeBuf.Available < HeaderSize)
@@ -457,6 +486,10 @@ public class HcRtu : ITool {
             if (Utils.ValidateCrc(packet))
                 // update event
                 ReceivedData?.Invoke(cmd, packet);
+            else
+                // error data
+                ReceivedError?.Invoke(ComErrorTypes.InvalidCrc);
+
             // update analyze time
             AnalyzeTimeout = DateTime.Now;
         } finally {
