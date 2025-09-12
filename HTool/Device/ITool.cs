@@ -24,6 +24,11 @@ public interface ITool {
     delegate void PerformReceiveData(CodeTypes codeTypes, byte[] packet);
 
     /// <summary>
+    ///     Received error data delegate
+    /// </summary>
+    delegate void PerformReceiveError(ComErrorTypes reason, object? param = null);
+
+    /// <summary>
     ///     Header size
     /// </summary>
     int HeaderSize { get; }
@@ -52,6 +57,11 @@ public interface ITool {
     ///     Received data event
     /// </summary>
     event PerformReceiveData ReceivedData;
+
+    /// <summary>
+    ///     Received error
+    /// </summary>
+    event PerformReceiveError ReceivedError;
 
     /// <summary>
     ///     Received raw data event

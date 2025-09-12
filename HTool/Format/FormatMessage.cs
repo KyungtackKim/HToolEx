@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.InteropServices;
 using HTool.Type;
 using HTool.Util;
 using JetBrains.Annotations;
@@ -17,13 +18,23 @@ public class FormatMessage {
     /// <param name="addr">address</param>
     /// <param name="packet">packet</param>
     /// <param name="retry">retry</param>
-    public FormatMessage(CodeTypes code, int addr, IReadOnlyCollection<byte> packet, int retry = 1) {
+    public FormatMessage(CodeTypes code, int addr, ReadOnlySpan<byte> packet, int retry = 1) {
         // set message values
         Code     = code;
         Address  = addr;
         Retry    = retry;
         CheckSum = Utils.CalculateCheckSum(packet);
-        Packet   = [..packet];
+        
+        // get the length
+        var length = packet.Length;
+        // create the packet
+        var list = new List<byte>(length);
+        // set the count
+        CollectionsMarshal.SetCount(list, length);
+        // copy the data
+        packet.CopyTo(CollectionsMarshal.AsSpan(list));
+        // set the packet
+        Packet = list;
     }
 
     /// <summary>

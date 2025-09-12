@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Timers;
 using HTool.Type;
@@ -14,10 +15,9 @@ namespace HTool.Device;
 /// </summary>
 [PublicAPI]
 public class HcTcp : ITool {
-    private const    int    ErrorFrameSize = 9;
-    private readonly byte[] _receiveBuffer = new byte[8 * 1024];
+    private const int ErrorFrameSize = 9;
     private SimpleTcpClient? Client { get; set; }
-    private ConcurrentQueue<byte> ReceiveBuf { get; } = [];
+    private ConcurrentQueue<(byte[] buf, int len)> ReceiveBuf { get; } = [];
     private RingBuffer AnalyzeBuf { get; } = new(16 * 1024);
     private Timer ProcessTimer { get; set; } = null!;
     private DateTime AnalyzeTimeout { get; set; }
@@ -54,6 +54,11 @@ public class HcTcp : ITool {
     public event ITool.PerformReceiveData? ReceivedData;
 
     /// <summary>
+    ///     Received data error event
+    /// </summary>
+    public event ITool.PerformReceiveError? ReceivedError;
+
+    /// <summary>
     ///     Received raw data event
     /// </summary>
     public event ITool.PerformRawData? ReceivedRaw;
@@ -83,8 +88,13 @@ public class HcTcp : ITool {
 
         // try catch
         try {
-            // close client
-            Close();
+            // check the received buffer
+            foreach (var value in ReceiveBuf)
+                // return the pool
+                ArrayPool<byte>.Shared.Return(value.buf);
+            // clear receive buffer
+            ReceiveBuf.Clear();
+            AnalyzeBuf.Clear();
             // create client
             Client = new SimpleTcpClient(ip, option);
             // set event
@@ -98,14 +108,12 @@ public class HcTcp : ITool {
             Client.Keepalive.TcpKeepAliveRetryCount = 5;
             // set the settings (WARNING: 반드시 아래 설정을 해줘야 하며, 안할 경우 데이터 수신시 데이터 오류가 발생할 수 있다)
             Client.Settings.UseAsyncDataReceivedEvents = false;
+            Client.Settings.StreamBufferSize           = 16 * 1024;
             // connect
             Client.Connect();
 
             // set device id
             DeviceId = id;
-            // clear receive buffer
-            ReceiveBuf.Clear();
-
             // create process timer
             ProcessTimer = new Timer();
             // set timer options
@@ -385,25 +393,30 @@ public class HcTcp : ITool {
     private void ClientOnDataReceived(object? sender, DataReceivedEventArgs e) {
         // get the data
         var data = e.Data;
-        // check the length
-        if (data.Count == 0)
+        // check the data
+        if (data.Array is null)
             return;
         // get the length
-        var length = Math.Min(data.Count, _receiveBuffer.Length);
+        var read = data.Count;
         // check the length
-        for (var i = 0; i < length; i++) {
-            // get the data
-            var d = data[i];
-            // set the data
-            _receiveBuffer[i] = d;
-            // enqueue the data
-            ReceiveBuf.Enqueue(d);
-        }
+        if (read < 1)
+            return;
 
-        // get the raw data
-        var raw = new ReadOnlySpan<byte>(_receiveBuffer, 0, length).ToArray();
-        // received raw data
-        ReceivedRaw?.Invoke(raw);
+        // rent the pool
+        var chunk = ArrayPool<byte>.Shared.Rent(read);
+        // copy the data
+        Buffer.BlockCopy(data.Array, data.Offset, chunk, 0, read);
+        // enqueue the data block
+        ReceiveBuf.Enqueue((chunk, read));
+        // check the received raw event
+        if (ReceivedRaw is null)
+            return;
+        // create the space
+        var raw = GC.AllocateUninitializedArray<byte>(read);
+        // copy the data
+        Buffer.BlockCopy(chunk, 0, raw, 0, read);
+        // event
+        ReceivedRaw(raw);
     }
 
     private void ProcessTimerOnElapsed(object? sender, ElapsedEventArgs e) {
@@ -428,28 +441,36 @@ public class HcTcp : ITool {
             return;
         // try finally
         try {
-            var count = 0;
-            // allocation the buffer
-            Span<byte> buffer = stackalloc byte[1024];
-            // get the data
-            while (count < buffer.Length && ReceiveBuf.TryDequeue(out var d))
-                // add the data
-                buffer[count++] = d;
+            var isUpdateForAnalyzeBuf = false;
+            // get the data block
+            while (ReceiveBuf.TryDequeue(out var block)) {
+                // get the data block
+                var (buf, length) = block;
+                // write the data
+                AnalyzeBuf.WriteBytes(buf.AsSpan(0, length));
+                // return the data block
+                ArrayPool<byte>.Shared.Return(buf);
+                // set the update analyze buf
+                isUpdateForAnalyzeBuf = true;
+            }
 
-            // check the count
-            if (count > 0) {
-                // add the data
-                AnalyzeBuf.WriteBytes(buffer[..count]);
+            // check the analyze buf changed
+            if (isUpdateForAnalyzeBuf)
                 // set analyze time
                 AnalyzeTimeout = DateTime.Now;
-            }
 
             // check analyze count
             if (AnalyzeBuf.Available > 0)
                 // check analyze timeout
-                if ((DateTime.Now - AnalyzeTimeout).TotalMilliseconds > Constants.ProcessTimeout)
+                if ((DateTime.Now - AnalyzeTimeout).TotalMilliseconds > Constants.ProcessTimeout) {
+                    // get the cleared buffer length
+                    var len = AnalyzeBuf.Available;
                     // clear buffer
                     AnalyzeBuf.Clear();
+                    // error data
+                    ReceivedError?.Invoke(ComErrorTypes.Timeout, len);
+                }
+
             // check data header length    [TID(2) PID(2) LEN(2) UID(1) FC(1)]
             if (AnalyzeBuf.Available < HeaderSize)
                 return;

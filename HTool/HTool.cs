@@ -101,6 +101,11 @@ public class HTool {
     public event PerformReceivedData? ReceivedData;
 
     /// <summary>
+    ///     Received message data error event
+    /// </summary>
+    public event ITool.PerformReceiveError? ReceiveError;
+
+    /// <summary>
     ///     Received raw data event
     /// </summary>
     public event PerformRawData? ReceivedRawData;
@@ -170,9 +175,10 @@ public class HTool {
             // set connection time
             ConnectionTime = DateTime.Now;
             // set event
-            Tool.ReceivedData += OnReceivedData;
-            Tool.ReceivedRaw  += OnReceivedRaw;
-            Tool.TransmitRaw  += OnTransmitRaw;
+            Tool.ReceivedData  += OnReceivedData;
+            Tool.ReceivedError += OnReceivedError;
+            Tool.ReceivedRaw   += OnReceivedRaw;
+            Tool.TransmitRaw   += OnTransmitRaw;
             // start process timer
             ProcessTimer.Start();
             // result
@@ -197,9 +203,10 @@ public class HTool {
         // reset information
         Info = new FormatInfo();
         // reset event
-        Tool.ReceivedData -= OnReceivedData;
-        Tool.ReceivedRaw  -= OnReceivedRaw;
-        Tool.TransmitRaw  -= OnTransmitRaw;
+        Tool.ReceivedData  -= OnReceivedData;
+        Tool.ReceivedError -= OnReceivedError;
+        Tool.ReceivedRaw   -= OnReceivedRaw;
+        Tool.TransmitRaw   -= OnTransmitRaw;
         // close
         Tool.Close();
     }
@@ -544,6 +551,11 @@ public class HTool {
             return;
         // update the keep alive time
         KeepAliveTime = DateTime.Now;
+    }
+
+    private void OnReceivedError(ComErrorTypes reason, object? param) {
+        // error event
+        ReceiveError?.Invoke(reason, param);
     }
 
     private void OnReceivedRaw(byte[] packet) {

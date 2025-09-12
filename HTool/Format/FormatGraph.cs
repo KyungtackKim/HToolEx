@@ -1,4 +1,5 @@
-﻿using HTool.Type;
+﻿using System.Buffers.Binary;
+using HTool.Type;
 using HTool.Util;
 using JetBrains.Annotations;
 
@@ -13,32 +14,40 @@ public class FormatGraph {
     ///     Constructor
     /// </summary>
     public FormatGraph(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
         // set generation type
         Type = type;
-        // check generation type rev.2
+        // check generation type
         if (type != GenerationTypes.GenRev2)
             return;
-        // get channel no.
-        Channel = bin.ReadUInt16();
-        // get values count
-        Count = bin.ReadUInt16();
-        // create values
-        Values = new float[Count];
-        // check count
-        for (var i = 0; i < Count; i++)
-            // read single
-            Values[i] = bin.ReadSingle();
-        // get check sum
-        CheckSum = values.Sum(v => v);
-        // throw an error if not all data has been read
-        if (bin.BaseStream.Position != bin.BaseStream.Length)
+        // get the span
+        var span = values.AsSpan();
+        // check the length
+        if (span.Length < 4)
+            throw new InvalidDataException("Too short.");
+        // get the information
+        Channel = BinaryPrimitives.ReadUInt16BigEndian(span);
+        Count   = BinaryPrimitives.ReadUInt16BigEndian(span[2..]);
+        // get the information
+        var payload  = checked(Count * 4);
+        var expected = 4 + payload;
+        // check the length
+        if (span.Length != expected)
             // throw exception
-            throw new InvalidDataException($"Not all bytes have been consumed. " +
-                                           $"{bin.BaseStream.Length - bin.BaseStream.Position} byte(s) remain");
+            throw new InvalidDataException($"Invalid length: got {span.Length}, expected {expected}.");
+
+        // get the data values span
+        var s = span[4..];
+        // values
+        Values = GC.AllocateUninitializedArray<float>(Count);
+        // check the count
+        for (int i = 0, offset = 0; i < Count; i++, offset += 4) {
+            // get the value
+            var value = BinaryPrimitives.ReadUInt32BigEndian(s[offset..]);
+            // set the value
+            Values[i] = BitConverter.Int32BitsToSingle((int)value);
+        }
+        // set the checksum
+        CheckSum = Utils.CalculateCheckSum(span);
     }
 
     /// <summary>

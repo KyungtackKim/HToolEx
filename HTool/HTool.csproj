@@ -11,8 +11,8 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
 
         <Title>HTool</Title>
-        <Version>1.1.12</Version>
-        <PackageVersion>1.1.12</PackageVersion>
+        <Version>1.1.13-beta.7</Version>
+        <PackageVersion>1.1.13-beta.7</PackageVersion>
         <PackageIcon>HTool.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>
@@ -28,12 +28,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="SuperSimpleTcp">
             <Version>3.0.17</Version>
         </PackageReference>
         <PackageReference Include="System.IO.Ports">
-            <Version>9.0.8</Version>
+            <Version>9.0.9</Version>
         </PackageReference>
     </ItemGroup>
 

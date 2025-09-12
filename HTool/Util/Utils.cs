@@ -345,13 +345,14 @@ public static class Utils {
     /// <param name="packet">packet</param>
     /// <returns>sum</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int CalculateCheckSum(IEnumerable<byte> packet) {
-        // sum the packet values
-        return packet switch {
-            byte[] array    => CalculateCheckSumFast(array.AsSpan()),
-            List<byte> list => CalculateCheckSumFast(CollectionsMarshal.AsSpan(list)),
-            _               => packet.Sum(x => x) // 기존 방식 유지
-        };
+    public static int CalculateCheckSum(ReadOnlySpan<byte> packet) {
+        var sum = 0;
+        // check the length
+        foreach (var value in packet)
+            // add the sum
+            sum += value;
+        // return the sum value
+        return sum;
     }
 
     /// <summary>
