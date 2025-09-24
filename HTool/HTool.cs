@@ -4,7 +4,6 @@ using HTool.Device;
 using HTool.Format;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 using Timer = System.Timers.Timer;
 
 namespace HTool;
@@ -12,8 +11,7 @@ namespace HTool;
 /// <summary>
 ///     HTool library class
 /// </summary>
-[PublicAPI]
-public class HTool {
+public sealed class HTool {
     /// <summary>
     ///     hanged connection delegate
     /// </summary>
@@ -49,7 +47,7 @@ public class HTool {
     }
 
     private ITool? Tool { get; set; }
-    private Timer ProcessTimer { get; set; } = new();
+    private Timer ProcessTimer { get; } = new();
 
     private KeyedQueue<FormatMessage, FormatMessage.MessageKey> MessageQue { get; } =
         KeyedQueue<FormatMessage, FormatMessage.MessageKey>.Create(static m => m.Key, capacity: 64);

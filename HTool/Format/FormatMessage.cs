@@ -1,12 +1,10 @@
 ﻿using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Format;
 
 /// <summary>
 ///     Hantas tool message format class
 /// </summary>
-[PublicAPI]
 public sealed class FormatMessage {
     /// <summary>
     ///     Default address

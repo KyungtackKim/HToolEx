@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     MODBUS function code types
 /// </summary>
-[PublicAPI]
 public enum CodeTypes {
     [Description("Read holding register")]
     ReadHoldingReg = 0x03,

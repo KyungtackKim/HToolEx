@@ -1,13 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 
 namespace HTool.Util;
 
 /// <summary>
 ///     Ring buffer class
 /// </summary>
-[PublicAPI]
-public class RingBuffer {
+public sealed class RingBuffer {
     private readonly byte[] _buffer;
     private readonly int    _mask;
     private          int    _readPos;

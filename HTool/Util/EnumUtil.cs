@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using JetBrains.Annotations;
 
 namespace HTool.Util;
 
 /// <summary>
 ///     Enum utilities class
 /// </summary>
-[PublicAPI]
 public static class EnumUtil {
     /// <summary>
     ///     Get description or name from enum value

@@ -1,12 +1,10 @@
 ﻿using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Device;
 
 /// <summary>
 ///     Hantas tool interface
 /// </summary>
-[PublicAPI]
 public interface ITool {
     /// <summary>
     ///     Connection changed delegate

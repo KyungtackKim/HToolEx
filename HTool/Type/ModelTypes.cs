@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Hantas tool model types
 /// </summary>
-[PublicAPI]
 public enum ModelTypes {
     // Hantas model codes
     [Description("MD")]

@@ -1,11 +1,8 @@
-﻿using JetBrains.Annotations;
-
-namespace HTool.Util;
+﻿namespace HTool.Util;
 
 /// <summary>
 ///     Constants class
 /// </summary>
-[PublicAPI]
 public static class Constants {
     /// <summary>
     ///     Baud rate for Serial communication

@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 
 namespace HTool.Format;
 
 /// <summary>
 ///     Status format class
 /// </summary>
-[PublicAPI]
-public class FormatStatus {
+public sealed class FormatStatus {
     /// <summary>
     ///     Constructor
     /// </summary>

@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Sample time types
 /// </summary>
-[PublicAPI]
 public enum SampleTypes {
     [Description("5 ms")]
     Ms5 = 1,

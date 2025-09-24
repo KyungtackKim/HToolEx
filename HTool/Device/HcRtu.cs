@@ -5,7 +5,6 @@ using System.Text;
 using System.Timers;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 using Timer = System.Timers.Timer;
 
 namespace HTool.Device;
@@ -13,8 +12,7 @@ namespace HTool.Device;
 /// <summary>
 ///     MODBUS RTU class
 /// </summary>
-[PublicAPI]
-public class HcRtu : ITool {
+public sealed class HcRtu : ITool {
     private const           int   ErrorFrameSize = 5;
     private static readonly int[] BaudRates      = [9600, 19200, 38400, 57600, 115200, 230400];
     private SerialPort Port { get; } = new();
@@ -455,12 +453,16 @@ public class HcRtu : ITool {
                 return;
 
             // get command value
-            var value = (int)AnalyzeBuf.Peek(FunctionPos);
-            // check command
-            if (!Enum.IsDefined(typeof(CodeTypes), value) && (value & (int)CodeTypes.Error) != (int)CodeTypes.Error)
+            var value = AnalyzeBuf.Peek(FunctionPos);
+            // get the error
+            var isError = (value & 0x80) != 0x00;
+            // get the base function
+            var baseFc = (byte)(value & 0x7F);
+            // check the command
+            if (!Tool.IsKnownCode(baseFc) && !isError)
                 return;
-            // get command
-            var cmd = Enum.IsDefined(typeof(CodeTypes), value) ? (CodeTypes)value : CodeTypes.Error;
+            // get the command
+            var cmd = !isError ? (CodeTypes)baseFc : CodeTypes.Error;
             // check function code
             var frame = cmd switch {
                 // ID(1) + FC(1) + LEN(1)=DATA_LEN + DATA(N) + CRC(2)

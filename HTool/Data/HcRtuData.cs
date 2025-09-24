@@ -1,13 +1,11 @@
 ﻿using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Data;
 
 /// <summary>
 ///     Receive data format for MODBUS-RTU class
 /// </summary>
-[PublicAPI]
-public class HcRtuData : IReceivedData {
+public sealed class HcRtuData : IReceivedData {
     /// <summary>
     ///     Constructor
     /// </summary>

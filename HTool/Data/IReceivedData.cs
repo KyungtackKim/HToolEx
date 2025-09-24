@@ -1,12 +1,10 @@
 ﻿using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Data;
 
 /// <summary>
 ///     Received data format interface
 /// </summary>
-[PublicAPI]
 public interface IReceivedData {
     /// <summary>
     ///     MODBUS function code

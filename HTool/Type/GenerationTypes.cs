@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Hantas tool generation types
 /// </summary>
-[PublicAPI]
 public enum GenerationTypes {
     [Description("Gen.1")]
     GenRev1,

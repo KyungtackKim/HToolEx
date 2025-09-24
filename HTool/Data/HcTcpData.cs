@@ -1,13 +1,11 @@
 ﻿using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Data;
 
 /// <summary>
 ///     Receive data format for MODBUS-TCP class
 /// </summary>
-[PublicAPI]
-public class HcTcpData : IReceivedData {
+public sealed class HcTcpData : IReceivedData {
     /// <summary>
     ///     Constructor
     /// </summary>

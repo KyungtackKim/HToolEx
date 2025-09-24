@@ -4,15 +4,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 
 namespace HTool.Format;
 
 /// <summary>
 ///     Event data format class
 /// </summary>
-[PublicAPI]
-public class FormatEvent {
+public sealed class FormatEvent {
     /// <summary>
     ///     Constructor
     /// </summary>
@@ -443,7 +441,6 @@ public class FormatEvent {
     /// <summary>
     ///     Graph step class
     /// </summary>
-    [PublicAPI]
     public class GraphStep {
         /// <summary>
         ///     Constructor

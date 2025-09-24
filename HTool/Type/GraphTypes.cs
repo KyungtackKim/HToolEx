@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Graph channel types
 /// </summary>
-[PublicAPI]
 public enum GraphTypes {
     [Description("None")]
     None,

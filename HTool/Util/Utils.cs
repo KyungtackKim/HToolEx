@@ -1,14 +1,12 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HTool.Type;
-using JetBrains.Annotations;
 
 namespace HTool.Util;
 
 /// <summary>
 ///     Utilities class
 /// </summary>
-[PublicAPI]
 public static class Utils {
     /// <summary>
     ///     MODBUS-RTU CRC-16 lookup table

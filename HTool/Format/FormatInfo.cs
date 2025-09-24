@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 
 namespace HTool.Format;
 
 /// <summary>
 ///     Device information format function class
 /// </summary>
-[PublicAPI]
-public class FormatInfo {
+public sealed class FormatInfo {
     /// <summary>
     ///     Constructor
     /// </summary>

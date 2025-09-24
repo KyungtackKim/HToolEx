@@ -4,7 +4,6 @@ using System.Net;
 using System.Timers;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 using SuperSimpleTcp;
 using Timer = System.Timers.Timer;
 
@@ -13,8 +12,7 @@ namespace HTool.Device;
 /// <summary>
 ///     MODBUS TCP class
 /// </summary>
-[PublicAPI]
-public class HcTcp : ITool {
+public sealed class HcTcp : ITool {
     private const int ErrorFrameSize = 9;
     private SimpleTcpClient? Client { get; set; }
     private ConcurrentQueue<(byte[] buf, int len)> ReceiveBuf { get; } = [];
@@ -475,12 +473,16 @@ public class HcTcp : ITool {
             if (AnalyzeBuf.Available < HeaderSize)
                 return;
             // get command value
-            var value = (int)AnalyzeBuf.Peek(FunctionPos);
-            // check command
-            if (!Enum.IsDefined(typeof(CodeTypes), value) && (value & (int)CodeTypes.Error) != (int)CodeTypes.Error)
+            var value = AnalyzeBuf.Peek(FunctionPos);
+            // get the error
+            var isError = (value & 0x80) != 0x00;
+            // get the base function
+            var baseFc = (byte)(value & 0x7F);
+            // check the command
+            if (!Tool.IsKnownCode(baseFc) && !isError)
                 return;
-            // get command
-            var cmd = Enum.IsDefined(typeof(CodeTypes), value) ? (CodeTypes)value : CodeTypes.Error;
+            // get the command
+            var cmd = !isError ? (CodeTypes)baseFc : CodeTypes.Error;
             // check function code
             var frame = cmd switch {
                 // TID(2) PID(2) LEN(2) UID(1) FC(1) LEN(1)=DATA_LEN DATA(N)

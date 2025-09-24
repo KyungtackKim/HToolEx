@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Event status types
 /// </summary>
-[PublicAPI]
 public enum EventTypes {
     [Description("Etc.")]
     Etc,
@@ -34,7 +32,6 @@ public enum EventTypes {
 ///     Event status flag types
 /// </summary>
 [Flags]
-[PublicAPI]
 public enum EventFlagTypes {
     [Description("None")]
     None = 0,

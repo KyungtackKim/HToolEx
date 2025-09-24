@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Torque unit types
 /// </summary>
-[PublicAPI]
 public enum UnitTypes {
     [Description("kgf.cm")]
     KgfCm,

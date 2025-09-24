@@ -1,13 +1,10 @@
-﻿using JetBrains.Annotations;
-
-namespace HTool.Util;
+﻿namespace HTool.Util;
 
 /// <summary>
 ///     This class extends BinaryReader to read data in Big-Endian byte order.
 /// </summary>
 /// <param name="input">stream</param>
-[PublicAPI]
-public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
+public sealed class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     // The constructor takes a Stream object as input.
     // This helper method converts a portion of a byte array to an indicated type in Big-Endian order.
     private static T ToBigEndian<T>(Func<byte[], int, T> converter, byte[] value, int startIndex, int bytesToReverse) {
@@ -32,7 +29,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override short ReadInt16() {
-        return ToBigEndian(BitConverter.ToInt16, base.ReadBytes(2), 0, 2);
+        return ToBigEndian(BitConverter.ToInt16, ReadBytes(2), 0, 2);
     }
 
     /// <summary>
@@ -40,7 +37,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override ushort ReadUInt16() {
-        return ToBigEndian(BitConverter.ToUInt16, base.ReadBytes(2), 0, 2);
+        return ToBigEndian(BitConverter.ToUInt16, ReadBytes(2), 0, 2);
     }
 
     /// <summary>
@@ -48,7 +45,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override int ReadInt32() {
-        return ToBigEndian(BitConverter.ToInt32, base.ReadBytes(4), 0, 4);
+        return ToBigEndian(BitConverter.ToInt32, ReadBytes(4), 0, 4);
     }
 
     /// <summary>
@@ -56,7 +53,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override uint ReadUInt32() {
-        return ToBigEndian(BitConverter.ToUInt32, base.ReadBytes(4), 0, 4);
+        return ToBigEndian(BitConverter.ToUInt32, ReadBytes(4), 0, 4);
     }
 
     /// <summary>
@@ -64,7 +61,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override ulong ReadUInt64() {
-        return ToBigEndian(BitConverter.ToUInt64, base.ReadBytes(8), 0, 8);
+        return ToBigEndian(BitConverter.ToUInt64, ReadBytes(8), 0, 8);
     }
 
     /// <summary>
@@ -72,7 +69,7 @@ public class BinaryReaderBigEndian(Stream input) : BinaryReader(input) {
     /// </summary>
     /// <returns>values</returns>
     public override float ReadSingle() {
-        return ToBigEndian(BitConverter.ToSingle, base.ReadBytes(4), 0, 4);
+        return ToBigEndian(BitConverter.ToSingle, ReadBytes(4), 0, 4);
     }
 
     /// <summary>

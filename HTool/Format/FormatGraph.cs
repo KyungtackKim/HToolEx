@@ -1,15 +1,13 @@
 ﻿using System.Buffers.Binary;
 using HTool.Type;
 using HTool.Util;
-using JetBrains.Annotations;
 
 namespace HTool.Format;
 
 /// <summary>
 ///     Graph data format class
 /// </summary>
-[PublicAPI]
-public class FormatGraph {
+public sealed class FormatGraph {
     /// <summary>
     ///     Constructor
     /// </summary>

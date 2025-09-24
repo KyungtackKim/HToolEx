@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     MODBUS communication types
 /// </summary>
-[PublicAPI]
 public enum ComTypes {
     [Description("MODBUS-RTU")]
     Rtu,
@@ -17,7 +15,6 @@ public enum ComTypes {
 /// <summary>
 ///     MODBUS communication error types
 /// </summary>
-[PublicAPI]
 public enum ComErrorTypes {
     InvalidFunction   = 0x01,
     InvalidAddress    = 0x02,

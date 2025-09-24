@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
-using JetBrains.Annotations;
 
 namespace HTool.Type;
 
 /// <summary>
 ///     Graph step types
 /// </summary>
-[PublicAPI]
 public enum GraphStepTypes {
     [Description("None")]
     None,
