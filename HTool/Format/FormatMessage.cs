@@ -18,13 +18,15 @@ public class FormatMessage {
     /// <param name="addr">address</param>
     /// <param name="packet">packet</param>
     /// <param name="retry">retry</param>
-    public FormatMessage(CodeTypes code, int addr, ReadOnlySpan<byte> packet, int retry = 1) {
+    /// <param name="notCheck">not check the response</param>
+    public FormatMessage(CodeTypes code, int addr, ReadOnlySpan<byte> packet, int retry = 1, bool notCheck = false) {
         // set message values
         Code     = code;
         Address  = addr;
         Retry    = retry;
+        NotCheck = notCheck;
         CheckSum = Utils.CalculateCheckSum(packet);
-        
+
         // get the length
         var length = packet.Length;
         // create the packet
@@ -56,6 +58,11 @@ public class FormatMessage {
     ///     Retry count
     /// </summary>
     public int Retry { get; private set; }
+
+    /// <summary>
+    ///     Not check
+    /// </summary>
+    public bool NotCheck { get; private set; }
 
     /// <summary>
     ///     Activation state

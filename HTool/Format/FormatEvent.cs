@@ -24,360 +24,8 @@ public class FormatEvent {
     /// <param name="values">values</param>
     /// <param name="type">type</param>
     public FormatEvent(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
-#if NOT_USE
-        ushort val;
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
-
-        // set generation type
-        Type = type;
-        // check type
-        switch (type) {
-            case GenerationTypes.GenRev1:
-            case GenerationTypes.GenRev1Ad:
-                // set values
-                Id = bin.ReadUInt16();
-                Date = DateTime.Now;
-                Time = Date;
-                FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
-                TargetTorque = bin.ReadUInt16() / 100.0f;
-                Torque = bin.ReadUInt16() / 100.0f;
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                RemainScrew = bin.ReadUInt16();
-                Error = bin.ReadUInt16();
-                // get direction value
-                val = bin.ReadUInt16();
-                // check defined direction
-                if (Enum.IsDefined(typeof(DirectionTypes), (int)val))
-                    // set direction
-                    Direction = (DirectionTypes)val;
-                // get event status value
-                val = bin.ReadUInt16();
-                // check defined event status
-                if (Enum.IsDefined(typeof(EventTypes), (int)val))
-                    // set event status
-                    Event = (EventTypes)val;
-                SnugAngle = bin.ReadUInt16();
-                Barcode = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
-                break;
-            case GenerationTypes.GenRev1Plus:
-                // set values
-                Id = bin.ReadUInt16();
-                Date = DateTime.Now;
-                Time = Date;
-                FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
-                TargetTorque = bin.ReadUInt16() / 100.0f;
-                Torque = bin.ReadUInt16() / 100.0f;
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                RemainScrew = bin.ReadUInt16();
-                Error = bin.ReadUInt16();
-                // get direction value
-                val = bin.ReadUInt16();
-                // check defined direction
-                if (Enum.IsDefined(typeof(DirectionTypes), (int)val))
-                    // set direction
-                    Direction = (DirectionTypes)val;
-                // get event status value
-                val = bin.ReadUInt16();
-                // check defined event status
-                if (Enum.IsDefined(typeof(EventTypes), (int)val))
-                    // set event status
-                    Event = (EventTypes)val;
-                SnugAngle = bin.ReadUInt16();
-                SeatingTorque = bin.ReadUInt16() / 100.0f;
-                ClampTorque = bin.ReadUInt16() / 100.0f;
-                PrevailingTorque = bin.ReadUInt16() / 100.0f;
-                SnugTorque = bin.ReadUInt16() / 100.0f;
-                Barcode = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
-                break;
-            case GenerationTypes.GenRev2:
-                // set values
-                Revision = $"{bin.ReadByte()}.{bin.ReadByte()}";
-                Id = bin.ReadUInt16();
-                Date = new DateTime(bin.ReadUInt16(), bin.ReadByte(), bin.ReadByte(),
-                    bin.ReadByte(), bin.ReadByte(), bin.ReadByte(), bin.ReadByte());
-                Time = Date;
-                FastenTime = bin.ReadUInt16();
-                Preset = bin.ReadUInt16();
-                // get unit value
-                val = bin.ReadUInt16();
-                // check defined unit
-                if (Enum.IsDefined(typeof(UnitTypes), (int)val))
-                    // set unit
-                    Unit = (UnitTypes)val;
-                RemainScrew = bin.ReadUInt16();
-                // get direction value
-                val = bin.ReadUInt16();
-                // check defined direction
-                if (Enum.IsDefined(typeof(DirectionTypes), (int)val))
-                    // set direction
-                    Direction = (DirectionTypes)val;
-                Error = bin.ReadUInt16();
-                // get event status value
-                val = bin.ReadUInt16();
-                // check defined event status
-                if (Enum.IsDefined(typeof(EventTypes), (int)val))
-                    // set event status
-                    Event = (EventTypes)val;
-                TargetTorque = bin.ReadSingle();
-                Torque = bin.ReadSingle();
-                SeatingTorque = bin.ReadSingle();
-                ClampTorque = bin.ReadSingle();
-                PrevailingTorque = bin.ReadSingle();
-                SnugTorque = bin.ReadSingle();
-                Speed = bin.ReadUInt16();
-                Angle1 = bin.ReadUInt16();
-                Angle2 = bin.ReadUInt16();
-                Angle = bin.ReadUInt16();
-                SnugAngle = bin.ReadUInt16();
-                // reserved
-                bin.ReadBytes(16);
-                // barcode
-                Barcode = Encoding.ASCII.GetString(bin.ReadBytes(Constants.BarcodeLength)).Replace("\0", string.Empty);
-                // get type of channel 1
-                val = bin.ReadUInt16();
-                // check defined type
-                if (Enum.IsDefined(typeof(GraphTypes), (int)val))
-                    // set type
-                    TypeOfChannel1 = (GraphTypes)val;
-                // get type of channel 2
-                val = bin.ReadUInt16();
-                // check defined type
-                if (Enum.IsDefined(typeof(GraphTypes), (int)val))
-                    // set type
-                    TypeOfChannel2 = (GraphTypes)val;
-                CountOfChannel1 = bin.ReadUInt16();
-                CountOfChannel2 = bin.ReadUInt16();
-                SamplingRate = bin.ReadUInt16();
-                // check count
-                for (var i = 0; i < GraphSteps.Length; i++) {
-                    // get id/index
-                    var id = (GraphStepTypes)bin.ReadUInt16();
-                    var index = bin.ReadUInt16();
-                    // check defined id
-                    if (Enum.IsDefined(typeof(GraphStepTypes), id))
-                        // set step values
-                        GraphSteps[i] = new GraphStep(id, index);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-        }
-
-        // get check sum
-        CheckSum = Utils.CalculateCheckSum(values);
-        // throw an error if not all data has been read
-        if (bin.BaseStream.Position != bin.BaseStream.Length)
-            // throw exception
-            throw new InvalidDataException($"Not all bytes have been consumed. " +
-                                           $"{bin.BaseStream.Length - bin.BaseStream.Position} byte(s) remain");
-#else
-        int                dir;
-        int                status;
-        int                end;
-        ReadOnlySpan<byte> b;
-        var                pos = 0;
-        // set the type
-        Type = type;
-        // get the span
-        var span = values.AsSpan();
-        // check the type
-        switch (type) {
-            case GenerationTypes.GenRev1:
-            case GenerationTypes.GenRev1Ad:
-                // set values
-                Id           = ReadUInt16(span, ref pos);
-                Date         = Time = DateTime.Now;
-                FastenTime   = ReadUInt16(span, ref pos);
-                Preset       = ReadUInt16(span, ref pos);
-                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = ReadUInt16(span, ref pos) / 100.0f;
-                Speed        = ReadUInt16(span, ref pos);
-                Angle1       = ReadUInt16(span, ref pos);
-                Angle2       = ReadUInt16(span, ref pos);
-                Angle        = ReadUInt16(span, ref pos);
-                RemainScrew  = ReadUInt16(span, ref pos);
-                Error        = ReadUInt16(span, ref pos);
-                // get the direction
-                dir = ReadUInt16(span, ref pos);
-                // check defined
-                if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
-                    Direction = (DirectionTypes)dir;
-                // get the status
-                status = ReadUInt16(span, ref pos);
-                // check defined
-                if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
-                    Event = (EventTypes)status;
-                SnugAngle = ReadUInt16(span, ref pos);
-                // get the barcode data span
-                b = span.Slice(pos, Constants.BarcodeLength);
-                // get the length
-                end = b.Length;
-                // check the null character
-                while (end > 0 && b[end - 1] == 0)
-                    // shift end position
-                    end--;
-                // set the barcode
-                Barcode = end == 0 ? string.Empty : Encoding.ASCII.GetString(b[..end]);
-                // update the position
-                pos += Constants.BarcodeLength;
-                break;
-            case GenerationTypes.GenRev1Plus:
-                // set values
-                Id           = ReadUInt16(span, ref pos);
-                Date         = Time = DateTime.Now;
-                FastenTime   = ReadUInt16(span, ref pos);
-                Preset       = ReadUInt16(span, ref pos);
-                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = ReadUInt16(span, ref pos) / 100.0f;
-                Speed        = ReadUInt16(span, ref pos);
-                Angle1       = ReadUInt16(span, ref pos);
-                Angle2       = ReadUInt16(span, ref pos);
-                Angle        = ReadUInt16(span, ref pos);
-                RemainScrew  = ReadUInt16(span, ref pos);
-                Error        = ReadUInt16(span, ref pos);
-                // get the direction
-                dir = ReadUInt16(span, ref pos);
-                // check defined
-                if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
-                    Direction = (DirectionTypes)dir;
-                // get the status
-                status = ReadUInt16(span, ref pos);
-                // check defined
-                if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
-                    Event = (EventTypes)status;
-                SnugAngle        = ReadUInt16(span, ref pos);
-                SeatingTorque    = ReadUInt16(span, ref pos) / 100.0f;
-                ClampTorque      = ReadUInt16(span, ref pos) / 100.0f;
-                PrevailingTorque = ReadUInt16(span, ref pos) / 100.0f;
-                SnugTorque       = ReadUInt16(span, ref pos) / 100.0f;
-                // get the barcode data span
-                b = span.Slice(pos, Constants.BarcodeLength);
-                // get the length
-                end = b.Length;
-                // check the null character
-                while (end > 0 && b[end - 1] == 0)
-                    // shift end position
-                    end--;
-                // set the barcode
-                Barcode = end == 0 ? string.Empty : Encoding.ASCII.GetString(b[..end]);
-                // update the position
-                pos += Constants.BarcodeLength;
-                break;
-            case GenerationTypes.GenRev2:
-                // header
-                Revision = $"{ReadByte(span, ref pos)}.{ReadByte(span, ref pos)}";
-                Id       = ReadUInt16(span, ref pos);
-                // date time
-                var year        = ReadUInt16(span, ref pos);
-                var month       = ReadByte(span, ref pos);
-                var day         = ReadByte(span, ref pos);
-                var hour        = ReadByte(span, ref pos);
-                var minute      = ReadByte(span, ref pos);
-                var second      = ReadByte(span, ref pos);
-                var millisecond = ReadByte(span, ref pos);
-                // set date time
-                Date = Time = new DateTime(year, month, day, hour, minute, second, millisecond);
-                // common
-                FastenTime = ReadUInt16(span, ref pos);
-                Preset     = ReadUInt16(span, ref pos);
-                // get the unit
-                var unit = ReadUInt16(span, ref pos);
-                // check defined
-                if (unit <= (int)UnitTypes.LbfFt)
-                    // set the value
-                    Unit = (UnitTypes)unit;
-                RemainScrew = ReadUInt16(span, ref pos);
-                // get the direction
-                dir = ReadUInt16(span, ref pos);
-                // check defined
-                if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
-                    Direction = (DirectionTypes)dir;
-                Error = ReadUInt16(span, ref pos);
-                // get the status
-                status = ReadUInt16(span, ref pos);
-                // check defined
-                if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
-                    Event = (EventTypes)status;
-                // torque
-                TargetTorque     = ReadSingle(span, ref pos);
-                Torque           = ReadSingle(span, ref pos);
-                SeatingTorque    = ReadSingle(span, ref pos);
-                ClampTorque      = ReadSingle(span, ref pos);
-                PrevailingTorque = ReadSingle(span, ref pos);
-                SnugTorque       = ReadSingle(span, ref pos);
-                // speed angle
-                Speed     = ReadUInt16(span, ref pos);
-                Angle1    = ReadUInt16(span, ref pos);
-                Angle2    = ReadUInt16(span, ref pos);
-                Angle     = ReadUInt16(span, ref pos);
-                SnugAngle = ReadUInt16(span, ref pos);
-                // reserved
-                pos += 16;
-                // get the barcode data span
-                b = span.Slice(pos, Constants.BarcodeLength);
-                // get the length
-                end = b.Length;
-                // check the null character
-                while (end > 0 && b[end - 1] == 0)
-                    // shift end position
-                    end--;
-                // set the barcode
-                Barcode = end == 0 ? string.Empty : Encoding.ASCII.GetString(b[..end]);
-                // update the position
-                pos += Constants.BarcodeLength;
-                // get the graph type
-                var type1 = ReadUInt16(span, ref pos);
-                var type2 = ReadUInt16(span, ref pos);
-                // check defined
-                if (type1 <= (int)GraphTypes.TorqueAngle)
-                    // set the value
-                    TypeOfChannel1 = (GraphTypes)type1;
-                if (type2 <= (int)GraphTypes.TorqueAngle)
-                    // set the value
-                    TypeOfChannel2 = (GraphTypes)type2;
-                CountOfChannel1 = ReadUInt16(span, ref pos);
-                CountOfChannel2 = ReadUInt16(span, ref pos);
-                SamplingRate    = ReadUInt16(span, ref pos);
-                // check the step count
-                for (var i = 0; i < GraphSteps.Length; i++) {
-                    // get the step information
-                    var id    = ReadUInt16(span, ref pos);
-                    var index = ReadUInt16(span, ref pos);
-                    // check defined
-                    if (id <= (int)GraphStepTypes.RotationAfterTorqueUp)
-                        // set the graph step
-                        GraphSteps[i] = new GraphStep((GraphStepTypes)id, index);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-        }
-
-        // set the checksum
-        CheckSum = Utils.CalculateCheckSum(span);
-        // check the length
-        if (pos != span.Length)
-            throw new InvalidDataException($"Not all bytes have been consumed. {span.Length - pos} byte(s) remain");
-#endif
+        // set the event data
+        Set(values, type);
     }
 
     /// <summary>
@@ -536,6 +184,235 @@ public class FormatEvent {
     /// </summary>
     [Browsable(false)]
     public int CheckSum { get; set; }
+
+    /// <summary>
+    ///     Set the event data
+    /// </summary>
+    /// <param name="values">values</param>
+    /// <param name="type">generation type</param>
+    public void Set(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
+        int dir;
+        int status;
+        var pos = 0;
+        // reset the information
+        Reset();
+        // check the values (year - month)
+        if (values[4] == 0 && values[5] == 0 && values[6] == 0 && values[7] == 0 && values[8] == 0 && values[9] == 0)
+            return;
+        // set the type
+        Type = type;
+        // get the span
+        var span = values.AsSpan();
+        // check the type
+        switch (type) {
+            case GenerationTypes.GenRev1:
+            case GenerationTypes.GenRev1Ad:
+                // set values
+                Id           = ReadUInt16(span, ref pos);
+                Date         = Time = DateTime.Now;
+                FastenTime   = ReadUInt16(span, ref pos);
+                Preset       = ReadUInt16(span, ref pos);
+                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
+                Torque       = ReadUInt16(span, ref pos) / 100.0f;
+                Speed        = ReadUInt16(span, ref pos);
+                Angle1       = ReadUInt16(span, ref pos);
+                Angle2       = ReadUInt16(span, ref pos);
+                Angle        = ReadUInt16(span, ref pos);
+                RemainScrew  = ReadUInt16(span, ref pos);
+                Error        = ReadUInt16(span, ref pos);
+                // get the direction
+                dir = ReadUInt16(span, ref pos);
+                // check defined
+                if (dir <= (int)DirectionTypes.Loosening)
+                    // set the value
+                    Direction = (DirectionTypes)dir;
+                // get the status
+                status = ReadUInt16(span, ref pos);
+                // check defined
+                if (status <= (int)EventTypes.ScrewCountReset)
+                    // set the value
+                    Event = (EventTypes)status;
+                SnugAngle = ReadUInt16(span, ref pos);
+                Barcode   = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
+                // update the position
+                pos += Constants.BarcodeLength;
+                break;
+            case GenerationTypes.GenRev1Plus:
+                // set values
+                Id           = ReadUInt16(span, ref pos);
+                Date         = Time = DateTime.Now;
+                FastenTime   = ReadUInt16(span, ref pos);
+                Preset       = ReadUInt16(span, ref pos);
+                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
+                Torque       = ReadUInt16(span, ref pos) / 100.0f;
+                Speed        = ReadUInt16(span, ref pos);
+                Angle1       = ReadUInt16(span, ref pos);
+                Angle2       = ReadUInt16(span, ref pos);
+                Angle        = ReadUInt16(span, ref pos);
+                RemainScrew  = ReadUInt16(span, ref pos);
+                Error        = ReadUInt16(span, ref pos);
+                // get the direction
+                dir = ReadUInt16(span, ref pos);
+                // check defined
+                if (dir <= (int)DirectionTypes.Loosening)
+                    // set the value
+                    Direction = (DirectionTypes)dir;
+                // get the status
+                status = ReadUInt16(span, ref pos);
+                // check defined
+                if (status <= (int)EventTypes.ScrewCountReset)
+                    // set the value
+                    Event = (EventTypes)status;
+                SnugAngle        = ReadUInt16(span, ref pos);
+                SeatingTorque    = ReadUInt16(span, ref pos) / 100.0f;
+                ClampTorque      = ReadUInt16(span, ref pos) / 100.0f;
+                PrevailingTorque = ReadUInt16(span, ref pos) / 100.0f;
+                SnugTorque       = ReadUInt16(span, ref pos) / 100.0f;
+                Barcode          = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
+                // update the position
+                pos += Constants.BarcodeLength;
+                break;
+            case GenerationTypes.GenRev2:
+                // header
+                Revision = $"{ReadByte(span, ref pos)}.{ReadByte(span, ref pos)}";
+                Id       = ReadUInt16(span, ref pos);
+                // date time
+                var year        = ReadUInt16(span, ref pos);
+                var month       = ReadByte(span, ref pos);
+                var day         = ReadByte(span, ref pos);
+                var hour        = ReadByte(span, ref pos);
+                var minute      = ReadByte(span, ref pos);
+                var second      = ReadByte(span, ref pos);
+                var millisecond = ReadByte(span, ref pos);
+                // set date time
+                Date = Time = new DateTime(year, month, day, hour, minute, second, millisecond);
+                // common
+                FastenTime = ReadUInt16(span, ref pos);
+                Preset     = ReadUInt16(span, ref pos);
+                // get the unit
+                var unit = ReadUInt16(span, ref pos);
+                // check defined
+                if (unit <= (int)UnitTypes.LbfFt)
+                    // set the value
+                    Unit = (UnitTypes)unit;
+                RemainScrew = ReadUInt16(span, ref pos);
+                // get the direction
+                dir = ReadUInt16(span, ref pos);
+                // check defined
+                if (dir <= (int)DirectionTypes.Loosening)
+                    // set the value
+                    Direction = (DirectionTypes)dir;
+                Error = ReadUInt16(span, ref pos);
+                // get the status
+                status = ReadUInt16(span, ref pos);
+                // check defined
+                if (status <= (int)EventTypes.ScrewCountReset)
+                    // set the value
+                    Event = (EventTypes)status;
+                // torque
+                TargetTorque     = ReadSingle(span, ref pos);
+                Torque           = ReadSingle(span, ref pos);
+                SeatingTorque    = ReadSingle(span, ref pos);
+                ClampTorque      = ReadSingle(span, ref pos);
+                PrevailingTorque = ReadSingle(span, ref pos);
+                SnugTorque       = ReadSingle(span, ref pos);
+                // speed angle
+                Speed     = ReadUInt16(span, ref pos);
+                Angle1    = ReadUInt16(span, ref pos);
+                Angle2    = ReadUInt16(span, ref pos);
+                Angle     = ReadUInt16(span, ref pos);
+                SnugAngle = ReadUInt16(span, ref pos);
+                // reserved
+                pos += 16;
+                // set the barcode
+                Barcode = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
+                // update the position
+                pos += Constants.BarcodeLength;
+                // get the graph type
+                var type1 = ReadUInt16(span, ref pos);
+                var type2 = ReadUInt16(span, ref pos);
+                // check defined
+                if (type1 <= (int)GraphTypes.TorqueAngle)
+                    // set the value
+                    TypeOfChannel1 = (GraphTypes)type1;
+                if (type2 <= (int)GraphTypes.TorqueAngle)
+                    // set the value
+                    TypeOfChannel2 = (GraphTypes)type2;
+                CountOfChannel1 = ReadUInt16(span, ref pos);
+                CountOfChannel2 = ReadUInt16(span, ref pos);
+                SamplingRate    = ReadUInt16(span, ref pos);
+                // check the step count
+                for (var i = 0; i < GraphSteps.Length; i++) {
+                    // get the step information
+                    var id    = ReadUInt16(span, ref pos);
+                    var index = ReadUInt16(span, ref pos);
+                    // check defined
+                    if (id <= (int)GraphStepTypes.RotationAfterTorqueUp)
+                        // set the graph step
+                        GraphSteps[i] = new GraphStep((GraphStepTypes)id, index);
+                }
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+
+        // set the checksum
+        CheckSum = Utils.CalculateCheckSum(span);
+        // check the length
+        if (pos != span.Length)
+            throw new InvalidDataException($"Not all bytes have been consumed. {span.Length - pos} byte(s) remain");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Reset() {
+        // reset the values
+        Id              = 0;
+        Revision        = string.Empty;
+        Date            = default;
+        Time            = default;
+        FastenTime      = Preset = RemainScrew   = Error       = Speed            = Angle1     = Angle2 = Angle = SnugAngle = 0;
+        TargetTorque    = Torque = SeatingTorque = ClampTorque = PrevailingTorque = SnugTorque = 0f;
+        Unit            = default;
+        Direction       = default;
+        Event           = default;
+        TypeOfChannel1  = default;
+        TypeOfChannel2  = default;
+        CountOfChannel1 = CountOfChannel2 = SamplingRate = 0;
+        Barcode         = string.Empty;
+        Array.Clear(GraphSteps, 0, GraphSteps.Length);
+        CheckSum = 0;
+    }
+
+    /// <summary>
+    ///     Check the length
+    /// </summary>
+    /// <param name="remaining">remaining</param>
+    /// <param name="need">need</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void Ensure(int remaining, int need) {
+        // check the length
+        if (remaining < need)
+            // throw the exception
+            throw new InvalidDataException($"Not enough bytes: need {need}, have {remaining}");
+    }
+
+    /// <summary>
+    ///     Trim the null character
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string AsciiTrimNullRight(ReadOnlySpan<byte> s) {
+        // get the length
+        var end = s.Length;
+        // check the null
+        while (end > 0 && s[end - 1] == 0)
+            // remove the character
+            end--;
+        // return the valid string
+        return end == 0 ? string.Empty : Encoding.ASCII.GetString(s[..end]);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static float ReadSingle(ReadOnlySpan<byte> values, ref int pos) {

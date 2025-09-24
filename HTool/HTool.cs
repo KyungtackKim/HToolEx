@@ -251,7 +251,7 @@ public class HTool {
             // set max split count
             split = ReadRegMaxSize;
         // get block
-        var block = count / (split + 1) + 1;
+        var block = (count + split - 1) / split;
         // check block count
         for (var i = 0; i < block; i++) {
             // get request count
@@ -294,7 +294,7 @@ public class HTool {
             // set max split count
             split = ReadRegMaxSize;
         // get block
-        var block = count / (split + 1) + 1;
+        var block = (count + split - 1) / split;
         // check block count
         for (var i = 0; i < block; i++) {
             var request = (ushort)split;
@@ -312,6 +312,30 @@ public class HTool {
         }
 
         return res;
+    }
+
+    /// <summary>
+    ///     Read input register via check the response
+    /// </summary>
+    /// <param name="addr">address</param>
+    /// <param name="count">count</param>
+    /// <param name="notCheck">not check state</param>
+    /// <returns>result</returns>
+    public bool ReadInputReg(ushort addr, ushort count, bool notCheck = false) {
+        // check communication
+        if (Tool == null)
+            return false;
+        // check connection state
+        if (ConnectionState != ConnectionTypes.Connected)
+            return false;
+        // check the count
+        if (count >= ReadRegMaxSize)
+            return false;
+        // create message
+        var msg = new FormatMessage(CodeTypes.ReadInputReg, addr,
+            Tool.GetReadInputRegPacket(addr, count), notCheck: notCheck);
+        // insert message
+        return Insert(msg);
     }
 
     /// <summary>
@@ -470,6 +494,9 @@ public class HTool {
                 return;
             // set activate
             msg.Activate();
+            // check the not check
+            if (!msg.NotCheck)
+                return;
         } else {
             // check timeout
             if ((DateTime.Now - msg.ActiveTime).TotalMilliseconds < Constants.MessageTimeout)
@@ -477,9 +504,10 @@ public class HTool {
             // de-active message
             if (msg.DeActive() > 0)
                 return;
-            // try dequeue
-            while (!MessageQue.TryDequeue(out _)) { }
         }
+
+        // try dequeue (remove the message)
+        while (!MessageQue.TryDequeue(out _)) { }
     }
 
     private void OnChangedConnect(bool state) {
