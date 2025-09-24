@@ -50,7 +50,10 @@ public class HTool {
 
     private ITool? Tool { get; set; }
     private Timer ProcessTimer { get; set; } = new();
-    private ConcurrentQueueWithCheck<FormatMessage> MessageQue { get; } = new();
+
+    private KeyedQueue<FormatMessage, FormatMessage.MessageKey> MessageQue { get; } =
+        KeyedQueue<FormatMessage, FormatMessage.MessageKey>.Create(static m => m.Key, capacity: 64);
+
     private DateTime ConnectionTime { get; set; }
     private DateTime KeepAliveRequestTime { get; set; } = DateTime.Now;
     private DateTime KeepAliveTime { get; set; } = DateTime.Now;
@@ -218,15 +221,23 @@ public class HTool {
     /// <param name="check">check contains for the message</param>
     /// <returns>result</returns>
     private bool Insert(FormatMessage msg, bool check = true) {
-        // check contains message
-        return check switch {
-            // insert message
-            true when !MessageQue.Contains(msg, new MessageComparer()) => MessageQue.Enqueue(msg),
-            // insert message
-            false => MessageQue.Enqueue(msg),
-            // failed insert
-            _ => false
-        };
+        // get the unique check option
+        var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
+        // try enqueue
+        return MessageQue.TryEnqueue(msg, mode);
+    }
+
+    /// <summary>
+    ///     Insert messages at the message
+    /// </summary>
+    /// <param name="messages">messages</param>
+    /// <param name="check">check contains for the message</param>
+    /// <returns>result</returns>
+    private bool InsertRange(IReadOnlyList<FormatMessage> messages, bool check = true) {
+        // get the unique check option
+        var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
+        // try enqueue the messages
+        return MessageQue.TryEnqueueRange(messages, mode).Accepted > 0;
     }
 
     /// <summary>
@@ -235,41 +246,42 @@ public class HTool {
     /// <param name="addr">address</param>
     /// <param name="count">count</param>
     /// <param name="split">split address count</param>
+    /// <param name="check">check the duplicate</param>
     /// <returns>result</returns>
-    public bool ReadHoldingReg(ushort addr, ushort count, int split = 0) {
+    public bool ReadHoldingReg(ushort addr, ushort count, int split = 0, bool check = true) {
         // check communication
         if (Tool == null)
             return false;
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
+        // check the count
+        if (count == 0)
+            return true;
 
-        var res     = false;
         var address = addr;
         // check split count
-        if (split == 0)
+        if (split <= 0)
             // set max split count
             split = ReadRegMaxSize;
         // get block
         var block = (count + split - 1) / split;
+        // create the messages
+        var messages = new List<FormatMessage>(block);
         // check block count
         for (var i = 0; i < block; i++) {
-            // get request count
-            var request = (ushort)split;
-            // check index
-            if (i == block - 1 && count % split > 0)
-                // change request count
-                request = (ushort)(count % split);
-            // create message
-            var msg = new FormatMessage(CodeTypes.ReadHoldingReg, address,
-                Tool.GetReadHoldingRegPacket(address, request));
-            // insert message
-            res |= Insert(msg);
-            // change address
+            // get the remaining
+            var remaining = count - i * split;
+            // get the request count
+            var request = (ushort)Math.Min(split, remaining);
+            // add message
+            messages.Add(new FormatMessage(CodeTypes.ReadHoldingReg, address, Tool.GetReadHoldingRegPacket(address, request)));
+            // update the address
             address += request;
         }
 
-        return res;
+        // insert messages
+        return InsertRange(messages, check);
     }
 
     /// <summary>
@@ -278,50 +290,9 @@ public class HTool {
     /// <param name="addr">address</param>
     /// <param name="count">count</param>
     /// <param name="split">split address count</param>
+    /// <param name="check">check the duplicate</param>
     /// <returns>result</returns>
-    public bool ReadInputReg(ushort addr, ushort count, int split = 0) {
-        // check communication
-        if (Tool == null)
-            return false;
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-
-        var res     = false;
-        var address = addr;
-        // check split count
-        if (split == 0)
-            // set max split count
-            split = ReadRegMaxSize;
-        // get block
-        var block = (count + split - 1) / split;
-        // check block count
-        for (var i = 0; i < block; i++) {
-            var request = (ushort)split;
-            // check index
-            if (i == block - 1 && count % split > 0)
-                // change request count
-                request = (ushort)(count % split);
-            // create message
-            var msg = new FormatMessage(CodeTypes.ReadInputReg, address,
-                Tool.GetReadInputRegPacket(address, request));
-            // insert message
-            res |= Insert(msg);
-            // change address
-            address += request;
-        }
-
-        return res;
-    }
-
-    /// <summary>
-    ///     Read input register via check the response
-    /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="count">count</param>
-    /// <param name="notCheck">not check state</param>
-    /// <returns>result</returns>
-    public bool ReadInputReg(ushort addr, ushort count, bool notCheck = false) {
+    public bool ReadInputReg(ushort addr, ushort count, int split = 0, bool check = true) {
         // check communication
         if (Tool == null)
             return false;
@@ -329,13 +300,32 @@ public class HTool {
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
         // check the count
-        if (count >= ReadRegMaxSize)
-            return false;
-        // create message
-        var msg = new FormatMessage(CodeTypes.ReadInputReg, addr,
-            Tool.GetReadInputRegPacket(addr, count), notCheck: notCheck);
-        // insert message
-        return Insert(msg);
+        if (count == 0)
+            return true;
+
+        var address = addr;
+        // check split count
+        if (split <= 0)
+            // set max split count
+            split = ReadRegMaxSize;
+        // get block
+        var block = (count + split - 1) / split;
+        // create the messages
+        var messages = new List<FormatMessage>(block);
+        // check block count
+        for (var i = 0; i < block; i++) {
+            // get the remaining
+            var remaining = count - i * split;
+            // get the request count
+            var request = (ushort)Math.Min(split, remaining);
+            // add message
+            messages.Add(new FormatMessage(CodeTypes.ReadInputReg, address, Tool.GetReadInputRegPacket(address, request)));
+            // update the address
+            address += request;
+        }
+
+        // insert messages
+        return InsertRange(messages, check);
     }
 
     /// <summary>
@@ -354,8 +344,7 @@ public class HTool {
             return false;
 
         // create message
-        var msg = new FormatMessage(CodeTypes.WriteSingleReg, addr,
-            Tool.SetSingleRegPacket(addr, value));
+        var msg = new FormatMessage(CodeTypes.WriteSingleReg, addr, Tool.SetSingleRegPacket(addr, value));
         // insert message
         return Insert(msg, check);
     }
@@ -374,26 +363,30 @@ public class HTool {
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
+        // check the values
+        if (values.Length == 0)
+            return true;
 
-        var res    = false;
-        var count  = values.Length;
-        var offset = 0;
-        // get block
-        var block = count / (WriteRegMaxSize + 1) + 1;
-        // check block count
-        for (var i = 0; i < block; i++) {
-            // get address
+        var offset   = 0;
+        var total    = values.Length;
+        var blocks   = (total + WriteRegMaxSize - 1) / WriteRegMaxSize;
+        var messages = new List<FormatMessage>(blocks);
+        // check the offset
+        while (offset < total) {
+            // get the length
+            var len = Math.Min(total - offset, WriteRegMaxSize);
+            // slice the messages
+            var slice = values.AsSpan(offset, len).ToArray();
+            // get the address
             var address = (ushort)(addr + offset);
-            // create message
-            var msg = new FormatMessage(CodeTypes.WriteMultiReg, address,
-                Tool.SetMultiRegPacket(address, values.Skip(offset).Take(WriteRegMaxSize).ToArray()));
-            // insert message
-            res |= Insert(msg, check);
-            // change address
-            offset += i < block - 1 ? WriteRegMaxSize : count % WriteRegMaxSize;
+            // add message
+            messages.Add(new FormatMessage(CodeTypes.WriteMultiReg, address, Tool.SetMultiRegPacket(address, slice)));
+            // update the information
+            offset += len;
         }
 
-        return res;
+        // insert messages
+        return InsertRange(messages, check);
     }
 
     /// <summary>
@@ -417,8 +410,7 @@ public class HTool {
             // set length
             length = str.Length;
         // create message
-        var msg = new FormatMessage(CodeTypes.WriteMultiReg, addr,
-            Tool.SetMultiRegStrPacket(addr, str, length));
+        var msg = new FormatMessage(CodeTypes.WriteMultiReg, addr, Tool.SetMultiRegStrPacket(addr, str, length));
         // insert message
         return Insert(msg, check);
     }
@@ -427,7 +419,7 @@ public class HTool {
     ///     Read information register
     /// </summary>
     /// <returns>result</returns>
-    public bool ReadInfoReg() {
+    public bool ReadInfoReg(bool check = true) {
         // check communication
         if (Tool == null)
             return false;
@@ -436,9 +428,9 @@ public class HTool {
             return false;
 
         // create message
-        var msg = new FormatMessage(CodeTypes.ReadInfoReg, 0, Tool.GetInfoRegPacket());
+        var msg = new FormatMessage(CodeTypes.ReadInfoReg, FormatMessage.EmptyAddr, Tool.GetInfoRegPacket());
         // insert message
-        return Insert(msg);
+        return Insert(msg, check);
     }
 
     private void OnElapsed(object? sender, ElapsedEventArgs e) {
@@ -462,8 +454,8 @@ public class HTool {
                 if (EnableKeepAlive) {
                     // check request keep-alive time laps
                     if ((DateTime.Now - KeepAliveRequestTime).TotalMilliseconds >= Constants.KeepAlivePeriod)
-                        // check queue count
-                        if (MessageQue.Count() == 0)
+                        // check the empty
+                        if (MessageQue.IsEmpty)
                             // insert the keep alive message
                             if (ReadInfoReg())
                                 // set keep alive time
@@ -479,11 +471,11 @@ public class HTool {
                 throw new ArgumentOutOfRangeException(string.Empty);
         }
 
-        // check queue count
-        if (MessageQue.Count() == 0)
+        // check the empty
+        if (MessageQue.IsEmpty)
             return;
         // peek the message
-        if (!MessageQue.Peek(out var msg))
+        if (!MessageQue.TryPeek(out var msg))
             return;
         // check activated state
         if (!msg.Activated) {
@@ -501,13 +493,13 @@ public class HTool {
             // check timeout
             if ((DateTime.Now - msg.ActiveTime).TotalMilliseconds < Constants.MessageTimeout)
                 return;
-            // de-active message
-            if (msg.DeActive() > 0)
+            // deactivate message
+            if (msg.Deactivate() > 0)
                 return;
         }
 
         // try dequeue (remove the message)
-        while (!MessageQue.TryDequeue(out _)) { }
+        MessageQue.TryDequeue(out _);
     }
 
     private void OnChangedConnect(bool state) {
@@ -530,7 +522,7 @@ public class HTool {
 
         var addr = FormatMessage.EmptyAddr;
         // peek the message
-        if (MessageQue.Peek(out var msg))
+        if (MessageQue.TryPeek(out var msg))
             // check queue
             if (msg is { Activated: true })
                 // check code
@@ -538,7 +530,7 @@ public class HTool {
                     // set address
                     addr = msg.Address;
                     // try dequeue
-                    while (!MessageQue.TryDequeue(out _)) { }
+                    MessageQue.TryDequeue(out _);
                 }
 
         // new message

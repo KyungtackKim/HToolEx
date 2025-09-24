@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.Runtime.InteropServices;
-using HTool.Type;
-using HTool.Util;
+﻿using HTool.Type;
 using JetBrains.Annotations;
 
 namespace HTool.Format;
@@ -10,7 +7,12 @@ namespace HTool.Format;
 ///     Hantas tool message format class
 /// </summary>
 [PublicAPI]
-public class FormatMessage {
+public sealed class FormatMessage {
+    /// <summary>
+    ///     Default address
+    /// </summary>
+    public const int EmptyAddr = 0;
+
     /// <summary>
     ///     Constructor
     /// </summary>
@@ -18,124 +20,103 @@ public class FormatMessage {
     /// <param name="addr">address</param>
     /// <param name="packet">packet</param>
     /// <param name="retry">retry</param>
-    /// <param name="notCheck">not check the response</param>
+    /// <param name="notCheck">not check</param>
     public FormatMessage(CodeTypes code, int addr, ReadOnlySpan<byte> packet, int retry = 1, bool notCheck = false) {
-        // set message values
+        // set the information
         Code     = code;
         Address  = addr;
         Retry    = retry;
         NotCheck = notCheck;
-        CheckSum = Utils.CalculateCheckSum(packet);
-
-        // get the length
-        var length = packet.Length;
-        // create the packet
-        var list = new List<byte>(length);
-        // set the count
-        CollectionsMarshal.SetCount(list, length);
-        // copy the data
-        packet.CopyTo(CollectionsMarshal.AsSpan(list));
+        // get the array
+        var array = GC.AllocateUninitializedArray<byte>(packet.Length);
+        // copy to the array
+        packet.CopyTo(array);
         // set the packet
-        Packet = list;
+        Packet = array;
+        // get the hash
+        var hash = FastHash(array);
+        // set the key
+        Key = new MessageKey(code, addr, hash);
     }
 
     /// <summary>
-    ///     Default address
+    ///     Code
     /// </summary>
-    public static int EmptyAddr { get; }
-
-    /// <summary>
-    ///     Function code
-    /// </summary>
-    public CodeTypes Code { get; private set; }
+    public CodeTypes Code { get; }
 
     /// <summary>
     ///     Address
     /// </summary>
-    public int Address { get; private set; }
+    public int Address { get; }
 
     /// <summary>
-    ///     Retry count
+    ///     Remaining retry count. Decremented by <see cref="Activate" />.
     /// </summary>
     public int Retry { get; private set; }
 
     /// <summary>
-    ///     Not check
+    ///     Not check option
     /// </summary>
-    public bool NotCheck { get; private set; }
+    public bool NotCheck { get; }
 
     /// <summary>
-    ///     Activation state
+    ///     Activated state
     /// </summary>
     public bool Activated { get; private set; }
 
     /// <summary>
-    ///     Activation time
+    ///     Activated time
     /// </summary>
     public DateTime ActiveTime { get; private set; }
 
     /// <summary>
-    ///     Message check sum
+    ///     Packet
     /// </summary>
-    [Browsable(false)]
-    public int CheckSum { get; private set; }
+    public ReadOnlyMemory<byte> Packet { get; }
 
     /// <summary>
-    ///     Packet data
+    ///     Key of packet
     /// </summary>
-    [Browsable(false)]
-    public List<byte> Packet { get; private set; }
+    public MessageKey Key { get; }
 
     /// <summary>
-    ///     Activate message
+    ///     Activate the message
     /// </summary>
     public void Activate() {
-        // set activated state
-        Activated = true;
-        // set activated time
+        // set the information
+        Activated  = true;
         ActiveTime = DateTime.Now;
-        // sub retry count
         Retry--;
     }
 
     /// <summary>
-    ///     De-active message
+    ///     Deactivate
     /// </summary>
-    /// <returns>retry count</returns>
-    public int DeActive() {
-        // reset activated state
+    /// <returns>retry</returns>
+    public int Deactivate() {
+        // set the information
         Activated = false;
-        // return retry count
+        // return the retry count
         return Retry;
     }
-}
 
-/// <summary>
-///     hantas tool message comparer class
-/// </summary>
-[PublicAPI]
-public class MessageComparer : IEqualityComparer<FormatMessage> {
-    /// <summary>
-    ///     Check equals
-    /// </summary>
-    /// <param name="x">source</param>
-    /// <param name="y">destination</param>
-    /// <returns>result</returns>
-    public bool Equals(FormatMessage? x, FormatMessage? y) {
-        // check message
-        if (x == null || y == null)
-            return false;
+    private static int FastHash(ReadOnlySpan<byte> packet) {
+        var hash = 2166136261u;
+        // check the packet
+        foreach (var b in packet) {
+            // calculate the hash
+            hash ^= b;
+            hash *= 16777619;
+        }
 
-        // compare
-        return x.Address == y.Address && x.CheckSum == y.CheckSum;
+        return unchecked((int)hash);
     }
 
     /// <summary>
-    ///     Get hash code
+    ///     Compact key for format message
     /// </summary>
-    /// <param name="obj">object</param>
-    /// <returns>result</returns>
-    public int GetHashCode(FormatMessage obj) {
-        return obj.CheckSum;
-    }
+    /// <param name="Code">code</param>
+    /// <param name="Address">address</param>
+    /// <param name="Hash">hash</param>
+    public readonly record struct MessageKey(CodeTypes Code, int Address, int Hash);
 }

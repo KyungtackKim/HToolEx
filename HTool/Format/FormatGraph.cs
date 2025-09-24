@@ -46,6 +46,7 @@ public class FormatGraph {
             // set the value
             Values[i] = BitConverter.Int32BitsToSingle((int)value);
         }
+
         // set the checksum
         CheckSum = Utils.CalculateCheckSum(span);
     }

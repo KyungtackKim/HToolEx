@@ -97,12 +97,12 @@ public class HcRtu : ITool {
             ReceiveBuf.Clear();
             AnalyzeBuf.Clear();
             // set com port
-            Port.PortName               = target;
-            Port.BaudRate               = option;
-            Port.ReadBufferSize         = 16 * 1024;
-            Port.WriteBufferSize        = 16 * 1024;
-            Port.Handshake              = Handshake.None;
-            Port.Encoding               = Encoding.GetEncoding(@"iso-8859-1");
+            Port.PortName        = target;
+            Port.BaudRate        = option;
+            Port.ReadBufferSize  = 16 * 1024;
+            Port.WriteBufferSize = 16 * 1024;
+            Port.Handshake       = Handshake.None;
+            Port.Encoding        = Encoding.GetEncoding(@"iso-8859-1");
             // open
             Port.Open();
             // set device id

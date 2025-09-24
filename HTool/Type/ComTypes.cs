@@ -25,5 +25,5 @@ public enum ComErrorTypes {
     InvalidCrc        = 0x07,
     InvalidFrame      = 0x0C,
     InvalidValueRange = 0x0E,
-    Timeout = 0x0F
+    Timeout           = 0x0F
 }
