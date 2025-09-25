@@ -355,6 +355,17 @@ public sealed class HTool {
     /// <param name="check">check contains for the message</param>
     /// <returns>result</returns>
     public bool WriteMultiReg(ushort addr, ushort[] values, bool check = true) {
+        return WriteMultiReg(addr, values.AsSpan(), check);
+    }
+
+    /// <summary>
+    ///     Write multiple register
+    /// </summary>
+    /// <param name="addr">address</param>
+    /// <param name="values">values</param>
+    /// <param name="check">check contains for the message</param>
+    /// <returns>result</returns>
+    public bool WriteMultiReg(ushort addr, ReadOnlySpan<ushort> values, bool check = true) {
         // check communication
         if (Tool == null)
             return false;
@@ -373,12 +384,17 @@ public sealed class HTool {
         while (offset < total) {
             // get the length
             var len = Math.Min(total - offset, WriteRegMaxSize);
-            // slice the messages
-            var slice = values.AsSpan(offset, len).ToArray();
             // get the address
             var address = (ushort)(addr + offset);
+            // get the buf
+            var buf = GC.AllocateUninitializedArray<ushort>(len);
+            // copy to the buf
+            values.Slice(offset, len).CopyTo(buf);
+            // get the packet
+            var packet = Tool.SetMultiRegPacket(address, buf);
             // add message
-            messages.Add(new FormatMessage(CodeTypes.WriteMultiReg, address, Tool.SetMultiRegPacket(address, slice)));
+            messages.Add(new FormatMessage(CodeTypes.WriteMultiReg, address, packet));
+
             // update the information
             offset += len;
         }
