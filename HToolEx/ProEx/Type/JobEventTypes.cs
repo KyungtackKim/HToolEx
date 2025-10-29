@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.ProEx.Type;
 
@@ -6,28 +7,28 @@ namespace HToolEx.ProEx.Type;
 ///     Job event status types
 /// </summary>
 public enum JobEventTypes {
-    [Description("Step into")]
+    [Display(Description = @"JobEventTypeStepInto", ResourceType = typeof(HToolExRes))]
     StepInto,
-    [Description("Fastening OK")]
+    [Display(Description = @"JobEventTypeFastenOk", ResourceType = typeof(HToolExRes))]
     FastenOk,
-    [Description("Fastening NG")]
+    [Display(Description = @"JobEventTypeFastenNg", ResourceType = typeof(HToolExRes))]
     FastenNg,
-    [Description("Step OK")]
+    [Display(Description = @"JobEventTypeStepOk", ResourceType = typeof(HToolExRes))]
     StepOk,
-    [Description("Step NG")]
+    [Display(Description = @"JobEventTypeStepNg", ResourceType = typeof(HToolExRes))]
     StepNg,
-    [Description("Job OK")]
+    [Display(Description = @"JobEventTypeJobOk", ResourceType = typeof(HToolExRes))]
     JobOk,
-    [Description("Job NG")]
+    [Display(Description = @"JobEventTypeJobNg", ResourceType = typeof(HToolExRes))]
     JobNg,
-    [Description("Job aborted")]
+    [Display(Description = @"JobEventTypeJobAbort", ResourceType = typeof(HToolExRes))]
     JobAborted,
-    [Description("Skip")]
+    [Display(Description = @"JobEventTypeSkip", ResourceType = typeof(HToolExRes))]
     Skip,
-    [Description("Back")]
+    [Display(Description = @"JobEventTypeBack", ResourceType = typeof(HToolExRes))]
     Back,
-    [Description("Reset step")]
+    [Display(Description = @"JobEventTypeResetStep", ResourceType = typeof(HToolExRes))]
     ResetStep,
-    [Description("Reset job")]
+    [Display(Description = @"JobEventTypeResetJob", ResourceType = typeof(HToolExRes))]
     ResetJob
 }

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 using JetBrains.Annotations;
 
 namespace HToolEx.ProEx.Type;
@@ -8,16 +10,16 @@ namespace HToolEx.ProEx.Type;
 /// </summary>
 [PublicAPI]
 public enum JobStepTypes {
-    [Description("Fastening")]
+    [Display(Description = @"JobStepTypeFastening", ResourceType = typeof(HToolExRes))]
     Fastening,
-    [Description("Input")]
+    [Display(Description = @"JobStepTypeInput", ResourceType = typeof(HToolExRes))]
     Input,
-    [Description("Output")]
+    [Display(Description = @"JobStepTypeOutput", ResourceType = typeof(HToolExRes))]
     Output,
-    [Description("Delay")]
+    [Display(Description = @"JobStepTypeDelay", ResourceType = typeof(HToolExRes))]
     Delay,
-    [Description("Message")]
+    [Display(Description = @"JobStepTypeMessage", ResourceType = typeof(HToolExRes))]
     Message,
-    [Description("ID")]
+    [Display(Description = @"JobStepTypeId", ResourceType = typeof(HToolExRes))]
     Id
 }

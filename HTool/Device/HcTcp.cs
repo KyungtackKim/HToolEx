@@ -192,7 +192,7 @@ public sealed class HcTcp : ITool {
     /// <returns>packet</returns>
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[12];
+        var packet = GC.AllocateUninitializedArray<byte>(12);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -208,7 +208,7 @@ public sealed class HcTcp : ITool {
         packet[10] = (byte)((count >> 8) & 0xFF);
         packet[11] = (byte)(count        & 0xFF);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public sealed class HcTcp : ITool {
     /// <returns>packet</returns>
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[12];
+        var packet = GC.AllocateUninitializedArray<byte>(12);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -235,7 +235,7 @@ public sealed class HcTcp : ITool {
         packet[10] = (byte)((count >> 8) & 0xFF);
         packet[11] = (byte)(count        & 0xFF);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -246,7 +246,7 @@ public sealed class HcTcp : ITool {
     /// <returns>packet</returns>
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[12];
+        var packet = GC.AllocateUninitializedArray<byte>(12);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -262,7 +262,7 @@ public sealed class HcTcp : ITool {
         packet[10] = (byte)((value >> 8) & 0xFF);
         packet[11] = (byte)(value        & 0xFF);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -271,7 +271,7 @@ public sealed class HcTcp : ITool {
     /// <param name="addr">address</param>
     /// <param name="values">values</param>
     /// <returns>packet</returns>
-    public byte[] SetMultiRegPacket(ushort addr, ushort[] values) {
+    public byte[] SetMultiRegPacket(ushort addr, ReadOnlySpan<ushort> values) {
         var index = 13;
         // get count
         var count = values.Length;
@@ -280,7 +280,7 @@ public sealed class HcTcp : ITool {
         // get the packet size
         var size = 6 + pdu;
         // allocation the packet
-        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        var packet = GC.AllocateUninitializedArray<byte>(size);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -305,7 +305,7 @@ public sealed class HcTcp : ITool {
         }
 
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -328,7 +328,7 @@ public sealed class HcTcp : ITool {
         // get the packet size
         var size = 6 + pdu;
         // allocation the packet
-        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        var packet = GC.AllocateUninitializedArray<byte>(size);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -354,7 +354,7 @@ public sealed class HcTcp : ITool {
             // set the padding value
             packet[index++] = 0;
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -363,7 +363,7 @@ public sealed class HcTcp : ITool {
     /// <returns>result</returns>
     public byte[] GetInfoRegPacket() {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[8];
+        var packet = GC.AllocateUninitializedArray<byte>(8);
         // set the MBAP header
         packet[0] = (byte)((DeviceId >> 8) & 0xFF);
         packet[1] = (byte)(DeviceId        & 0xFF);
@@ -375,7 +375,7 @@ public sealed class HcTcp : ITool {
         // set the PDU values
         packet[7] = (byte)CodeTypes.ReadInfoReg;
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     private void ClientOnConnectionChanged(object? sender, ConnectionEventArgs e) {
@@ -426,6 +426,10 @@ public sealed class HcTcp : ITool {
             ProcessTimer.Stop();
             // dispose timer
             ProcessTimer.Dispose();
+            // check the received buffer
+            foreach (var value in ReceiveBuf)
+                // return the pool
+                ArrayPool<byte>.Shared.Return(value.buf);
             // clear buffer
             ReceiveBuf.Clear();
             AnalyzeBuf.Clear();

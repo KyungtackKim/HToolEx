@@ -19,20 +19,16 @@ public sealed class FormatMessage {
     /// <param name="packet">packet</param>
     /// <param name="retry">retry</param>
     /// <param name="notCheck">not check</param>
-    public FormatMessage(CodeTypes code, int addr, ReadOnlySpan<byte> packet, int retry = 1, bool notCheck = false) {
+    public FormatMessage(CodeTypes code, int addr, byte[] packet, int retry = 1, bool notCheck = false) {
         // set the information
         Code     = code;
         Address  = addr;
         Retry    = retry;
         NotCheck = notCheck;
-        // get the array
-        var array = GC.AllocateUninitializedArray<byte>(packet.Length);
-        // copy to the array
-        packet.CopyTo(array);
         // set the packet
-        Packet = array;
+        Packet = packet;
         // get the hash
-        var hash = FastHash(array);
+        var hash = FastHash(Packet.Span);
         // set the key
         Key = new MessageKey(code, addr, hash);
     }

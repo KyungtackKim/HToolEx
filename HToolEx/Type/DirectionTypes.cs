@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,8 +7,8 @@ namespace HToolEx.Type;
 ///     Motor direction types
 /// </summary>
 public enum DirectionTypes {
-    [Description("Fastening")]
+    [Display(Description = @"DirTypeFastening", ResourceType = typeof(HToolExRes))]
     Fastening,
-    [Description("Loosening")]
+    [Display(Description = @"DirTypeLoosening", ResourceType = typeof(HToolExRes))]
     Loosening
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,22 +7,22 @@ namespace HToolEx.Type;
 ///     Multi sequence command types
 /// </summary>
 public enum MsCmdTypes {
-    [Description("None")]
+    [Display(Description = @"MsCmdTypeNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Fastening")]
+    [Display(Description = @"MsCmdTypeFastening", ResourceType = typeof(HToolExRes))]
     Fastening,
-    [Description("End")]
+    [Display(Description = @"MsCmdTypeEnd", ResourceType = typeof(HToolExRes))]
     End,
-    [Description("Delay")]
+    [Display(Description = @"MsCmdTypeDelay", ResourceType = typeof(HToolExRes))]
     Delay,
-    [Description("Select preset")]
+    [Display(Description = @"MsCmdTypePreset", ResourceType = typeof(HToolExRes))]
     SelectPreset,
-    [Description("Loosening")]
+    [Display(Description = @"MsCmdTypeLoosening", ResourceType = typeof(HToolExRes))]
     Loosening,
-    [Description("Jump")]
+    [Display(Description = @"MsCmdTypeJump", ResourceType = typeof(HToolExRes))]
     Jump,
-    [Description("Count value = A")]
+    [Display(Description = @"MsCmdTypeCount", ResourceType = typeof(HToolExRes))]
     CountValue,
-    [Description("Sub if (A)")]
+    [Display(Description = @"MsCmdTypeIf", ResourceType = typeof(HToolExRes))]
     SubIf
 }

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.ProEx.Type;
 
@@ -6,14 +8,14 @@ namespace HToolEx.ProEx.Type;
 ///     Graph channel types for ParaMon-Pro X
 /// </summary>
 public enum GraphTypes {
-    [Description("None")]
+    [Display(Description = @"GraphTypeNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Torque")]
+    [Display(Description = @"GraphTypeTorque", ResourceType = typeof(HToolExRes))]
     Torque,
-    [Description("Speed")]
+    [Display(Description = @"GraphTypeSpeed", ResourceType = typeof(HToolExRes))]
     Speed,
-    [Description("Angle")]
+    [Display(Description = @"GraphTypeAngle", ResourceType = typeof(HToolExRes))]
     Angle,
-    [Description("Torque / Angle")]
+    [Display(Description = @"GraphTypeTorqueAngle", ResourceType = typeof(HToolExRes))]
     TorqueAngle
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,16 +7,16 @@ namespace HToolEx.Type;
 ///     Model command types
 /// </summary>
 public enum ModelCmdTypes {
-    [Description("None")]
+    [Display(Description = @"ModelCmdNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Fastening")]
+    [Display(Description = @"ModelCmdFastening", ResourceType = typeof(HToolExRes))]
     Fastening,
-    [Description("Delay")]
+    [Display(Description = @"ModelCmdDelay", ResourceType = typeof(HToolExRes))]
     Delay,
-    [Description("Input")]
+    [Display(Description = @"ModelCmdInput", ResourceType = typeof(HToolExRes))]
     Input,
-    [Description("Output")]
+    [Display(Description = @"ModelCmdOutput", ResourceType = typeof(HToolExRes))]
     Output,
-    [Description("Barcode")]
+    [Display(Description = @"ModelCmdBarcode", ResourceType = typeof(HToolExRes))]
     Barcode
 }

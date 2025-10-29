@@ -11,7 +11,7 @@ public static class Utils {
     /// <summary>
     ///     MODBUS-RTU CRC-16 lookup table
     /// </summary>
-    public static readonly ushort[] ModbusCrc16Table = [
+    private static readonly ushort[] ModbusCrc16Table = [
         0x0000,
         0xC0C1,
         0xC181,
@@ -468,15 +468,20 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out float value) {
+    public static void ConvertValue(ReadOnlySpan<byte> values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
         // check the length
         if (values.Length < 4) {
             // reset the value
             value = 0;
         } else {
-            // get the int value
-            var intValue = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
+            // get the int value based on word order
+            var intValue = wordOrder == WordOrderTypes.HighLow
+                // ABCD: High word first (most common)
+                ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]
+                // CDAB: Low word first
+                : (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
             // set the value
             value = BitConverter.Int32BitsToSingle(intValue);
         }
@@ -498,10 +503,21 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out int value) {
-        // set the value
-        value = values.Length >= 4 ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3] : 0;
+    public static void ConvertValue(ReadOnlySpan<byte> values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+        // set the default value
+        value = 0;
+        // check the length
+        if (values.Length != 4)
+            return;
+        // check the word order
+        if (wordOrder == WordOrderTypes.HighLow)
+            // ABCD: High word first (most common)
+            value = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
+        else
+            // CDAB: Low word first
+            value = (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
     }
 
     /// <summary>
@@ -509,9 +525,10 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out float value) {
-        ConvertValue(values.AsSpan(), out value);
+    public static void ConvertValue(byte[] values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+        ConvertValue(values.AsSpan(), out value, wordOrder);
     }
 
     /// <summary>
@@ -529,9 +546,10 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out int value) {
-        ConvertValue(values.AsSpan(), out value);
+    public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+        ConvertValue(values.AsSpan(), out value, wordOrder);
     }
 
     /// <summary>
@@ -629,16 +647,39 @@ public static class Utils {
     }
 
     /// <summary>
+    ///     Get ushort values from int32 value
+    /// </summary>
+    /// <param name="value">int value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <returns>values</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ushort[] GetValuesFromValue(int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+        // get high and low words
+        var highWord = (ushort)(value >> 16);
+        var lowWord  = (ushort)value;
+        // return based on word order
+        return wordOrder == WordOrderTypes.HighLow
+            ? [highWord, lowWord]  // ABCD: High word first
+            : [lowWord, highWord]; // CDAB: Low word first
+    }
+
+    /// <summary>
     ///     Get ushort values from single value
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">single value</param>
+    /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <returns>values</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ushort[] GetValuesFromSingle(float value) {
+    public static ushort[] GetValuesFromValue(float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
         // get the bits
         var bits = BitConverter.SingleToInt32Bits(value);
-        // result
-        return [(ushort)(bits >> 16), (ushort)bits];
+        // get high and low words
+        var highWord = (ushort)(bits >> 16);
+        var lowWord  = (ushort)bits;
+        // return based on word order
+        return wordOrder == WordOrderTypes.HighLow
+            ? [highWord, lowWord]  // ABCD: High word first
+            : [lowWord, highWord]; // CDAB: Low word first
     }
 
     /// <summary>

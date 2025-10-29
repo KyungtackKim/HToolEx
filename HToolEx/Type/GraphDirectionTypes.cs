@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,12 +7,12 @@ namespace HToolEx.Type;
 ///     Graph direction types
 /// </summary>
 public enum GraphDirectionTypes {
-    [Description("All")]
+    [Display(Description = @"GraphDirAll", ResourceType = typeof(HToolExRes))]
     All,
-    [Description("Fasten Only")]
+    [Display(Description = @"GraphDirFasten", ResourceType = typeof(HToolExRes))]
     FastenOnly,
-    [Description("Loosen Only")]
+    [Display(Description = @"GraphDirLoosen", ResourceType = typeof(HToolExRes))]
     LoosenOnly,
-    [Description("Both")]
+    [Display(Description = @"GraphDirBoth", ResourceType = typeof(HToolExRes))]
     Both
 }

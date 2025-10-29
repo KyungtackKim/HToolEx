@@ -123,7 +123,7 @@ public interface ITool {
     /// <param name="addr">address</param>
     /// <param name="values">values</param>
     /// <returns>packet</returns>
-    byte[] SetMultiRegPacket(ushort addr, ushort[] values);
+    byte[] SetMultiRegPacket(ushort addr, ReadOnlySpan<ushort> values);
 
     /// <summary>
     ///     Set multiple register ascii packet

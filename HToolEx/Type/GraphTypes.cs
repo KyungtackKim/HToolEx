@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,22 +7,22 @@ namespace HToolEx.Type;
 ///     Graph channel types
 /// </summary>
 public enum GraphTypes {
-    [Description("None")]
+    [Display(Description = @"GraphTypeNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Torque")]
+    [Display(Description = @"GraphTypeTorque", ResourceType = typeof(HToolExRes))]
     Torque,
-    [Description("Current")]
+    [Display(Description = @"GraphTypeCurrent", ResourceType = typeof(HToolExRes))]
     Current,
-    [Description("Speed")]
+    [Display(Description = @"GraphTypeSpeed", ResourceType = typeof(HToolExRes))]
     Speed,
-    [Description("Angle")]
+    [Display(Description = @"GraphTypeAngle", ResourceType = typeof(HToolExRes))]
     Angle,
-    [Description("Speed command")]
+    [Display(Description = @"GraphTypeSpeedCmd", ResourceType = typeof(HToolExRes))]
     SpeedCmd,
-    [Description("Current command")]
+    [Display(Description = @"GraphTypeCurrentCmd", ResourceType = typeof(HToolExRes))]
     CurrentCmd,
-    [Description("Snug angle")]
+    [Display(Description = @"GraphTypeSnugAngle", ResourceType = typeof(HToolExRes))]
     SnugAngle,
-    [Description("Torque / Angle")]
+    [Display(Description = @"GraphTypeTorqueAngle", ResourceType = typeof(HToolExRes))]
     TorqueAngle
 }

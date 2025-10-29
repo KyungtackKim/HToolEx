@@ -187,7 +187,7 @@ public sealed class HcRtu : ITool {
     /// <returns>packet</returns>
     public byte[] GetReadHoldingRegPacket(ushort addr, ushort count) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[8];
+        var packet = GC.AllocateUninitializedArray<byte>(8);
         // set values
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.ReadHoldingReg;
@@ -196,10 +196,12 @@ public sealed class HcRtu : ITool {
         packet[4] = (byte)((count >> 8) & 0xFF);
         packet[5] = (byte)(count        & 0xFF);
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+        Utils.CalculateCrcTo(p[..6], p[6..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -210,7 +212,7 @@ public sealed class HcRtu : ITool {
     /// <returns>packet</returns>
     public byte[] GetReadInputRegPacket(ushort addr, ushort count) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[8];
+        var packet = GC.AllocateUninitializedArray<byte>(8);
         // set values
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.ReadInputReg;
@@ -219,10 +221,12 @@ public sealed class HcRtu : ITool {
         packet[4] = (byte)((count >> 8) & 0xFF);
         packet[5] = (byte)(count        & 0xFF);
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+        Utils.CalculateCrcTo(p[..6], p[6..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -233,7 +237,7 @@ public sealed class HcRtu : ITool {
     /// <returns>packet</returns>
     public byte[] SetSingleRegPacket(ushort addr, ushort value) {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[8];
+        var packet = GC.AllocateUninitializedArray<byte>(8);
         // set values
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.WriteSingleReg;
@@ -242,10 +246,12 @@ public sealed class HcRtu : ITool {
         packet[4] = (byte)((value >> 8) & 0xFF);
         packet[5] = (byte)(value        & 0xFF);
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..6], packet[6..]);
+        Utils.CalculateCrcTo(p[..6], p[6..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -254,14 +260,14 @@ public sealed class HcRtu : ITool {
     /// <param name="addr">address</param>
     /// <param name="values">values</param>
     /// <returns>packet</returns>
-    public byte[] SetMultiRegPacket(ushort addr, ushort[] values) {
+    public byte[] SetMultiRegPacket(ushort addr, ReadOnlySpan<ushort> values) {
         var index = 7;
         // get count
         var count = values.Length;
         // get the packet size
         var size = index + count * 2 + 2;
         // allocation the packet
-        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        var packet = GC.AllocateUninitializedArray<byte>(size);
         // set the header
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.WriteMultiReg;
@@ -278,10 +284,12 @@ public sealed class HcRtu : ITool {
             packet[index++] = (byte)(value        & 0xFF);
         }
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..^2], packet[^2..]);
+        Utils.CalculateCrcTo(p[..^2], p[^2..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -302,7 +310,7 @@ public sealed class HcRtu : ITool {
         // get the packet size
         var size = index + count * 2 + 2;
         // allocation the packet
-        var packet = size < 1024 ? stackalloc byte[size] : new byte[size];
+        var packet = GC.AllocateUninitializedArray<byte>(size);
         // set the header
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.WriteMultiReg;
@@ -321,10 +329,12 @@ public sealed class HcRtu : ITool {
             // set the padding value
             packet[index++] = 0;
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..^2], packet[^2..]);
+        Utils.CalculateCrcTo(p[..^2], p[^2..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>
@@ -333,15 +343,17 @@ public sealed class HcRtu : ITool {
     /// <returns>result</returns>
     public byte[] GetInfoRegPacket() {
         // allocation the packet
-        Span<byte> packet = stackalloc byte[4];
+        var packet = GC.AllocateUninitializedArray<byte>(4);
         // set values
         packet[0] = DeviceId;
         packet[1] = (byte)CodeTypes.ReadInfoReg;
 
+        // get the span
+        var p = packet.AsSpan();
         // set the crc
-        Utils.CalculateCrcTo(packet[..2], packet[2..]);
+        Utils.CalculateCrcTo(p[..2], p[2..]);
         // packet
-        return packet.ToArray();
+        return packet;
     }
 
     /// <summary>

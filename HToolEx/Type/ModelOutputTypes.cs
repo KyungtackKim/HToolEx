@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,14 +7,14 @@ namespace HToolEx.Type;
 ///     Model output function types
 /// </summary>
 public enum ModelOutputTypes {
-    [Description("None")]
+    [Display(Description = @"ModelOutputTypeNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("On")]
+    [Display(Description = @"ModelOutputTypeOn", ResourceType = typeof(HToolExRes))]
     On,
-    [Description("Off")]
+    [Display(Description = @"ModelOutputTypeOff", ResourceType = typeof(HToolExRes))]
     Off,
-    [Description("On for 0.5 sec")]
+    [Display(Description = @"ModelOutputTypeHalfSec", ResourceType = typeof(HToolExRes))]
     OnShort,
-    [Description("On for 1.0 sec")]
+    [Display(Description = @"ModelOutputTypeSec", ResourceType = typeof(HToolExRes))]
     OnLong
 }

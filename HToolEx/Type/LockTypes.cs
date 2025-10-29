@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,12 +7,12 @@ namespace HToolEx.Type;
 ///     Tool lock types
 /// </summary>
 public enum LockTypes {
-    [Description("UnLock")]
+    [Display(Description = @"LockTypeUnLock", ResourceType = typeof(HToolExRes))]
     UnLock,
-    [Description("Lock")]
+    [Display(Description = @"LockTypeLock", ResourceType = typeof(HToolExRes))]
     Lock,
-    [Description("Loosen lock")]
+    [Display(Description = @"LockTypeLoosenLock", ResourceType = typeof(HToolExRes))]
     LoosenOnly,
-    [Description("Fasten lock")]
+    [Display(Description = @"LockTypeFastenLock", ResourceType = typeof(HToolExRes))]
     FastenOnly
 }

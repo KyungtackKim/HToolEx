@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 using HToolEx.Util;
 using JetBrains.Annotations;
 
@@ -12,39 +14,39 @@ public class FormatSetInOut {
     ///     Input function types
     /// </summary>
     public enum SetInputTypes {
-        [Description("Disable")]
+        [Display(Description = @"SetInTypeDisable", ResourceType = typeof(HToolExRes))]
         Disable,
-        [Description("Job selection 1")]
+        [Display(Description = @"SetInTypeJob1", ResourceType = typeof(HToolExRes))]
         JobSelect1,
-        [Description("Job selection 2")]
+        [Display(Description = @"SetInTypeJob2", ResourceType = typeof(HToolExRes))]
         JobSelect2,
-        [Description("Job selection 3")]
+        [Display(Description = @"SetInTypeJob3", ResourceType = typeof(HToolExRes))]
         JobSelect3,
-        [Description("Job selection 4")]
+        [Display(Description = @"SetInTypeJob4", ResourceType = typeof(HToolExRes))]
         JobSelect4,
-        [Description("Job selection 5")]
+        [Display(Description = @"SetInTypeJob5", ResourceType = typeof(HToolExRes))]
         JobSelect5,
-        [Description("Job selection 6")]
+        [Display(Description = @"SetInTypeJob6", ResourceType = typeof(HToolExRes))]
         JobSelect6,
-        [Description("Job selection 7")]
+        [Display(Description = @"SetInTypeJob7", ResourceType = typeof(HToolExRes))]
         JobSelect7,
-        [Description("Job selection 8")]
+        [Display(Description = @"SetInTypeJob8", ResourceType = typeof(HToolExRes))]
         JobSelect8,
-        [Description("Skip")]
+        [Display(Description = @"SetInTypeSkip", ResourceType = typeof(HToolExRes))]
         Skip,
-        [Description("Back")]
+        [Display(Description = @"SetInTypeBack", ResourceType = typeof(HToolExRes))]
         Back,
-        [Description("Step reset")]
+        [Display(Description = @"SetInTypeStepReset", ResourceType = typeof(HToolExRes))]
         StepReset,
-        [Description("Job reset")]
+        [Display(Description = @"SetInTypeJobReset", ResourceType = typeof(HToolExRes))]
         JobReset,
-        [Description("Next job")]
+        [Display(Description = @"SetInTypeNextJob", ResourceType = typeof(HToolExRes))]
         NextJob,
-        [Description("Previous job")]
+        [Display(Description = @"SetInTypePrevJob", ResourceType = typeof(HToolExRes))]
         PreviousJob,
-        [Description("Tool alarm reset")]
+        [Display(Description = @"SetInTypeAlarmReset", ResourceType = typeof(HToolExRes))]
         AlarmReset,
-        [Description("Emergency lock")]
+        [Display(Description = @"SetInTypeEmergency", ResourceType = typeof(HToolExRes))]
         EmergencyLock
     }
 
@@ -52,23 +54,23 @@ public class FormatSetInOut {
     ///     Output function types
     /// </summary>
     public enum SetOutputTypes {
-        [Description("Disable")]
+        [Display(Description = @"SetOutTypeDisable", ResourceType = typeof(HToolExRes))]
         Disable,
-        [Description("Fastening OK")]
+        [Display(Description = @"SetOutTypeFastenOk", ResourceType = typeof(HToolExRes))]
         FastenOk,
-        [Description("Fastening NG")]
+        [Display(Description = @"SetOutTypeFastenNg", ResourceType = typeof(HToolExRes))]
         FastenNg,
-        [Description("Step OK")]
+        [Display(Description = @"SetOutTypeStepOk", ResourceType = typeof(HToolExRes))]
         StepOk,
-        [Description("Step NG")]
+        [Display(Description = @"SetOutTypeStepNg", ResourceType = typeof(HToolExRes))]
         StepNg,
-        [Description("Job OK")]
+        [Display(Description = @"SetOutTypeJobOk", ResourceType = typeof(HToolExRes))]
         JobOk,
-        [Description("Job NG")]
+        [Display(Description = @"SetOutTypeJobNg", ResourceType = typeof(HToolExRes))]
         JobNg,
-        [Description("Ready (Continuous)")]
+        [Display(Description = @"SetOutTypeReady", ResourceType = typeof(HToolExRes))]
         SystemReady,
-        [Description("Alarm (Continuous)")]
+        [Display(Description = @"SetOutTypeAlarm", ResourceType = typeof(HToolExRes))]
         Alarm
     }
 

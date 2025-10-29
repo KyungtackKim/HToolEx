@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,25 +7,25 @@ namespace HToolEx.Type;
 ///     Event status types
 /// </summary>
 public enum EventTypes {
-    [Description("Etc.")]
+    [Display(Description = @"EventEtc", ResourceType = typeof(HToolExRes))]
     Etc,
-    [Description("Fastening OK")]
+    [Display(Description = @"EventFastenOk", ResourceType = typeof(HToolExRes))]
     FastenOk,
-    [Description("Fastening NG")]
+    [Display(Description = @"EventFastenNg", ResourceType = typeof(HToolExRes))]
     FastenNg,
-    [Description("F / L")]
+    [Display(Description = @"EventDir", ResourceType = typeof(HToolExRes))]
     Fl,
-    [Description("Preset change")]
+    [Display(Description = @"EventPreset", ResourceType = typeof(HToolExRes))]
     PresetChange,
-    [Description("Alarm reset")]
+    [Display(Description = @"EventAlarmReset", ResourceType = typeof(HToolExRes))]
     AlarmReset,
-    [Description("Error")]
+    [Display(Description = @"EventError", ResourceType = typeof(HToolExRes))]
     Error,
-    [Description("Barcode")]
+    [Display(Description = @"EventBarcode", ResourceType = typeof(HToolExRes))]
     Barcode,
-    [Description("Screw cancel")]
+    [Display(Description = @"EventScrewCancel", ResourceType = typeof(HToolExRes))]
     ScrewCancel,
-    [Description("Screw count reset")]
+    [Display(Description = @"EventScrewReset", ResourceType = typeof(HToolExRes))]
     ScrewCountReset
 }
 
@@ -33,26 +34,26 @@ public enum EventTypes {
 /// </summary>
 [Flags]
 public enum EventFlagTypes {
-    [Description("None")]
+    [Display(Description = @"EventNone", ResourceType = typeof(HToolExRes))]
     None = 0,
-    [Description("Etc.")]
+    [Display(Description = @"EventEtc", ResourceType = typeof(HToolExRes))]
     Etc = 1 << 0,
-    [Description("Fastening OK")]
+    [Display(Description = @"EventFastenOk", ResourceType = typeof(HToolExRes))]
     FastenOk = 1 << 1,
-    [Description("Fastening NG")]
+    [Display(Description = @"EventFastenNg", ResourceType = typeof(HToolExRes))]
     FastenNg = 1 << 2,
-    [Description("F / L")]
+    [Display(Description = @"EventDir", ResourceType = typeof(HToolExRes))]
     Fl = 1 << 3,
-    [Description("Preset change")]
+    [Display(Description = @"EventPreset", ResourceType = typeof(HToolExRes))]
     PresetChange = 1 << 4,
-    [Description("Alarm reset")]
+    [Display(Description = @"EventAlarmReset", ResourceType = typeof(HToolExRes))]
     AlarmReset = 1 << 5,
-    [Description("Error")]
+    [Display(Description = @"EventError", ResourceType = typeof(HToolExRes))]
     Error = 1 << 6,
-    [Description("Barcode")]
+    [Display(Description = @"EventBarcode", ResourceType = typeof(HToolExRes))]
     Barcode = 1 << 7,
-    [Description("Screw cancel")]
+    [Display(Description = @"EventScrewCancel", ResourceType = typeof(HToolExRes))]
     ScrewCancel = 1 << 8,
-    [Description("Screw count reset")]
+    [Display(Description = @"EventScrewReset", ResourceType = typeof(HToolExRes))]
     ScrewCountReset = 1 << 9
 }

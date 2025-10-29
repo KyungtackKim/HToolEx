@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,28 +7,28 @@ namespace HToolEx.Type;
 ///     Graph step types
 /// </summary>
 public enum GraphStepTypes {
-    [Description("None")]
+    [Display(Description = @"GraphStepNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Free reverse rotation")]
+    [Display(Description = @"GraphStepFreeReverse", ResourceType = typeof(HToolExRes))]
     FreeReverseRotation,
-    [Description("Thread tap")]
+    [Display(Description = @"GraphStepThreadTap", ResourceType = typeof(HToolExRes))]
     ThreadTap,
-    [Description("Engaging")]
+    [Display(Description = @"GraphStepEngaging", ResourceType = typeof(HToolExRes))]
     Engaging,
-    [Description("Free rotation")]
+    [Display(Description = @"GraphStepFreeRotation", ResourceType = typeof(HToolExRes))]
     FreeRotation,
-    [Description("Fastening")]
+    [Display(Description = @"GraphStepFasten", ResourceType = typeof(HToolExRes))]
     Fastening,
-    [Description("Snug torque")]
+    [Display(Description = @"GraphStepSnugTorque", ResourceType = typeof(HToolExRes))]
     SnugTorque,
-    [Description("Prevailing start")]
+    [Display(Description = @"GraphStepPrevailingStart", ResourceType = typeof(HToolExRes))]
     Prevailing,
-    [Description("Seating")]
+    [Display(Description = @"GraphStepSeating", ResourceType = typeof(HToolExRes))]
     Seating,
-    [Description("Clamp")]
+    [Display(Description = @"GraphStepClamp", ResourceType = typeof(HToolExRes))]
     Clamp,
-    [Description("Torque complete")]
+    [Display(Description = @"GraphStepComplete", ResourceType = typeof(HToolExRes))]
     TorqueComplete,
-    [Description("Rotation after torque-up")]
+    [Display(Description = @"GraphStepRotateAfterTorqueUp", ResourceType = typeof(HToolExRes))]
     RotationAfterTorqueUp
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using HToolEx.Localization;
 
 namespace HToolEx.Type;
 
@@ -6,14 +7,14 @@ namespace HToolEx.Type;
 ///     Model input function types
 /// </summary>
 public enum ModelInputTypes {
-    [Description("None")]
+    [Display(Description = @"ModelInputTypeNone", ResourceType = typeof(HToolExRes))]
     None,
-    [Description("Active High")]
+    [Display(Description = @"ModelInputTypeActiveHigh", ResourceType = typeof(HToolExRes))]
     ActiveHigh,
-    [Description("Active Low")]
+    [Display(Description = @"ModelInputTypeActiveLow", ResourceType = typeof(HToolExRes))]
     ActiveLow,
-    [Description("Status High")]
+    [Display(Description = @"ModelInputTypeStatusHigh", ResourceType = typeof(HToolExRes))]
     StatusHigh,
-    [Description("Status Low")]
+    [Display(Description = @"ModelInputTypeStatusLow", ResourceType = typeof(HToolExRes))]
     StatusLow
 }
