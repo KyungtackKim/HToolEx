@@ -64,6 +64,11 @@ public class HToolEz : IDisposable {
     public BodyTypes Body { get; private set; } = BodyTypes.Separated;
 
     /// <summary>
+    ///     Device calibration data
+    /// </summary>
+    public FormatCalData? CalInfo { get; private set; }
+
+    /// <summary>
     ///     Dispose
     /// </summary>
     public void Dispose() {
@@ -124,8 +129,8 @@ public class HToolEz : IDisposable {
             Device.ReceivedTorque += OnDeviceReceivedTorque;
             // start process timer
             ProcessTimer.Start();
-            // invoke connection changed event
-            ChangedConnect?.Invoke(true);
+            // request the calibration data
+            SendCommandAsync(DeviceCommandTypes.ReqCalData, DeviceHelper.CreateReqCalPacket(), token: token);
             // result
             return Task.FromResult(true);
         } catch (Exception ex) {
@@ -158,7 +163,7 @@ public class HToolEz : IDisposable {
             // give a short time for the message to be sent
             await Task.Delay(50, token).ConfigureAwait(false);
         }
-
+        
         // stop timer
         ProcessTimer.Stop();
         // clear message queue
@@ -320,9 +325,16 @@ public class HToolEz : IDisposable {
         // try catch
         try {
             // set connected state on any response
-            if (ConnectionState == ConnectionTypes.Connecting)
+            if (ConnectionState == ConnectionTypes.Connecting) {
+                // create terminate packet
+                var terminatePacket = DeviceHelper.CreateTerminatePacket();
+                // send terminate command without waiting for response
+                SendCommand(DeviceCommandTypes.ReqCalTerminate, terminatePacket, 0, true);
                 // set the connected
                 ConnectionState = ConnectionTypes.Connected;
+                // invoke connection changed event
+                ChangedConnect?.Invoke(true);
+            }
 
             // peek the message
             if (MessageQueue.TryPeek(out var msg))
@@ -335,14 +347,14 @@ public class HToolEz : IDisposable {
 
             // detect body type from RES_CAL_DATA (0x80) response
             if (cmd == DeviceCommandTypes.ResCalData && data.Length > 5) {
-                // BodyType is at offset 5 (after header: STX(2) + Length(2) + Command(1))
-                var type = (BodyTypes)data.Span[5];
+                // check the information state
+                CalInfo ??= new FormatCalData(data[5..]);
                 // check the body type
-                if (type != Body) {
+                if (CalInfo.Body != Body) {
                     // set the body type
-                    Body = type;
+                    Body = CalInfo.Body;
                     // debug long
-                    Console.WriteLine($"[HToolEz] Body type detected: {type}");
+                    Console.WriteLine($"[HToolEz] Body type detected: {CalInfo.Body}");
                 }
             }
 

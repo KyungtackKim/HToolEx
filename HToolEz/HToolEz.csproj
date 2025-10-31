@@ -8,19 +8,18 @@
         <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>Resources\README.md</PackageReadmeFile>
 
         <Title>HToolEz</Title>
-        <Version>0.0.1</Version>
-        <PackageVersion>0.0.1</PackageVersion>
+        <Version>0.0.8</Version>
+        <PackageVersion>0.0.8</PackageVersion>
         <PackageIcon>Resources\icon.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>
         <Description>This library provides functionality for EZtorQ-III.</Description>
         <LangVersion>12</LangVersion>
         <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-        <PlatformTarget>x86</PlatformTarget>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<Platforms>x64</Platforms>
         <Copyright>MIT</Copyright>
     </PropertyGroup>
 
@@ -34,10 +33,6 @@
             <PackagePath>\</PackagePath>
         </None>
         <None Update="Resources\icon.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Update="Resources\README.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>

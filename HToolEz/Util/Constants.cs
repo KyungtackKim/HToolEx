@@ -12,7 +12,7 @@ public static class Constants {
     /// <summary>
     ///     Process period
     /// </summary>
-    public static int ProcessPeriod => 20;
+    public static int ProcessPeriod => 100;
 
     /// <summary>
     ///     Keep alive request period
@@ -22,7 +22,7 @@ public static class Constants {
     /// <summary>
     ///     Process lock time out
     /// </summary>
-    public static int ProcessLockTime => 2;
+    public static int ProcessLockTime => 20;
 
     /// <summary>
     ///     Process timeout

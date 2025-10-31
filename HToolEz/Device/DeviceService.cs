@@ -28,7 +28,7 @@ public class DeviceService : IDeviceService {
     private SerialPort? Port { get; set; }
     private Timer? ProcessTimer { get; set; }
     private ConcurrentQueue<(int len, byte[] buf)> ReceiveBuf { get; } = new();
-    private RingBuffer AnalyzeBuf { get; } = new(1 * 1024);
+    private RingBuffer AnalyzeBuf { get; } = new(12 * 1024);
 
     /// <inheritdoc />
     public DeviceModeTypes Mode {
@@ -332,6 +332,8 @@ public class DeviceService : IDeviceService {
             return;
         // check the timer stop state
         if (_isStopTimer) {
+            // reset the stop state
+            _isStopTimer = false;
             // get the process timer
             var timer = ProcessTimer;
             // check timer start state
@@ -383,7 +385,7 @@ public class DeviceService : IDeviceService {
             if (AnalyzeBuf.Peek(0) != DeviceHelper.HeaderStx[0] || AnalyzeBuf.Peek(1) != DeviceHelper.HeaderStx[1])
                 return;
             // get the frame length
-            var frame = ((AnalyzeBuf.Peek(2) << 8) | AnalyzeBuf.Peek(3)) + DeviceHelper.HeaderSize;
+            var frame = ((AnalyzeBuf.Peek(3) << 8) | AnalyzeBuf.Peek(2)) + DeviceHelper.HeaderSize;
             // check the frame length
             if (total < frame)
                 return;
