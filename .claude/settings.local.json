@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet --version:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet pack:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace HToolEz.Defines.Enums;
+namespace HToolEz.Type;
 
 /// <summary>
 ///     Torque unit types
@@ -17,5 +17,7 @@ public enum UnitTypes {
     [Description("lbf.in")]
     LbfIn,
     [Description("ozf.in")]
-    OzfIn
+    OzfIn,
+    [Description("lbf.ft")]
+    LbfFt
 }
