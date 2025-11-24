@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using HTool.Type;
+using HToolEz.Type;
 
-namespace HTool.Util;
+namespace HToolEz.Util;
 
 /// <summary>
 ///     Utilities class
@@ -511,19 +511,34 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+    public static void ConvertValue(
+        ReadOnlySpan<byte> values,
+        out float          value,
+        WordOrderTypes     wordOrder   = WordOrderTypes.HighLow,
+        bool               isBigEndian = false) {
         // check the length
         if (values.Length < 4) {
             // reset the value
             value = 0;
         } else {
-            // get the int value based on word order
-            var intValue = wordOrder == WordOrderTypes.HighLow
-                // ABCD: High word first (most common)
-                ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]
-                // CDAB: Low word first
-                : (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+            int intValue;
+            // check endianness
+            if (isBigEndian)
+                // Big-endian byte order
+                intValue = wordOrder == WordOrderTypes.HighLow
+                    // ABCD: High word first (most common)
+                    ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]
+                    // CDAB: Low word first
+                    : (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+            else
+                // Little-endian byte order
+                intValue = wordOrder == WordOrderTypes.HighLow
+                    // DCBA: Little-endian
+                    ? values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24)
+                    // BADC: Little-endian with word swap
+                    : values[2] | (values[3] << 8) | (values[0] << 16) | (values[1] << 24);
             // set the value
             value = BitConverter.Int32BitsToSingle(intValue);
         }
@@ -534,10 +549,19 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">ushort value</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out ushort value) {
-        // set the value
-        value = values.Length >= 2 ? (ushort)((values[0] << 8) | values[1]) : (ushort)0;
+    public static void ConvertValue(ReadOnlySpan<byte> values, out ushort value, bool isBigEndian = false) {
+        // check the length
+        if (values.Length < 2) {
+            value = 0;
+            return;
+        }
+
+        // set the value based on endianness
+        value = isBigEndian
+            ? (ushort)((values[0] << 8) | values[1])         // Big-endian
+            : (ushort)(values[0]        | (values[1] << 8)); // Little-endian
     }
 
     /// <summary>
@@ -546,20 +570,39 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+    public static void ConvertValue(
+        ReadOnlySpan<byte> values,
+        out int            value,
+        WordOrderTypes     wordOrder   = WordOrderTypes.HighLow,
+        bool               isBigEndian = false) {
         // set the default value
         value = 0;
         // check the length
         if (values.Length != 4)
             return;
-        // check the word order
-        if (wordOrder == WordOrderTypes.HighLow)
-            // ABCD: High word first (most common)
-            value = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
-        else
-            // CDAB: Low word first
-            value = (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+
+        // check endianness
+        if (isBigEndian) {
+            // Big-endian byte order
+            // check the word order
+            if (wordOrder == WordOrderTypes.HighLow)
+                // ABCD: High word first (most common)
+                value = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
+            else
+                // CDAB: Low word first
+                value = (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+        } else {
+            // Little-endian byte order
+            // check the word order
+            if (wordOrder == WordOrderTypes.HighLow)
+                // DCBA: Little-endian
+                value = values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24);
+            else
+                // BADC: Little-endian with word swap
+                value = values[2] | (values[3] << 8) | (values[0] << 16) | (values[1] << 24);
+        }
     }
 
     /// <summary>
@@ -568,9 +611,10 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
-        ConvertValue(values.AsSpan(), out value, wordOrder);
+    public static void ConvertValue(byte[] values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, wordOrder, isBigEndian);
     }
 
     /// <summary>
@@ -578,9 +622,10 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">ushort value</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out ushort value) {
-        ConvertValue(values.AsSpan(), out value);
+    public static void ConvertValue(byte[] values, out ushort value, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, isBigEndian);
     }
 
     /// <summary>
@@ -589,9 +634,10 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
-        ConvertValue(values.AsSpan(), out value, wordOrder);
+    public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, wordOrder, isBigEndian);
     }
 
     /// <summary>
@@ -743,5 +789,102 @@ public static class Utils {
         (list[source], list[dest]) = (list[dest], list[source]);
         // result
         return true;
+    }
+
+    /// <summary>
+    ///     Check if the int value is a defined member of the enum type
+    /// </summary>
+    /// <typeparam name="T">enum type</typeparam>
+    /// <param name="value">int value to check</param>
+    /// <returns>true if the value is defined in the enum, false otherwise</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsKnownItem<T>(int value) where T : struct, Enum {
+        // check using cached HashSet (O(1) lookup)
+        return EnumCache<T>.Values.Contains(value);
+    }
+
+    /// <summary>
+    ///     Check if the enum value is a defined member of the enum type
+    /// </summary>
+    /// <typeparam name="T">enum type</typeparam>
+    /// <param name="value">enum value to check</param>
+    /// <returns>true if the value is defined in the enum, false otherwise</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsKnownItem<T>(T value) where T : struct, Enum {
+        // convert to int and check using cached HashSet
+        return EnumCache<T>.Values.Contains(Convert.ToInt32(value));
+    }
+
+    /// <summary>
+    ///     Write int32 value to byte array at specified offset
+    /// </summary>
+    /// <param name="buffer">destination byte array</param>
+    /// <param name="offset">offset position</param>
+    /// <param name="value">int32 value to write</param>
+    /// <param name="isBigEndian">true for big-endian (default), false for little-endian</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteValue(byte[] buffer, int offset, int value, bool isBigEndian = true) {
+        // check the big-endian
+        if (isBigEndian) {
+            // set the values
+            buffer[offset]     = (byte)(value >> 24);
+            buffer[offset + 1] = (byte)(value >> 16);
+            buffer[offset + 2] = (byte)(value >> 8);
+            buffer[offset + 3] = (byte)value;
+        } else {
+            // set the values
+            buffer[offset]     = (byte)value;
+            buffer[offset + 1] = (byte)(value >> 8);
+            buffer[offset + 2] = (byte)(value >> 16);
+            buffer[offset + 3] = (byte)(value >> 24);
+        }
+    }
+
+    /// <summary>
+    ///     Write ushort value to byte array at specified offset
+    /// </summary>
+    /// <param name="buffer">destination byte array</param>
+    /// <param name="offset">offset position</param>
+    /// <param name="value">ushort value to write</param>
+    /// <param name="isBigEndian">true for big-endian (default), false for little-endian</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteValue(byte[] buffer, int offset, ushort value, bool isBigEndian = true) {
+        // check the big-endian
+        if (isBigEndian) {
+            // set the values
+            buffer[offset]     = (byte)(value >> 8);
+            buffer[offset + 1] = (byte)value;
+        } else {
+            // set the values
+            buffer[offset]     = (byte)value;
+            buffer[offset + 1] = (byte)(value >> 8);
+        }
+    }
+
+    /// <summary>
+    ///     Write float value to byte array at specified offset
+    /// </summary>
+    /// <param name="buffer">destination byte array</param>
+    /// <param name="offset">offset position</param>
+    /// <param name="value">float value to write</param>
+    /// <param name="isBigEndian">true for big-endian (default), false for little-endian</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteValue(byte[] buffer, int offset, float value, bool isBigEndian = true) {
+        // get the values
+        var bits = BitConverter.SingleToInt32Bits(value);
+        // set the values
+        WriteValue(buffer, offset, bits, isBigEndian);
+    }
+
+    /// <summary>
+    ///     Static cache for enum values to avoid reflection overhead
+    /// </summary>
+    /// <typeparam name="T">enum type</typeparam>
+    private static class EnumCache<T> where T : struct, Enum {
+        /// <summary>
+        ///     Pre-computed HashSet of all valid enum values (as int)
+        /// </summary>
+        public static readonly HashSet<int> Values =
+            Enum.GetValues<T>().Select(v => Convert.ToInt32(v)).ToHashSet();
     }
 }

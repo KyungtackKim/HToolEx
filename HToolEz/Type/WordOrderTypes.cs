@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace HTool.Type;
+namespace HToolEz.Type;
 
 /// <summary>
 ///     Word order types for 32-bit MODBUS register values

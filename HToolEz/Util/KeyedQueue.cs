@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace HTool.Util;
+namespace HToolEz.Util;
 
 /// <summary>
 ///     Defines how <see cref="KeyedQueue{T, TKey}" /> handles duplicates when enqueuing.
