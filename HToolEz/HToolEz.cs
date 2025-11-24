@@ -16,14 +16,26 @@ public class HToolEz : IDisposable {
     /// </summary>
     public delegate void PerformChangedConnect(bool state);
 
+    private readonly double _emaAlpha;
+    private readonly double _emaNegAlpha;
+
     private DateTime _connectTime;
+    private double   _emaValue;
+    private bool     _hasFirstValue;
 
     private bool _isDisposed;
 
     /// <summary>
     ///     Constructor
     /// </summary>
-    public HToolEz() {
+    public HToolEz(double emaAlpha = 0.6f) {
+        // check valid EMA alpha
+        if (emaAlpha is < 0.0f or > 1.0f)
+            // set the default EMA alpha
+            emaAlpha = 0.6f;
+        // set the EMA alpha
+        _emaAlpha    = emaAlpha;
+        _emaNegAlpha = 1.0f - emaAlpha;
         // create the device
         Device = DeviceServiceFactory.Create(DeviceServiceFactory.ConnectionTypes.Serial);
         // set timer option
@@ -67,6 +79,11 @@ public class HToolEz : IDisposable {
     ///     Device calibration data
     /// </summary>
     public FormatCalData? CalInfo { get; private set; }
+
+    /// <summary>
+    ///     Device sensor value
+    /// </summary>
+    public int Sensor => (int)Math.Round(_emaValue);
 
     /// <summary>
     ///     Dispose
@@ -115,6 +132,11 @@ public class HToolEz : IDisposable {
     public Task<bool> ConnectAsync(string target, CancellationToken token = default) {
         // try catch
         try {
+            // reset the information
+            CalInfo = null;
+            // reset the state
+            Body           = BodyTypes.Integrated;
+            _hasFirstValue = false;
             // connect to device
             if (!Device.Connect(target))
                 return Task.FromResult(false);
@@ -163,7 +185,7 @@ public class HToolEz : IDisposable {
             // give a short time for the message to be sent
             await Task.Delay(50, token).ConfigureAwait(false);
         }
-        
+
         // stop timer
         ProcessTimer.Stop();
         // clear message queue
@@ -345,17 +367,66 @@ public class HToolEz : IDisposable {
                         // try dequeue
                         MessageQueue.TryDequeue(out _);
 
-            // detect body type from RES_CAL_DATA (0x80) response
-            if (cmd == DeviceCommandTypes.ResCalData && data.Length > 5) {
-                // check the information state
-                CalInfo ??= new FormatCalData(data[5..]);
-                // check the body type
-                if (CalInfo.Body != Body) {
-                    // set the body type
-                    Body = CalInfo.Body;
-                    // debug long
-                    Console.WriteLine($"[HToolEz] Body type detected: {CalInfo.Body}");
+            // check the command
+            switch (cmd) {
+                // detect body type from RES_CAL_DATA (0x80) response
+                case DeviceCommandTypes.ResCalData when data.Length > 5: {
+                    // check the information state
+                    CalInfo ??= new FormatCalData(data[5..]);
+                    // check the body type
+                    if (CalInfo.Body != Body) {
+                        // set the body type
+                        Body = CalInfo.Body;
+                        // debug long
+                        Console.WriteLine($"[HToolEz] Body type detected: {CalInfo.Body}");
+                    }
+
+                    break;
                 }
+                // detect sensor value from REP_CURRENT_ADC (0xA0)
+                case DeviceCommandTypes.RepAdc:
+
+                    int value;
+                    // check the mode
+                    if (Body == BodyTypes.Separated) {
+                        // convert to sensor value (integer-32bit)
+                        Utils.ConvertValue(data.Span[5..], out int v);
+                        // check the value range
+                        if (v is < -131072 or > 131072)
+                            return;
+                        // set the value
+                        value = v;
+                    } else {
+                        // convert to sensor value (ushort-16bit)
+                        Utils.ConvertValue(data.Span[5..], out ushort v);
+                        // set the value
+                        value = v;
+                    }
+
+                    // check first value
+                    if (!_hasFirstValue) {
+                        // set value
+                        _emaValue = value;
+                        // set first value
+                        _hasFirstValue = true;
+                    } else {
+                        // set value
+                        _emaValue = value * _emaAlpha + _emaValue * _emaNegAlpha;
+                    }
+
+                    break;
+                case DeviceCommandTypes.ReqCalData:
+                case DeviceCommandTypes.ReqCalSetPoint:
+                case DeviceCommandTypes.ReqCalSave:
+                case DeviceCommandTypes.ReqCalTerminate:
+                case DeviceCommandTypes.ReqSetData:
+                case DeviceCommandTypes.ReqTorque:
+                case DeviceCommandTypes.ResCalSetPoint:
+                case DeviceCommandTypes.ResCalSave:
+                case DeviceCommandTypes.ResSetData:
+                case DeviceCommandTypes.ResTorque:
+                default:
+                    break;
             }
 
             // invoke received data event

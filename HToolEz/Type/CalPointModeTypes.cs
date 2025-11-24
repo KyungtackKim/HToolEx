@@ -5,7 +5,7 @@ namespace HToolEz.Type;
 /// <summary>
 ///     Calibration types
 /// </summary>
-public enum CalibrationTypes : byte {
+public enum CalPointModeTypes : byte {
     /// <summary>
     ///     3-Point calibration
     /// </summary>

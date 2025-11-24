@@ -280,7 +280,7 @@ public class DeviceService : IDeviceService {
                     if (!float.TryParse(data[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var torque))
                         return;
                     // convert to unit
-                    var unit = Utils.ConvertToUnit(data[1].Trim());
+                    var unit = Utils.ParseToUnit(data[1].Trim());
                     // invoke the received torque
                     ReceivedTorque?.Invoke(torque, unit);
 

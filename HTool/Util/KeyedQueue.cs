@@ -81,7 +81,7 @@ public class KeyedQueue<T, TKey> : IDisposable where TKey : notnull {
         Func<T, TKey>            keySelector,
         IEqualityComparer<TKey>? keyComparer = null,
         int                      capacity    = 0) {
-        ArgumentOutOfRangeException.ThrowIfNegative(capacity, nameof(capacity));
+        ArgumentOutOfRangeException.ThrowIfNegative(capacity);
         _keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
         _queue       = capacity > 0 ? new Queue<(T Item, TKey Key)>(capacity) : new Queue<(T Item, TKey Key)>();
         _keyCounts   = new Dictionary<TKey, int>(keyComparer);
@@ -151,7 +151,7 @@ public class KeyedQueue<T, TKey> : IDisposable where TKey : notnull {
     /// <param name="capacity">capacity</param>
     /// <returns></returns>
     public static KeyedQueue<T, TKey> Create(Func<T, TKey> keySelector, IEqualityComparer<TKey>? keyComparer = null, int capacity = 0) {
-        ArgumentOutOfRangeException.ThrowIfNegative(capacity, nameof(capacity));
+        ArgumentOutOfRangeException.ThrowIfNegative(capacity);
         // create the instance
         return new KeyedQueue<T, TKey>(keySelector, keyComparer, capacity);
     }

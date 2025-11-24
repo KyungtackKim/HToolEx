@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using HToolEz.Format;
 using HToolEz.Type;
 using HToolEz.Util;
 
@@ -35,7 +36,7 @@ public static class DeviceHelper {
     /// <param name="index">index</param>
     /// <returns>packet</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static byte[] CreateReqCalSetPointPacket(CalibrationTypes point, int index) {
+    public static byte[] CreateReqCalSetPointPacket(CalPointModeTypes point, int index) {
         // check the point
         if (!Utils.IsKnownItem(point))
             throw new ArgumentException($"Unknown calibration point type: {point}", nameof(point));
@@ -79,5 +80,42 @@ public static class DeviceHelper {
     public static byte[] CreateReqTorquePacket() {
         // return the packet
         return [HeaderStx[0], HeaderStx[1], 0x00, 0x01, (byte)DeviceCommandTypes.ReqTorque];
+    }
+
+    /// <summary>
+    ///     Create calibration data save packet from FormatCalData
+    /// </summary>
+    /// <param name="calData">calibration data object</param>
+    /// <returns>packet</returns>
+    /// <exception cref="ArgumentNullException">Thrown when calData is null</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static byte[] CreateReqCalSavePacket(FormatCalData calData) {
+        // check null
+        if (calData == null)
+            throw new ArgumentNullException(nameof(calData), "Calibration data cannot be null");
+
+        // convert calibration data to bytes
+        var calBytes = calData.ToBytes();
+        // calculate total packet size (header + length + command + data)
+        var packetSize = HeaderSize + 1 + calBytes.Length;
+        // create packet buffer
+        var packet = new byte[packetSize];
+
+        // set header (STX)
+        packet[0] = HeaderStx[0];
+        packet[1] = HeaderStx[1];
+
+        // set length (command + data size)
+        var dataSize = 1 + calBytes.Length;
+        packet[2] = (byte)(dataSize >> 8); // high byte
+        packet[3] = (byte)dataSize;        // low byte
+
+        // set command
+        packet[4] = (byte)DeviceCommandTypes.ReqCalSave;
+
+        // copy calibration data
+        Array.Copy(calBytes, 0, packet, 5, calBytes.Length);
+
+        return packet;
     }
 }

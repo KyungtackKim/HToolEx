@@ -33,19 +33,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentFTP" Version="49.0.1" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-        <PackageReference Include="SuperSimpleTcp" Version="3.0.17" />
-        <PackageReference Include="System.IO.Ports" Version="9.0.8" />
+        <PackageReference Include="FluentFTP" Version="49.0.1"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2"/>
+        <PackageReference Include="SuperSimpleTcp" Version="3.0.17"/>
+        <PackageReference Include="System.IO.Ports" Version="9.0.8"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="README.md" Pack="true" PackagePath="\" />
-        <None Update="HToolEx.png" Pack="true" PackagePath="\" />
+        <None Update="README.md" Pack="true" PackagePath="\"/>
+        <None Update="HToolEx.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="ProEx\" />
+        <Folder Include="ProEx\"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -54,16 +54,16 @@
             <LastGenOutput>HToolExRes.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Localization\HToolExRes.de.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>HToolExRes.de.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>HToolExRes.de.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Localization\HToolExRes.es.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>HToolExRes.es.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>HToolExRes.es.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Localization\HToolExRes.fr.resx">
-          <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>HToolExRes.fr.Designer.cs</LastGenOutput>
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>HToolExRes.fr.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 
@@ -74,19 +74,19 @@
             <DependentUpon>HToolExRes.resx</DependentUpon>
         </Compile>
         <Compile Update="Localization\HToolExRes.de.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>HToolExRes.de.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>HToolExRes.de.resx</DependentUpon>
         </Compile>
         <Compile Update="Localization\HToolExRes.es.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>HToolExRes.es.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>HToolExRes.es.resx</DependentUpon>
         </Compile>
         <Compile Update="Localization\HToolExRes.fr.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>HToolExRes.fr.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>HToolExRes.fr.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 </Project>

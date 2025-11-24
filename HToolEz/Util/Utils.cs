@@ -394,7 +394,7 @@ public static class Utils {
     /// <param name="dst">destination unit</param>
     /// <returns>converted torque</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float ConvertToUnit(float value, UnitTypes src, UnitTypes dst) {
+    public static float ConvertTorqueUnit(float value, UnitTypes src, UnitTypes dst) {
         // const value for unit N.m
         const float nCm   = 100.0f;
         const float kgfM  = 0.101971621f;
@@ -432,7 +432,7 @@ public static class Utils {
     /// <param name="value">value</param>
     /// <returns>unit</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static UnitTypes ConvertToUnit(string value) {
+    public static UnitTypes ParseToUnit(string value) {
         // check null or empty
         if (string.IsNullOrEmpty(value))
             return UnitTypes.KgfCm;
@@ -446,6 +446,25 @@ public static class Utils {
             "ozf.in" => UnitTypes.OzfIn,
             "lbf.ft" => UnitTypes.LbfFt,
             _        => UnitTypes.KgfCm
+        };
+    }
+
+    /// <summary>
+    ///     Convert unit type to string representation                                                            │
+    /// </summary>
+    /// <param name="value">unit type as integer (0=kgf.cm, 1=kgf.m, ...)</param>
+    /// <returns>unit string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ParseToUnit(int value) {
+        return value switch {
+            0 => "kgf.cm",
+            1 => "kgf.m",
+            2 => "N.m",
+            3 => "N.cm",
+            4 => "ozf.in",
+            5 => "lbf.ft",
+            6 => "ozf.ft",
+            _ => "kgf.cm"
         };
     }
 
@@ -492,19 +511,34 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+    public static void ConvertValue(
+        ReadOnlySpan<byte> values,
+        out float          value,
+        WordOrderTypes     wordOrder   = WordOrderTypes.HighLow,
+        bool               isBigEndian = false) {
         // check the length
         if (values.Length < 4) {
             // reset the value
             value = 0;
         } else {
-            // get the int value based on word order
-            var intValue = wordOrder == WordOrderTypes.HighLow
-                // ABCD: High word first (most common)
-                ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]
-                // CDAB: Low word first
-                : (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+            int intValue;
+            // check endianness
+            if (isBigEndian)
+                // Big-endian byte order
+                intValue = wordOrder == WordOrderTypes.HighLow
+                    // ABCD: High word first (most common)
+                    ? (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3]
+                    // CDAB: Low word first
+                    : (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+            else
+                // Little-endian byte order
+                intValue = wordOrder == WordOrderTypes.HighLow
+                    // DCBA: Little-endian
+                    ? values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24)
+                    // BADC: Little-endian with word swap
+                    : values[2] | (values[3] << 8) | (values[0] << 16) | (values[1] << 24);
             // set the value
             value = BitConverter.Int32BitsToSingle(intValue);
         }
@@ -515,10 +549,19 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">ushort value</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out ushort value) {
-        // set the value
-        value = values.Length >= 2 ? (ushort)((values[0] << 8) | values[1]) : (ushort)0;
+    public static void ConvertValue(ReadOnlySpan<byte> values, out ushort value, bool isBigEndian = false) {
+        // check the length
+        if (values.Length < 2) {
+            value = 0;
+            return;
+        }
+
+        // set the value based on endianness
+        value = isBigEndian
+            ? (ushort)((values[0] << 8) | values[1])         // Big-endian
+            : (ushort)(values[0]        | (values[1] << 8)); // Little-endian
     }
 
     /// <summary>
@@ -527,20 +570,39 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(ReadOnlySpan<byte> values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
+    public static void ConvertValue(
+        ReadOnlySpan<byte> values,
+        out int            value,
+        WordOrderTypes     wordOrder   = WordOrderTypes.HighLow,
+        bool               isBigEndian = false) {
         // set the default value
         value = 0;
         // check the length
         if (values.Length != 4)
             return;
-        // check the word order
-        if (wordOrder == WordOrderTypes.HighLow)
-            // ABCD: High word first (most common)
-            value = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
-        else
-            // CDAB: Low word first
-            value = (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+
+        // check endianness
+        if (isBigEndian) {
+            // Big-endian byte order
+            // check the word order
+            if (wordOrder == WordOrderTypes.HighLow)
+                // ABCD: High word first (most common)
+                value = (values[0] << 24) | (values[1] << 16) | (values[2] << 8) | values[3];
+            else
+                // CDAB: Low word first
+                value = (values[2] << 24) | (values[3] << 16) | (values[0] << 8) | values[1];
+        } else {
+            // Little-endian byte order
+            // check the word order
+            if (wordOrder == WordOrderTypes.HighLow)
+                // DCBA: Little-endian
+                value = values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24);
+            else
+                // BADC: Little-endian with word swap
+                value = values[2] | (values[3] << 8) | (values[0] << 16) | (values[1] << 24);
+        }
     }
 
     /// <summary>
@@ -549,9 +611,10 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">float value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
-        ConvertValue(values.AsSpan(), out value, wordOrder);
+    public static void ConvertValue(byte[] values, out float value, WordOrderTypes wordOrder = WordOrderTypes.HighLow, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, wordOrder, isBigEndian);
     }
 
     /// <summary>
@@ -559,9 +622,10 @@ public static class Utils {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="value">ushort value</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out ushort value) {
-        ConvertValue(values.AsSpan(), out value);
+    public static void ConvertValue(byte[] values, out ushort value, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, isBigEndian);
     }
 
     /// <summary>
@@ -570,9 +634,10 @@ public static class Utils {
     /// <param name="values">values</param>
     /// <param name="value">int value</param>
     /// <param name="wordOrder">word order for 32-bit value (default: HighLow/ABCD)</param>
+    /// <param name="isBigEndian">true for big-endian, false for little-endian (default)</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
-        ConvertValue(values.AsSpan(), out value, wordOrder);
+    public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow, bool isBigEndian = false) {
+        ConvertValue(values.AsSpan(), out value, wordOrder, isBigEndian);
     }
 
     /// <summary>

@@ -32,9 +32,9 @@ public sealed class FormatCalSetData {
         _body = body;
         /*      common information      */
         // check the point type
-        if (Utils.IsKnownItem<CalibrationTypes>(d[0]))
+        if (Utils.IsKnownItem<CalPointModeTypes>(d[0]))
             // set the point type
-            Point = (CalibrationTypes)d[0];
+            Point = (CalPointModeTypes)d[0];
         // set the index
         Index = d[1];
         /*      value information       */
@@ -46,7 +46,7 @@ public sealed class FormatCalSetData {
             Value = value;
         } else {
             // convert value
-            Utils.ConvertValue(d[2..], out var value);
+            Utils.ConvertValue(d[2..], out ushort value);
             // set the value
             Value = value;
         }
@@ -55,7 +55,7 @@ public sealed class FormatCalSetData {
     /// <summary>
     ///     Calibration point type
     /// </summary>
-    public CalibrationTypes Point { get; }
+    public CalPointModeTypes Point { get; }
 
     /// <summary>
     ///     Calibration point index

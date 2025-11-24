@@ -13,6 +13,42 @@ public sealed class FormatCalData {
     private static readonly int[] Size = [41, 63];
 
     /// <summary>
+    ///     Mapping from CalPointTypes to array index for 3-point calibration (positive)
+    /// </summary>
+    private static readonly Dictionary<CalPointTypes, int> ThreePointPositiveMap = new() {
+        [CalPointTypes.Point10P] = 0, [CalPointTypes.Point50P] = 1, [CalPointTypes.Point100P] = 2
+    };
+
+    /// <summary>
+    ///     Mapping from CalPointTypes to array index for 3-point calibration (negative)
+    /// </summary>
+    private static readonly Dictionary<CalPointTypes, int> ThreePointNegativeMap = new() {
+        [CalPointTypes.Point10M] = 0, [CalPointTypes.Point50M] = 1, [CalPointTypes.Point100M] = 2
+    };
+
+    /// <summary>
+    ///     Mapping from CalPointTypes to array index for 5-point calibration (positive)
+    /// </summary>
+    private static readonly Dictionary<CalPointTypes, int> FivePointPositiveMap = new() {
+        [CalPointTypes.Point20P]  = 0,
+        [CalPointTypes.Point40P]  = 1,
+        [CalPointTypes.Point60P]  = 2,
+        [CalPointTypes.Point80P]  = 3,
+        [CalPointTypes.Point100P] = 4
+    };
+
+    /// <summary>
+    ///     Mapping from CalPointTypes to array index for 5-point calibration (negative)
+    /// </summary>
+    private static readonly Dictionary<CalPointTypes, int> FivePointNegativeMap = new() {
+        [CalPointTypes.Point20M]  = 0,
+        [CalPointTypes.Point40M]  = 1,
+        [CalPointTypes.Point60M]  = 2,
+        [CalPointTypes.Point80M]  = 3,
+        [CalPointTypes.Point100M] = 4
+    };
+
+    /// <summary>
     ///     Constructor
     /// </summary>
     /// <param name="data">data packet</param>
@@ -32,14 +68,14 @@ public sealed class FormatCalData {
         if (Utils.IsKnownItem<BodyTypes>(d[0]))
             // set the body
             Body = (BodyTypes)d[0];
-        // convert values
+        // convert values (EZTorQ-III uses little-endian)
         Utils.ConvertValue(d[1..5], out int model);
-        Utils.ConvertValue(d[5..9], out float max);
+        Utils.ConvertValue(d[5..9], out int max);
         Utils.ConvertValue(d[9..13], out int body);
         Utils.ConvertValue(d[13..17], out int sensor);
         // set the values
         Model        = (uint)model;
-        MaxTorque    = max;
+        MaxTorque    = max / 100.0f; // Convert integer to float (scaled by 100)
         BodySerial   = (uint)body;
         SensorSerial = (uint)sensor;
         // check the unit item
@@ -47,9 +83,9 @@ public sealed class FormatCalData {
             // set the unit
             Unit = (UnitTypes)d[17];
         // check the point type
-        if (Utils.IsKnownItem<CalibrationTypes>(d[18]))
+        if (Utils.IsKnownItem<CalPointModeTypes>(d[18]))
             // set the point type
-            CalType = (CalibrationTypes)d[18];
+            CalType = (CalPointModeTypes)d[18];
 
         /*      calibration information     */
         // check body type
@@ -60,18 +96,18 @@ public sealed class FormatCalData {
             case BodyTypes.Separated when size != Size[1]:
                 throw new ArgumentException($"Separated body type requires {Size[1]} bytes, but received {size} bytes.", nameof(data));
             case BodyTypes.Separated:
-                // convert values (4 bytes each, starting from index 19, protocol v0.1)
-                Utils.ConvertValue(d[19..23], out var offsetSep);
-                Utils.ConvertValue(d[23..27], out var p1Sep);
-                Utils.ConvertValue(d[27..31], out var p2Sep);
-                Utils.ConvertValue(d[31..35], out var p3Sep);
-                Utils.ConvertValue(d[35..39], out var p4Sep);
-                Utils.ConvertValue(d[39..43], out var p5Sep);
-                Utils.ConvertValue(d[43..47], out var n1Sep);
-                Utils.ConvertValue(d[47..51], out var n2Sep);
-                Utils.ConvertValue(d[51..55], out var n3Sep);
-                Utils.ConvertValue(d[55..59], out var n4Sep);
-                Utils.ConvertValue(d[59..63], out var n5Sep);
+                // convert values (4 bytes each, starting from index 19, protocol v0.1, little-endian)
+                Utils.ConvertValue(d[19..23], out int offsetSep);
+                Utils.ConvertValue(d[23..27], out int p1Sep);
+                Utils.ConvertValue(d[27..31], out int p2Sep);
+                Utils.ConvertValue(d[31..35], out int p3Sep);
+                Utils.ConvertValue(d[35..39], out int p4Sep);
+                Utils.ConvertValue(d[39..43], out int p5Sep);
+                Utils.ConvertValue(d[43..47], out int n1Sep);
+                Utils.ConvertValue(d[47..51], out int n2Sep);
+                Utils.ConvertValue(d[51..55], out int n3Sep);
+                Utils.ConvertValue(d[55..59], out int n4Sep);
+                Utils.ConvertValue(d[59..63], out int n5Sep);
                 // set the values
                 Offset    = offsetSep;
                 Positives = [p1Sep, p2Sep, p3Sep, p4Sep, p5Sep];
@@ -79,24 +115,69 @@ public sealed class FormatCalData {
                 break;
             case BodyTypes.Integrated:
             default:
-                // convert values (2 bytes each, starting from index 19, protocol v0.9)
-                Utils.ConvertValue(d[19..21], out var offsetInt);
-                Utils.ConvertValue(d[21..23], out var p1Int);
-                Utils.ConvertValue(d[23..25], out var p2Int);
-                Utils.ConvertValue(d[25..27], out var p3Int);
-                Utils.ConvertValue(d[27..29], out var p4Int);
-                Utils.ConvertValue(d[29..31], out var p5Int);
-                Utils.ConvertValue(d[31..33], out var n1Int);
-                Utils.ConvertValue(d[33..35], out var n2Int);
-                Utils.ConvertValue(d[35..37], out var n3Int);
-                Utils.ConvertValue(d[37..39], out var n4Int);
-                Utils.ConvertValue(d[39..41], out var n5Int);
+                // convert values (2 bytes each, starting from index 19, protocol v0.9, little-endian)
+                Utils.ConvertValue(d[19..21], out ushort offsetInt);
+                Utils.ConvertValue(d[21..23], out ushort p1Int);
+                Utils.ConvertValue(d[23..25], out ushort p2Int);
+                Utils.ConvertValue(d[25..27], out ushort p3Int);
+                Utils.ConvertValue(d[27..29], out ushort p4Int);
+                Utils.ConvertValue(d[29..31], out ushort p5Int);
+                Utils.ConvertValue(d[31..33], out ushort n1Int);
+                Utils.ConvertValue(d[33..35], out ushort n2Int);
+                Utils.ConvertValue(d[35..37], out ushort n3Int);
+                Utils.ConvertValue(d[37..39], out ushort n4Int);
+                Utils.ConvertValue(d[39..41], out ushort n5Int);
                 // set the values
                 Offset    = offsetInt;
                 Positives = [p1Int, p2Int, p3Int, p4Int, p5Int];
                 Negatives = [n1Int, n2Int, n3Int, n4Int, n5Int];
                 break;
         }
+    }
+
+    /// <summary>
+    ///     Constructor that creates a new instance based on source data with updated calibration points
+    /// </summary>
+    /// <param name="src">Source calibration data</param>
+    /// <param name="calPoints">Calibration points to update (key: point type, value: new calibration value)</param>
+    public FormatCalData(FormatCalData src, Dictionary<CalPointTypes, int> calPoints) {
+        // Copy all values from source
+        Body         = src.Body;
+        Model        = src.Model;
+        MaxTorque    = src.MaxTorque;
+        BodySerial   = src.BodySerial;
+        SensorSerial = src.SensorSerial;
+        Unit         = src.Unit;
+        CalType      = src.CalType;
+
+        // Copy calibration values from source
+        Offset    = src.Offset;
+        Positives = [.. src.Positives];
+        Negatives = [.. src.Negatives];
+
+        // Select mapping tables based on calibration type
+        var positiveMap = CalType == CalPointModeTypes.ThreePoint ? ThreePointPositiveMap : FivePointPositiveMap;
+        var negativeMap = CalType == CalPointModeTypes.ThreePoint ? ThreePointNegativeMap : FivePointNegativeMap;
+
+        // Apply calibration point updates
+        foreach (var (point, value) in calPoints)
+            // check the point
+            if (point == CalPointTypes.PointZero)
+                // set the offset value
+                Offset = value;
+            else if (positiveMap.TryGetValue(point, out var posIdx))
+                // set the positive value
+                Positives[posIdx] = value;
+            else if (negativeMap.TryGetValue(point, out var negIdx))
+                // set the negative value
+                Negatives[negIdx] = value;
+
+        // For 3-point calibration, ensure unused points are zero
+        if (CalType != CalPointModeTypes.ThreePoint)
+            return;
+        // reset the not used value
+        Positives[3] = Positives[4] = 0;
+        Negatives[3] = Negatives[4] = 0;
     }
 
     /// <summary>
@@ -132,7 +213,7 @@ public sealed class FormatCalData {
     /// <summary>
     ///     Calibration type
     /// </summary>
-    public CalibrationTypes CalType { get; } = CalibrationTypes.ThreePoint;
+    public CalPointModeTypes CalType { get; } = CalPointModeTypes.ThreePoint;
 
     /// <summary>
     ///     Offset
@@ -158,19 +239,19 @@ public sealed class FormatCalData {
         var size  = Body == BodyTypes.Separated ? Size[1] : Size[0];
         var bytes = new byte[size];
 
-        // common information (0-18)
+        // common information (0-18, little-endian)
         bytes[0] = (byte)Body;
         Utils.WriteValue(bytes, 1, (int)Model);
-        Utils.WriteValue(bytes, 5, MaxTorque);
+        Utils.WriteValue(bytes, 5, (int)(MaxTorque * 100.0f));
         Utils.WriteValue(bytes, 9, (int)BodySerial);
         Utils.WriteValue(bytes, 13, (int)SensorSerial);
         bytes[17] = (byte)Unit;
         bytes[18] = (byte)CalType;
 
-        // calibration data
+        // calibration data (little-endian)
         switch (Body) {
             case BodyTypes.Separated:
-                // 4 bytes each (int32, big-endian)
+                // 4 bytes each (int32, little-endian)
                 Utils.WriteValue(bytes, 19, Offset);
                 for (var i = 0; i < 5; i++)
                     Utils.WriteValue(bytes, 23 + i * 4, Positives[i]);
@@ -180,7 +261,7 @@ public sealed class FormatCalData {
 
             case BodyTypes.Integrated:
             default:
-                // 2 bytes each (ushort, big-endian)
+                // 2 bytes each (ushort, little-endian)
                 Utils.WriteValue(bytes, 19, (ushort)Offset);
                 for (var i = 0; i < 5; i++)
                     Utils.WriteValue(bytes, 21 + i * 2, (ushort)Positives[i]);

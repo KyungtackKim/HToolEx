@@ -394,7 +394,7 @@ public static class Utils {
     /// <param name="dst">destination unit</param>
     /// <returns>converted torque</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float ConvertToUnit(float value, UnitTypes src, UnitTypes dst) {
+    public static float ConvertTorqueUnit(float value, UnitTypes src, UnitTypes dst) {
         // const value for unit N.m
         const float nCm   = 100.0f;
         const float kgfM  = 0.101971621f;
@@ -423,6 +423,48 @@ public static class Utils {
             UnitTypes.OzfIn => valueInNm * ozfIn,
             UnitTypes.LbfFt => valueInNm * lbfFt,
             _               => valueInNm
+        };
+    }
+
+    /// <summary>
+    ///     Convert to unit from string
+    /// </summary>
+    /// <param name="value">value</param>
+    /// <returns>unit</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static UnitTypes ParseToUnit(string value) {
+        // check null or empty
+        if (string.IsNullOrEmpty(value))
+            return UnitTypes.KgfCm;
+        // convert to unit
+        return value.ToLowerInvariant() switch {
+            "kgf.cm" => UnitTypes.KgfCm,
+            "kgf.m"  => UnitTypes.KgfM,
+            "n.m"    => UnitTypes.Nm,
+            "n.cm"   => UnitTypes.NCm,
+            "lbf.in" => UnitTypes.LbfIn,
+            "ozf.in" => UnitTypes.OzfIn,
+            "lbf.ft" => UnitTypes.LbfFt,
+            _        => UnitTypes.KgfCm
+        };
+    }
+
+    /// <summary>
+    ///     Convert unit type to string representation                                                            │
+    /// </summary>
+    /// <param name="value">unit type as integer (0=kgf.cm, 1=kgf.m, ...)</param>
+    /// <returns>unit string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ParseToUnit(int value) {
+        return value switch {
+            0 => "kgf.cm",
+            1 => "kgf.m",
+            2 => "N.m",
+            3 => "N.cm",
+            4 => "ozf.in",
+            5 => "lbf.ft",
+            6 => "ozf.ft",
+            _ => "kgf.cm"
         };
     }
 
