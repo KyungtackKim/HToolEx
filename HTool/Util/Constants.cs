@@ -5,14 +5,13 @@
 /// </summary>
 public static class Constants {
     /// <summary>
+    ///     Barcode length
+    /// </summary>
+    public const int BarcodeLength = 64;
+    /// <summary>
     ///     Baud rate for Serial communication
     /// </summary>
     public static readonly int[] BaudRates = [9600, 19200, 38400, 57600, 115200, 230400];
-
-    /// <summary>
-    ///     Barcode length
-    /// </summary>
-    public static int BarcodeLength = 64;
 
     /// <summary>
     ///     Process period

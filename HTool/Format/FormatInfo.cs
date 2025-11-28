@@ -30,18 +30,18 @@ public sealed class FormatInfo {
         if (values.Length < Size)
             return;
 
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
+        // get span
+        var span = values.AsSpan();
+        var pos  = 0;
 
         // get values
-        Id         = bin.ReadUInt16();
-        Controller = bin.ReadUInt16();
-        Driver     = bin.ReadUInt16();
-        Firmware   = bin.ReadUInt16();
+        Id         = BinarySpanReader.ReadUInt16(span, ref pos);
+        Controller = BinarySpanReader.ReadUInt16(span, ref pos);
+        Driver     = BinarySpanReader.ReadUInt16(span, ref pos);
+        Firmware   = BinarySpanReader.ReadUInt16(span, ref pos);
         // get serial raw values
-        var s = bin.ReadBytes(5);
+        var s = span.Slice(pos, 5);
+        pos += 5;
         // set serial number
         Serial = $"{s[^1]:D2}{s[^2]:D2}{s[^3]:D2}{s[^4]:D2}{s[^5]:D2}";
         // check length (255255xx255255)
@@ -49,9 +49,9 @@ public sealed class FormatInfo {
             // set default model code
             Serial = $"0000{s[^3]:D2}0000";
         // check position
-        if (bin.BaseStream.Position <= bin.BaseStream.Length - sizeof(uint))
+        if (pos <= span.Length - sizeof(uint))
             // set used count
-            Used = bin.ReadUInt32();
+            Used = BinarySpanReader.ReadUInt32(span, ref pos);
         // check defined model
         if (Enum.IsDefined(typeof(ModelTypes), Convert.ToInt32(Serial[4..6])))
             // set model types
@@ -61,16 +61,16 @@ public sealed class FormatInfo {
             Model = ModelTypes.Ad;
         // check ad model type
         if (Model == ModelTypes.Ad)
-            // get the dummy data
-            bin.ReadByte();
+            // skip the dummy data
+            pos += 1;
 
         // get check sum
         CheckSum = values.Sum(v => v);
         // throw an error if not all data has been read
-        if (bin.BaseStream.Position != bin.BaseStream.Length)
+        if (pos != span.Length)
             // throw exception
             throw new InvalidDataException($"Not all bytes have been consumed. " +
-                                           $"{bin.BaseStream.Length - bin.BaseStream.Position} byte(s) remain");
+                                           $"{span.Length - pos} byte(s) remain");
     }
 
     /// <summary>

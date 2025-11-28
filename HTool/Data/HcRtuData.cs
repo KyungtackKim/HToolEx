@@ -43,7 +43,7 @@ public sealed class HcRtuData : IReceivedData {
     /// <summary>
     ///     Create for the data format
     /// </summary>
-    /// <param name="values"></param>
+    /// <param name="values">Raw packet data</param>
     public void Create(IReadOnlyList<byte> values) {
         var pos = 0;
         // set header

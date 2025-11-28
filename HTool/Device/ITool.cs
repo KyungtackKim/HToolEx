@@ -9,21 +9,27 @@ public interface ITool {
     /// <summary>
     ///     Connection changed delegate
     /// </summary>
+    /// <param name="state">Connection state (true: connected, false: disconnected)</param>
     delegate void PerformConnect(bool state);
 
     /// <summary>
     ///     Received raw data delegate
     /// </summary>
+    /// <param name="packet">Raw packet data</param>
     delegate void PerformRawData(byte[] packet);
 
     /// <summary>
     ///     Received data delegate
     /// </summary>
+    /// <param name="codeTypes">MODBUS function code</param>
+    /// <param name="packet">Received packet data</param>
     delegate void PerformReceiveData(CodeTypes codeTypes, byte[] packet);
 
     /// <summary>
     ///     Received error data delegate
     /// </summary>
+    /// <param name="reason">Error reason type</param>
+    /// <param name="param">Additional error parameter</param>
     delegate void PerformReceiveError(ComErrorTypes reason, object? param = null);
 
     /// <summary>
@@ -57,7 +63,7 @@ public interface ITool {
     event PerformReceiveData ReceivedData;
 
     /// <summary>
-    ///     Received error
+    ///     Received error event
     /// </summary>
     event PerformReceiveError ReceivedError;
 

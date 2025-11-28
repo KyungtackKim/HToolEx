@@ -10,8 +10,8 @@ public abstract class Tool {
     /// <summary>
     ///     Create the communication tool
     /// </summary>
-    /// <param name="type">communication type</param>
-    /// <returns>result</returns>
+    /// <param name="type">Communication type (RTU or TCP)</param>
+    /// <returns>Created tool instance</returns>
     public static ITool Create(ComTypes type) {
         return type switch {
             ComTypes.Rtu => new HcRtu(),
@@ -23,8 +23,8 @@ public abstract class Tool {
     /// <summary>
     ///     Check the known code
     /// </summary>
-    /// <param name="v">value</param>
-    /// <returns>result</returns>
+    /// <param name="v">MODBUS function code value</param>
+    /// <returns>True if the code is known, otherwise false</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsKnownCode(byte v) {
         // check the known code

@@ -13,12 +13,11 @@ public sealed class FormatStatus {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="type">type</param>
-    public FormatStatus(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
+    public FormatStatus(byte[] values, GenerationTypes type = GenerationTypes.GenRev2) {
         int val1, val2;
-        // memory stream
-        using var stream = new MemoryStream(values);
-        // binary reader
-        using var bin = new BinaryReaderBigEndian(stream);
+        // get span
+        var span = values.AsSpan();
+        var pos  = 0;
 
         // set generation type
         Type = type;
@@ -28,62 +27,58 @@ public sealed class FormatStatus {
             case GenerationTypes.GenRev1Ad:
             case GenerationTypes.GenRev1Plus:
                 // set values
-                Torque   = bin.ReadUInt16();
-                Speed    = bin.ReadUInt16();
-                Current  = bin.ReadUInt16();
-                Preset   = bin.ReadUInt16();
-                TorqueUp = Convert.ToBoolean(bin.ReadUInt16());
-                FastenOk = Convert.ToBoolean(bin.ReadUInt16());
-                Ready    = Convert.ToBoolean(bin.ReadUInt16());
-                Run      = Convert.ToBoolean(bin.ReadUInt16());
-                Alarm    = bin.ReadUInt16();
+                Torque   = BinarySpanReader.ReadUInt16(span, ref pos);
+                Speed    = BinarySpanReader.ReadUInt16(span, ref pos);
+                Current  = BinarySpanReader.ReadUInt16(span, ref pos);
+                Preset   = BinarySpanReader.ReadUInt16(span, ref pos);
+                TorqueUp = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                FastenOk = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Ready    = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Run      = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Alarm    = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get direction value
-                val1 = bin.ReadUInt16();
+                val1 = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined direction
                 if (Enum.IsDefined(typeof(DirectionTypes), val1))
-                    // set direction
                     Direction = (DirectionTypes)val1;
-                RemainScrew = bin.ReadUInt16();
+                RemainScrew = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get input/output value
-                val1 = bin.ReadUInt16();
-                val2 = bin.ReadUInt16();
+                val1 = BinarySpanReader.ReadUInt16(span, ref pos);
+                val2 = BinarySpanReader.ReadUInt16(span, ref pos);
                 // set input/output value
                 Input  = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((val1 >> i) & 0x1)).ToArray();
                 Output = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((val2 >> i) & 0x1)).ToArray();
-
                 // set temperature
-                Temperature = bin.ReadUInt16();
+                Temperature = BinarySpanReader.ReadUInt16(span, ref pos);
                 break;
             case GenerationTypes.GenRev2:
                 // set values
-                Torque   = bin.ReadSingle();
-                Speed    = bin.ReadUInt16();
-                Current  = bin.ReadSingle();
-                Preset   = bin.ReadUInt16();
-                Model    = bin.ReadUInt16();
-                TorqueUp = Convert.ToBoolean(bin.ReadUInt16());
-                FastenOk = Convert.ToBoolean(bin.ReadUInt16());
-                Ready    = Convert.ToBoolean(bin.ReadUInt16());
-                Run      = Convert.ToBoolean(bin.ReadUInt16());
-                Alarm    = bin.ReadUInt16();
+                Torque   = BinarySpanReader.ReadSingle(span, ref pos);
+                Speed    = BinarySpanReader.ReadUInt16(span, ref pos);
+                Current  = BinarySpanReader.ReadSingle(span, ref pos);
+                Preset   = BinarySpanReader.ReadUInt16(span, ref pos);
+                Model    = BinarySpanReader.ReadUInt16(span, ref pos);
+                TorqueUp = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                FastenOk = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Ready    = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Run      = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
+                Alarm    = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get direction value
-                val1 = bin.ReadUInt16();
+                val1 = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined direction
                 if (Enum.IsDefined(typeof(DirectionTypes), val1))
-                    // set direction
                     Direction = (DirectionTypes)val1;
-                RemainScrew = bin.ReadUInt16();
+                RemainScrew = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get input/output value
-                var input  = bin.ReadUInt16();
-                var output = bin.ReadUInt16();
+                var input  = BinarySpanReader.ReadUInt16(span, ref pos);
+                var output = BinarySpanReader.ReadUInt16(span, ref pos);
                 // set input/output value
                 Input  = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((input  >> i) & 0x1)).ToArray();
                 Output = Enumerable.Range(0, 16).Select(i => Convert.ToBoolean((output >> i) & 0x1)).ToArray();
-
                 // set temperature
-                Temperature = bin.ReadSingle();
+                Temperature = BinarySpanReader.ReadSingle(span, ref pos);
                 // set lock state
-                IsLock = Convert.ToBoolean(bin.ReadUInt16());
+                IsLock = Convert.ToBoolean(BinarySpanReader.ReadUInt16(span, ref pos));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -92,10 +87,10 @@ public sealed class FormatStatus {
         // get check sum
         CheckSum = Utils.CalculateCheckSum(values);
         // throw an error if not all data has been read
-        if (bin.BaseStream.Position != bin.BaseStream.Length)
+        if (pos != span.Length)
             // throw exception
             throw new InvalidDataException($"Not all bytes have been consumed. " +
-                                           $"{bin.BaseStream.Length - bin.BaseStream.Position} byte(s) remain");
+                                           $"{span.Length - pos} byte(s) remain");
     }
 
     /// <summary>

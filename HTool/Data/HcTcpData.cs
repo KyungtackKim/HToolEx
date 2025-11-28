@@ -26,7 +26,7 @@ public sealed class HcTcpData : IReceivedData {
     public int ProtocolId { get; private set; }
 
     /// <summary>
-    ///     MODBUS-TCP uni id
+    ///     MODBUS-TCP unit id
     /// </summary>
     public int UnitId { get; private set; }
 
@@ -53,7 +53,7 @@ public sealed class HcTcpData : IReceivedData {
     /// <summary>
     ///     Create for the data format
     /// </summary>
-    /// <param name="values"></param>
+    /// <param name="values">Raw packet data</param>
     public void Create(IReadOnlyList<byte> values) {
         var pos = 0;
         // set header

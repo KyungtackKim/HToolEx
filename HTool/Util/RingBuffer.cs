@@ -1,15 +1,28 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace HTool.Util;
+﻿namespace HTool.Util;
 
 /// <summary>
 ///     Ring buffer class
 /// </summary>
 public sealed class RingBuffer {
+    /// <summary>
+    ///     Buffer array
+    /// </summary>
     private readonly byte[] _buffer;
-    private readonly int    _mask;
-    private          int    _readPos;
-    private          int    _writePos;
+
+    /// <summary>
+    ///     Mask for fast modulo operation (capacity - 1)
+    /// </summary>
+    private readonly int _mask;
+
+    /// <summary>
+    ///     Read position
+    /// </summary>
+    private int _readPos;
+
+    /// <summary>
+    ///     Write position
+    /// </summary>
+    private int _writePos;
 
     /// <summary>
     ///     Constructor
@@ -168,7 +181,6 @@ public sealed class RingBuffer {
     /// </summary>
     /// <param name="offset">offset</param>
     /// <returns>data</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte Peek(int offset) {
         // get the values
         var available = Available;
@@ -182,7 +194,6 @@ public sealed class RingBuffer {
     ///     Read all peek data
     /// </summary>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlySpan<byte> PeekBytes() {
         // get the values
         var available = Available;
@@ -212,7 +223,6 @@ public sealed class RingBuffer {
     /// </summary>
     /// <param name="length">length</param>
     /// <returns>data</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] ReadBytes(int length) {
         // check length
         if (length < 0)
@@ -253,7 +263,6 @@ public sealed class RingBuffer {
     ///     Remove the data
     /// </summary>
     /// <param name="length">length</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveBytes(int length) {
         // check length
         if (length < 0)
@@ -273,7 +282,6 @@ public sealed class RingBuffer {
     /// <summary>
     ///     Clear all data
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear() {
         // reset positions
         _readPos  = 0;

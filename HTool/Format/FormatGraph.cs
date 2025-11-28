@@ -1,5 +1,4 @@
-﻿using System.Buffers.Binary;
-using HTool.Type;
+﻿using HTool.Type;
 using HTool.Util;
 
 namespace HTool.Format;
@@ -11,7 +10,7 @@ public sealed class FormatGraph {
     /// <summary>
     ///     Constructor
     /// </summary>
-    public FormatGraph(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
+    public FormatGraph(byte[] values, GenerationTypes type = GenerationTypes.GenRev2) {
         // set generation type
         Type = type;
         // check generation type
@@ -23,8 +22,8 @@ public sealed class FormatGraph {
         if (span.Length < 4)
             throw new InvalidDataException("Too short.");
         // get the information
-        Channel = BinaryPrimitives.ReadUInt16BigEndian(span);
-        Count   = BinaryPrimitives.ReadUInt16BigEndian(span[2..]);
+        Channel = BinarySpanReader.ReadUInt16(span);
+        Count   = BinarySpanReader.ReadUInt16(span[2..]);
         // get the information
         var payload  = checked(Count * 4);
         var expected = 4 + payload;
@@ -38,12 +37,9 @@ public sealed class FormatGraph {
         // values
         Values = GC.AllocateUninitializedArray<float>(Count);
         // check the count
-        for (int i = 0, offset = 0; i < Count; i++, offset += 4) {
-            // get the value
-            var value = BinaryPrimitives.ReadUInt32BigEndian(s[offset..]);
+        for (int i = 0, offset = 0; i < Count; i++, offset += 4)
             // set the value
-            Values[i] = BitConverter.Int32BitsToSingle((int)value);
-        }
+            Values[i] = BinarySpanReader.ReadSingle(s[offset..]);
 
         // set the checksum
         CheckSum = Utils.CalculateCheckSum(span);
@@ -57,30 +53,25 @@ public sealed class FormatGraph {
     /// <summary>
     ///     Channel number
     /// </summary>
-
     public int Channel { get; }
 
     /// <summary>
     ///     Channel point count
     /// </summary>
-
     public int Count { get; }
 
     /// <summary>
-    ///     Values
+    ///     Graph data values
     /// </summary>
-
     public float[] Values { get; } = null!;
 
     /// <summary>
     ///     Check sum
     /// </summary>
-
     public int CheckSum { get; }
 
     /// <summary>
-    ///     Format size
+    ///     Format header size
     /// </summary>
-
     public static int Size => 4;
 }

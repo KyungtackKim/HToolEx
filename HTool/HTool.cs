@@ -13,18 +13,23 @@ namespace HTool;
 /// </summary>
 public sealed class HTool {
     /// <summary>
-    ///     hanged connection delegate
+    ///     Changed connection state delegate
     /// </summary>
+    /// <param name="state">Connection state (true: connected, false: disconnected)</param>
     public delegate void PerformChangedConnect(bool state);
 
     /// <summary>
     ///     Received raw data delegate
     /// </summary>
+    /// <param name="data">Raw packet data</param>
     public delegate void PerformRawData(byte[] data);
 
     /// <summary>
     ///     Received data delegate
     /// </summary>
+    /// <param name="codeTypes">MODBUS function code</param>
+    /// <param name="addr">Register address</param>
+    /// <param name="data">Received data</param>
     public delegate void PerformReceivedData(CodeTypes codeTypes, int addr, IReceivedData data);
 
     /// <summary>
@@ -69,7 +74,7 @@ public sealed class HTool {
     /// <summary>
     ///     Communication tool generation type
     /// </summary>
-    public GenerationTypes Gen { get; private set; }
+    public GenerationTypes Gen { get; private set; } = GenerationTypes.GenRev2;
 
     /// <summary>
     ///     Device information
@@ -119,7 +124,7 @@ public sealed class HTool {
     /// <summary>
     ///     Set the communication type
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="type">Communication type (RTU or TCP)</param>
     public void SetType(ComTypes type) {
         // check communication tool
         if (Tool != null) {
@@ -432,7 +437,8 @@ public sealed class HTool {
     /// <summary>
     ///     Read information register
     /// </summary>
-    /// <returns>result</returns>
+    /// <param name="check">Check the duplicate</param>
+    /// <returns>Result of the operation</returns>
     public bool ReadInfoReg(bool check = true) {
         // check communication
         if (Tool == null)

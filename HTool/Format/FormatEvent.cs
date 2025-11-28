@@ -1,7 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.ComponentModel;
 using HTool.Type;
 using HTool.Util;
 
@@ -21,7 +18,7 @@ public sealed class FormatEvent {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="type">type</param>
-    public FormatEvent(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
+    public FormatEvent(byte[] values, GenerationTypes type = GenerationTypes.GenRev2) {
         // set the event data
         Set(values, type);
     }
@@ -188,7 +185,7 @@ public sealed class FormatEvent {
     /// </summary>
     /// <param name="values">values</param>
     /// <param name="type">generation type</param>
-    public void Set(byte[] values, GenerationTypes type = GenerationTypes.GenRev1) {
+    public void Set(byte[] values, GenerationTypes type = GenerationTypes.GenRev2) {
         int dir;
         int status;
         var pos = 0;
@@ -206,147 +203,134 @@ public sealed class FormatEvent {
             case GenerationTypes.GenRev1:
             case GenerationTypes.GenRev1Ad:
                 // set values
-                Id           = ReadUInt16(span, ref pos);
+                Id           = BinarySpanReader.ReadUInt16(span, ref pos);
                 Date         = Time = DateTime.Now;
-                FastenTime   = ReadUInt16(span, ref pos);
-                Preset       = ReadUInt16(span, ref pos);
-                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = ReadUInt16(span, ref pos) / 100.0f;
-                Speed        = ReadUInt16(span, ref pos);
-                Angle1       = ReadUInt16(span, ref pos);
-                Angle2       = ReadUInt16(span, ref pos);
-                Angle        = ReadUInt16(span, ref pos);
-                RemainScrew  = ReadUInt16(span, ref pos);
-                Error        = ReadUInt16(span, ref pos);
+                FastenTime   = BinarySpanReader.ReadUInt16(span, ref pos);
+                Preset       = BinarySpanReader.ReadUInt16(span, ref pos);
+                TargetTorque = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                Torque       = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                Speed        = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle1       = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle2       = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle        = BinarySpanReader.ReadUInt16(span, ref pos);
+                RemainScrew  = BinarySpanReader.ReadUInt16(span, ref pos);
+                Error        = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get the direction
-                dir = ReadUInt16(span, ref pos);
+                dir = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
                     Direction = (DirectionTypes)dir;
                 // get the status
-                status = ReadUInt16(span, ref pos);
+                status = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
                     Event = (EventTypes)status;
-                SnugAngle = ReadUInt16(span, ref pos);
-                Barcode   = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
-                // update the position
-                pos += Constants.BarcodeLength;
+                SnugAngle =  BinarySpanReader.ReadUInt16(span, ref pos);
+                Barcode   =  Utils.ToAsciiTrimEnd(span.Slice(pos, Constants.BarcodeLength));
+                pos       += Constants.BarcodeLength;
                 break;
             case GenerationTypes.GenRev1Plus:
                 // set values
-                Id           = ReadUInt16(span, ref pos);
+                Id           = BinarySpanReader.ReadUInt16(span, ref pos);
                 Date         = Time = DateTime.Now;
-                FastenTime   = ReadUInt16(span, ref pos);
-                Preset       = ReadUInt16(span, ref pos);
-                TargetTorque = ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = ReadUInt16(span, ref pos) / 100.0f;
-                Speed        = ReadUInt16(span, ref pos);
-                Angle1       = ReadUInt16(span, ref pos);
-                Angle2       = ReadUInt16(span, ref pos);
-                Angle        = ReadUInt16(span, ref pos);
-                RemainScrew  = ReadUInt16(span, ref pos);
-                Error        = ReadUInt16(span, ref pos);
+                FastenTime   = BinarySpanReader.ReadUInt16(span, ref pos);
+                Preset       = BinarySpanReader.ReadUInt16(span, ref pos);
+                TargetTorque = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                Torque       = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                Speed        = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle1       = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle2       = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle        = BinarySpanReader.ReadUInt16(span, ref pos);
+                RemainScrew  = BinarySpanReader.ReadUInt16(span, ref pos);
+                Error        = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get the direction
-                dir = ReadUInt16(span, ref pos);
+                dir = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
                     Direction = (DirectionTypes)dir;
                 // get the status
-                status = ReadUInt16(span, ref pos);
+                status = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
                     Event = (EventTypes)status;
-                SnugAngle        = ReadUInt16(span, ref pos);
-                SeatingTorque    = ReadUInt16(span, ref pos) / 100.0f;
-                ClampTorque      = ReadUInt16(span, ref pos) / 100.0f;
-                PrevailingTorque = ReadUInt16(span, ref pos) / 100.0f;
-                SnugTorque       = ReadUInt16(span, ref pos) / 100.0f;
-                Barcode          = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
-                // update the position
-                pos += Constants.BarcodeLength;
+                SnugAngle        =  BinarySpanReader.ReadUInt16(span, ref pos);
+                SeatingTorque    =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                ClampTorque      =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                PrevailingTorque =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                SnugTorque       =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                Barcode          =  Utils.ToAsciiTrimEnd(span.Slice(pos, Constants.BarcodeLength));
+                pos              += Constants.BarcodeLength;
                 break;
             case GenerationTypes.GenRev2:
                 // header
-                Revision = $"{ReadByte(span, ref pos)}.{ReadByte(span, ref pos)}";
-                Id       = ReadUInt16(span, ref pos);
+                Revision = $"{BinarySpanReader.ReadByte(span, ref pos)}.{BinarySpanReader.ReadByte(span, ref pos)}";
+                Id       = BinarySpanReader.ReadUInt16(span, ref pos);
                 // date time
-                var year        = ReadUInt16(span, ref pos);
-                var month       = ReadByte(span, ref pos);
-                var day         = ReadByte(span, ref pos);
-                var hour        = ReadByte(span, ref pos);
-                var minute      = ReadByte(span, ref pos);
-                var second      = ReadByte(span, ref pos);
-                var millisecond = ReadByte(span, ref pos);
+                var year        = BinarySpanReader.ReadUInt16(span, ref pos);
+                var month       = BinarySpanReader.ReadByte(span, ref pos);
+                var day         = BinarySpanReader.ReadByte(span, ref pos);
+                var hour        = BinarySpanReader.ReadByte(span, ref pos);
+                var minute      = BinarySpanReader.ReadByte(span, ref pos);
+                var second      = BinarySpanReader.ReadByte(span, ref pos);
+                var millisecond = BinarySpanReader.ReadByte(span, ref pos);
                 // set date time
                 Date = Time = new DateTime(year, month, day, hour, minute, second, millisecond);
                 // common
-                FastenTime = ReadUInt16(span, ref pos);
-                Preset     = ReadUInt16(span, ref pos);
+                FastenTime = BinarySpanReader.ReadUInt16(span, ref pos);
+                Preset     = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get the unit
-                var unit = ReadUInt16(span, ref pos);
+                var unit = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (unit <= (int)UnitTypes.LbfFt)
-                    // set the value
                     Unit = (UnitTypes)unit;
-                RemainScrew = ReadUInt16(span, ref pos);
+                RemainScrew = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get the direction
-                dir = ReadUInt16(span, ref pos);
+                dir = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (dir <= (int)DirectionTypes.Loosening)
-                    // set the value
                     Direction = (DirectionTypes)dir;
-                Error = ReadUInt16(span, ref pos);
+                Error = BinarySpanReader.ReadUInt16(span, ref pos);
                 // get the status
-                status = ReadUInt16(span, ref pos);
+                status = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (status <= (int)EventTypes.ScrewCountReset)
-                    // set the value
                     Event = (EventTypes)status;
                 // torque
-                TargetTorque     = ReadSingle(span, ref pos);
-                Torque           = ReadSingle(span, ref pos);
-                SeatingTorque    = ReadSingle(span, ref pos);
-                ClampTorque      = ReadSingle(span, ref pos);
-                PrevailingTorque = ReadSingle(span, ref pos);
-                SnugTorque       = ReadSingle(span, ref pos);
+                TargetTorque     = BinarySpanReader.ReadSingle(span, ref pos);
+                Torque           = BinarySpanReader.ReadSingle(span, ref pos);
+                SeatingTorque    = BinarySpanReader.ReadSingle(span, ref pos);
+                ClampTorque      = BinarySpanReader.ReadSingle(span, ref pos);
+                PrevailingTorque = BinarySpanReader.ReadSingle(span, ref pos);
+                SnugTorque       = BinarySpanReader.ReadSingle(span, ref pos);
                 // speed angle
-                Speed     = ReadUInt16(span, ref pos);
-                Angle1    = ReadUInt16(span, ref pos);
-                Angle2    = ReadUInt16(span, ref pos);
-                Angle     = ReadUInt16(span, ref pos);
-                SnugAngle = ReadUInt16(span, ref pos);
+                Speed     = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle1    = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle2    = BinarySpanReader.ReadUInt16(span, ref pos);
+                Angle     = BinarySpanReader.ReadUInt16(span, ref pos);
+                SnugAngle = BinarySpanReader.ReadUInt16(span, ref pos);
                 // reserved
                 pos += 16;
                 // set the barcode
-                Barcode = AsciiTrimNullRight(span.Slice(pos, Constants.BarcodeLength));
-                // update the position
-                pos += Constants.BarcodeLength;
+                Barcode =  Utils.ToAsciiTrimEnd(span.Slice(pos, Constants.BarcodeLength));
+                pos     += Constants.BarcodeLength;
                 // get the graph type
-                var type1 = ReadUInt16(span, ref pos);
-                var type2 = ReadUInt16(span, ref pos);
+                var type1 = BinarySpanReader.ReadUInt16(span, ref pos);
+                var type2 = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check defined
                 if (type1 <= (int)GraphTypes.TorqueAngle)
-                    // set the value
                     TypeOfChannel1 = (GraphTypes)type1;
                 if (type2 <= (int)GraphTypes.TorqueAngle)
-                    // set the value
                     TypeOfChannel2 = (GraphTypes)type2;
-                CountOfChannel1 = ReadUInt16(span, ref pos);
-                CountOfChannel2 = ReadUInt16(span, ref pos);
-                SamplingRate    = ReadUInt16(span, ref pos);
+                CountOfChannel1 = BinarySpanReader.ReadUInt16(span, ref pos);
+                CountOfChannel2 = BinarySpanReader.ReadUInt16(span, ref pos);
+                SamplingRate    = BinarySpanReader.ReadUInt16(span, ref pos);
                 // check the step count
                 for (var i = 0; i < GraphSteps.Length; i++) {
                     // get the step information
-                    var id    = ReadUInt16(span, ref pos);
-                    var index = ReadUInt16(span, ref pos);
+                    var id    = BinarySpanReader.ReadUInt16(span, ref pos);
+                    var index = BinarySpanReader.ReadUInt16(span, ref pos);
                     // check defined
                     if (id <= (int)GraphStepTypes.RotationAfterTorqueUp)
-                        // set the graph step
                         GraphSteps[i] = new GraphStep((GraphStepTypes)id, index);
                 }
 
@@ -362,7 +346,6 @@ public sealed class FormatEvent {
             throw new InvalidDataException($"Not all bytes have been consumed. {span.Length - pos} byte(s) remain");
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Reset() {
         // reset the values
         Id              = 0;
@@ -380,62 +363,6 @@ public sealed class FormatEvent {
         Barcode         = string.Empty;
         Array.Clear(GraphSteps, 0, GraphSteps.Length);
         CheckSum = 0;
-    }
-
-    /// <summary>
-    ///     Check the length
-    /// </summary>
-    /// <param name="remaining">remaining</param>
-    /// <param name="need">need</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Ensure(int remaining, int need) {
-        // check the length
-        if (remaining < need)
-            // throw the exception
-            throw new InvalidDataException($"Not enough bytes: need {need}, have {remaining}");
-    }
-
-    /// <summary>
-    ///     Trim the null character
-    /// </summary>
-    /// <param name="s"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string AsciiTrimNullRight(ReadOnlySpan<byte> s) {
-        // get the length
-        var end = s.Length;
-        // check the null
-        while (end > 0 && s[end - 1] == 0)
-            // remove the character
-            end--;
-        // return the valid string
-        return end == 0 ? string.Empty : Encoding.ASCII.GetString(s[..end]);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static float ReadSingle(ReadOnlySpan<byte> values, ref int pos) {
-        // get the value
-        var value = BinaryPrimitives.ReadUInt32BigEndian(values.Slice(pos, 4));
-        // update the position
-        pos += 4;
-        // return the value
-        return BitConverter.Int32BitsToSingle((int)value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ushort ReadUInt16(ReadOnlySpan<byte> values, ref int pos) {
-        // get the value
-        var value = BinaryPrimitives.ReadUInt16BigEndian(values.Slice(pos, 2));
-        // update the position
-        pos += 2;
-        // return the value
-        return value;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static byte ReadByte(ReadOnlySpan<byte> values, ref int pos) {
-        // return the value
-        return values[pos++];
     }
 
     /// <summary>

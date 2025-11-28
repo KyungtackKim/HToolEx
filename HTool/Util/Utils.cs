@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using HTool.Type;
 
 namespace HTool.Util;
@@ -9,7 +10,7 @@ namespace HTool.Util;
 /// </summary>
 public static class Utils {
     /// <summary>
-    ///     MODBUS-RTU CRC-16 lookup table
+    ///     MODBUS-RTU CRC-16 lookup table (256 entries)
     /// </summary>
     private static readonly ushort[] ModbusCrc16Table = [
         0x0000,
@@ -450,7 +451,7 @@ public static class Utils {
     }
 
     /// <summary>
-    ///     Convert unit type to string representation                                                            │
+    ///     Convert unit type to string representation
     /// </summary>
     /// <param name="value">unit type as integer (0=kgf.cm, 1=kgf.m, ...)</param>
     /// <returns>unit string</returns>
@@ -743,5 +744,22 @@ public static class Utils {
         (list[source], list[dest]) = (list[dest], list[source]);
         // result
         return true;
+    }
+
+    /// <summary>
+    ///     Convert bytes to ASCII string, trimming trailing null characters
+    /// </summary>
+    /// <param name="span">span</param>
+    /// <returns>string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToAsciiTrimEnd(ReadOnlySpan<byte> span) {
+        // get the length
+        var end = span.Length;
+        // check the null
+        while (end > 0 && span[end - 1] == 0)
+            // trim the null
+            end--;
+        // return the string
+        return end == 0 ? string.Empty : Encoding.ASCII.GetString(span[..end]);
     }
 }
