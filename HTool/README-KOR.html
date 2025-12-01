@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>HTool - MODBUS 통신 라이브러리</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section {
+            margin-bottom: 16px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 6px 12px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-link.sub {
+            padding-left: 24px;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 300px;
+            padding: 48px 64px;
+            max-width: 960px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        h1 .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            vertical-align: middle;
+            margin-left: 12px;
+        }
+
+        .description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 48px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+        }
+
+        p code, li code, td code {
+            background: #f1f5f9;
+            color: #dc2626;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .info-box.note {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .info-box.warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .info-box.error {
+            background: #fef2f2;
+            border-left: 4px solid var(--error-color);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-header">HTool</div>
+        <div class="sidebar-subtitle">MODBUS 통신 라이브러리 v1.1.22</div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">시작하기</div>
+            <a class="nav-link" href="#overview">개요</a>
+            <a class="nav-link" href="#features">주요 기능</a>
+            <a class="nav-link" href="#installation">설치</a>
+            <a class="nav-link" href="#quickstart">빠른 시작</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">API</div>
+            <a class="nav-link" href="#htool-class">HTool 클래스</a>
+            <a class="nav-link sub" href="#properties">속성</a>
+            <a class="nav-link sub" href="#methods">메서드</a>
+            <a class="nav-link sub" href="#events">이벤트</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">데이터 포맷</div>
+            <a class="nav-link" href="#format-info">FormatInfo</a>
+            <a class="nav-link" href="#format-status">FormatStatus</a>
+            <a class="nav-link" href="#format-event">FormatEvent</a>
+            <a class="nav-link" href="#format-graph">FormatGraph</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">유틸리티</div>
+            <a class="nav-link" href="#binaryspanreader">BinarySpanReader</a>
+            <a class="nav-link" href="#keyedqueue">KeyedQueue</a>
+            <a class="nav-link" href="#ringbuffer">RingBuffer</a>
+            <a class="nav-link" href="#utils">Utils</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">참조</div>
+            <a class="nav-link" href="#modbus">MODBUS 프로토콜</a>
+            <a class="nav-link" href="#errors">에러 처리</a>
+            <a class="nav-link" href="#troubleshooting">문제 해결</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1>HTool <span class="badge">v1.1.22</span></h1>
+        <p class="description">
+            HANTAS 산업용 토크 툴 및 컨트롤러를 위한 MODBUS 통신 C# 라이브러리입니다.
+            MODBUS RTU/TCP 프로토콜을 지원하며, 이벤트 기반 아키텍처로 설계되었습니다.
+        </p>
+
+        <div style="margin-bottom: 32px; padding: 12px 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #2563eb;">
+            <strong>📖 Language / 언어:</strong>
+            <span style="color: #2563eb; font-weight: 600;">한국어</span> |
+            <a href="HTool-Documentation-English.html" style="color: #2563eb; text-decoration: none;">English</a> |
+            <a href="HTool-Documentation-Korean.md" style="color: #64748b; text-decoration: none;">Markdown (KOR)</a> |
+            <a href="HTool-Documentation-English.md" style="color: #64748b; text-decoration: none;">Markdown (ENG)</a>
+        </div>
+
+        <!-- 개요 -->
+        <section id="overview">
+            <h2>개요</h2>
+            <p>
+                <strong>HTool</strong>은 HANTAS 토크 툴 및 컨트롤러와 MODBUS RTU/TCP 통신을 위한 종합적인 C# 라이브러리입니다.
+                이벤트 기반 아키텍처와 자동 메시지 큐잉, 레지스터 자동 분할, 스레드 안전 연산 기능을 제공하여
+                .NET 애플리케이션에 HANTAS 장비를 쉽게 통합할 수 있습니다.
+            </p>
+
+            <h3>시스템 요구사항</h3>
+            <table>
+                <tr>
+                    <th>항목</th>
+                    <th>요구사항</th>
+                </tr>
+                <tr>
+                    <td><strong>.NET</strong></td>
+                    <td>8.0 이상</td>
+                </tr>
+                <tr>
+                    <td><strong>OS</strong></td>
+                    <td>Windows 10.0.17763.0 이상</td>
+                </tr>
+                <tr>
+                    <td><strong>RTU 통신</strong></td>
+                    <td>사용 가능한 COM 포트</td>
+                </tr>
+                <tr>
+                    <td><strong>TCP 통신</strong></td>
+                    <td>장치 네트워크 접근</td>
+                </tr>
+            </table>
+
+            <h3>의존성</h3>
+            <table>
+                <tr>
+                    <th>패키지</th>
+                    <th>버전</th>
+                    <th>용도</th>
+                </tr>
+                <tr>
+                    <td><code>SuperSimpleTcp</code></td>
+                    <td>3.0.20</td>
+                    <td>TCP 소켓 통신</td>
+                </tr>
+                <tr>
+                    <td><code>System.IO.Ports</code></td>
+                    <td>10.0.0</td>
+                    <td>시리얼 포트 통신</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 주요 기능 -->
+        <section id="features">
+            <h2>주요 기능</h2>
+
+            <h3>통신</h3>
+            <ul>
+                <li><strong>듀얼 프로토콜 지원</strong>: MODBUS RTU (시리얼) 및 MODBUS TCP/IP</li>
+                <li><strong>자동 연결 관리</strong>: 연결 상태 추적 및 자동 재연결 지원</li>
+                <li><strong>Keep-Alive 메커니즘</strong>: 연결 상태 자동 모니터링 (3초 주기)</li>
+            </ul>
+
+            <h3>메시지 처리</h3>
+            <ul>
+                <li><strong>스레드 안전 메시지 큐</strong>: KeyedQueue를 통한 중복 방지 및 재시도 로직</li>
+                <li><strong>스마트 레지스터 연산</strong>: 대용량 읽기/쓰기 시 자동 청크 분할
+                    <ul>
+                        <li>최대 읽기: 125 레지스터/요청</li>
+                        <li>최대 쓰기: 123 레지스터/요청</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>데이터 파싱</h3>
+            <ul>
+                <li><strong>장치 정보 자동 파싱</strong>: 모델, 시리얼, 펌웨어, 세대 정보</li>
+                <li><strong>상태 데이터</strong>: 실시간 토크, 속도, 전류, 알람 등</li>
+                <li><strong>이벤트 데이터</strong>: 체결 결과, 바코드, 그래프 스텝</li>
+                <li><strong>그래프 데이터</strong>: 토크/각도 그래프 수집</li>
+            </ul>
+
+            <h3>디버깅</h3>
+            <ul>
+                <li><strong>Raw 패킷 모니터링</strong>: TX/RX 패킷 실시간 확인</li>
+                <li><strong>에러 이벤트</strong>: 상세한 에러 정보 제공</li>
+            </ul>
+        </section>
+
+        <!-- 설치 -->
+        <section id="installation">
+            <h2>설치</h2>
+
+            <h3>NuGet (권장)</h3>
+            <pre>dotnet add package HTool</pre>
+
+            <p>또는 Package Manager Console:</p>
+            <pre>Install-Package HTool</pre>
+
+            <h3>소스에서 빌드</h3>
+            <pre>git clone https://github.com/KyungtackKim/HToolEx.git
+cd HToolEx/HTool
+dotnet build -c Release</pre>
+
+            <h3>NuGet 패키지 생성</h3>
+            <pre>dotnet pack HTool.csproj -c Release
+# 출력: bin/Release/HTool.1.1.22.nupkg</pre>
+        </section>
+
+        <!-- 빠른 시작 -->
+        <section id="quickstart">
+            <h2>빠른 시작</h2>
+
+            <h3>MODBUS TCP 예제</h3>
+            <pre>using HTool;
+using HTool.Type;
+using HTool.Format;
+
+// HTool 인스턴스 생성
+var htool = new HTool.HTool(ComTypes.Tcp);
+
+// 연결 이벤트 구독
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine($"연결됨: {htool.Info.Model}");
+        Console.WriteLine($"시리얼: {htool.Info.Serial}");
+        Console.WriteLine($"펌웨어: {htool.Info.Firmware}");
+        
+        // 연결 후 레지스터 읽기
+        htool.ReadHoldingReg(addr: 0, count: 10);
+    }
+};
+
+// 데이터 수신 이벤트 구독
+htool.ReceivedData += (code, addr, data) => {
+    Console.WriteLine($"수신: Code={code}, Address={addr}");
+};
+
+// 장치 연결 (IP주소, 포트, 장치ID)
+htool.Connect("192.168.1.100", 5000, id: 0x01);
+
+// 종료 시
+htool.Close();</pre>
+
+            <h3>MODBUS RTU (시리얼) 예제</h3>
+            <pre>var htool = new HTool.HTool(ComTypes.Rtu);
+
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine($"연결됨: {htool.Info.Serial}");
+    }
+};
+
+// COM 포트 연결 (포트명, 보드레이트, 장치ID)
+htool.Connect("COM3", 115200, id: 0x01);</pre>
+
+            <h3>지원 보드레이트</h3>
+            <pre>int[] baudRates = [9600, 19200, 38400, 57600, 115200, 230400];</pre>
+        </section>
+
+        <!-- HTool 클래스 -->
+        <section id="htool-class">
+            <h2>HTool 클래스</h2>
+            <p>메인 라이브러리 클래스로 모든 통신 기능을 제공합니다.</p>
+
+            <h3>생성자</h3>
+            <pre>// 기본 생성자
+public HTool()
+
+// 통신 타입 지정 생성자
+public HTool(ComTypes type)</pre>
+
+            <h3 id="properties">속성</h3>
+            <table>
+                <tr>
+                    <th>속성</th>
+                    <th>타입</th>
+                    <th>설명</th>
+                    <th>기본값</th>
+                </tr>
+                <tr>
+                    <td><code>Type</code></td>
+                    <td><code>ComTypes</code></td>
+                    <td>통신 타입 (RTU/TCP)</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><code>ConnectionState</code></td>
+                    <td><code>ConnectionTypes</code></td>
+                    <td>현재 연결 상태</td>
+                    <td><code>Close</code></td>
+                </tr>
+                <tr>
+                    <td><code>Info</code></td>
+                    <td><code>FormatInfo</code></td>
+                    <td>장치 정보 (연결 후)</td>
+                    <td>빈 인스턴스</td>
+                </tr>
+                <tr>
+                    <td><code>Gen</code></td>
+                    <td><code>GenerationTypes</code></td>
+                    <td>장치 세대/리비전</td>
+                    <td><code>GenRev2</code></td>
+                </tr>
+                <tr>
+                    <td><code>EnableKeepAlive</code></td>
+                    <td><code>bool</code></td>
+                    <td>Keep-Alive 활성화</td>
+                    <td><code>false</code></td>
+                </tr>
+            </table>
+
+            <h4>정적 속성</h4>
+            <table>
+                <tr>
+                    <th>속성</th>
+                    <th>타입</th>
+                    <th>값</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>ReadRegMaxSize</code></td>
+                    <td><code>int</code></td>
+                    <td>125</td>
+                    <td>최대 읽기 레지스터 수</td>
+                </tr>
+                <tr>
+                    <td><code>WriteRegMaxSize</code></td>
+                    <td><code>int</code></td>
+                    <td>123</td>
+                    <td>최대 쓰기 레지스터 수</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 메서드 -->
+        <section id="methods">
+            <h2>메서드</h2>
+
+            <h3>연결 관리</h3>
+            <pre>// 통신 타입 설정 (연결 전에만 가능)
+public void SetType(ComTypes type)
+
+// 장치 연결
+// target: TCP=IP주소, RTU=COM포트명
+// option: TCP=포트번호, RTU=보드레이트
+// id: MODBUS 장치 ID (1-15)
+public bool Connect(string target, int option, byte id = 0x01)
+
+// 연결 종료
+public void Close()</pre>
+
+            <h3>레지스터 읽기</h3>
+            <pre>// Holding 레지스터 읽기 (FC 0x03)
+public bool ReadHoldingReg(ushort addr, ushort count, 
+                           int split = 0, bool check = true)
+
+// Input 레지스터 읽기 (FC 0x04)
+public bool ReadInputReg(ushort addr, ushort count, 
+                         int split = 0, bool check = true)
+
+// 장치 정보 읽기 (FC 0x11, HANTAS 전용)
+public bool ReadInfoReg(bool check = true)</pre>
+
+            <h3>레지스터 쓰기</h3>
+            <pre>// 단일 레지스터 쓰기 (FC 0x06)
+public bool WriteSingleReg(ushort addr, ushort value, bool check = true)
+
+// 다중 레지스터 쓰기 (FC 0x10)
+public bool WriteMultiReg(ushort addr, ushort[] values, bool check = true)
+public bool WriteMultiReg(ushort addr, ReadOnlySpan&lt;ushort&gt; values, 
+                          bool check = true)
+
+// 문자열 레지스터 쓰기 (ASCII, 레지스터당 2바이트)
+// length: 패딩 포함 총 길이 (0=문자열 길이 사용)
+public bool WriteStrReg(ushort addr, string str, 
+                        int length = 0, bool check = true)</pre>
+        </section>
+
+        <!-- 이벤트 -->
+        <section id="events">
+            <h2>이벤트</h2>
+
+            <pre>// 연결 상태 변경 이벤트
+// state: true=연결됨, false=연결 해제됨
+public event PerformChangedConnect? ChangedConnect;
+
+// 데이터 수신 이벤트
+// codeTypes: MODBUS Function Code
+// addr: 레지스터 주소
+// data: 수신 데이터
+public event PerformReceivedData? ReceivedData;
+
+// 에러 발생 이벤트
+// reason: 에러 유형
+// param: 추가 에러 정보
+public event ITool.PerformReceiveError? ReceiveError;
+
+// Raw 데이터 수신 이벤트 (디버깅용)
+public event PerformRawData? ReceivedRawData;
+
+// Raw 데이터 송신 이벤트 (디버깅용)
+public event PerformRawData? TransmitRawData;</pre>
+
+            <h3>이벤트 사용 예제</h3>
+            <pre>// 연결 상태 모니터링
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine("장치 연결됨");
+    } else {
+        Console.WriteLine("장치 연결 해제됨");
+    }
+};
+
+// 데이터 수신 처리
+htool.ReceivedData += (code, addr, data) => {
+    switch (code) {
+        case CodeTypes.ReadHoldingReg:
+            Console.WriteLine($"Holding 레지스터 수신: {data.Length}바이트");
+            break;
+        case CodeTypes.ReadInputReg:
+            Console.WriteLine($"Input 레지스터 수신: {data.Length}바이트");
+            break;
+    }
+};
+
+// 에러 처리
+htool.ReceiveError += (reason, param) => {
+    Console.WriteLine($"에러 발생: {reason}");
+};
+
+// Raw 패킷 모니터링 (디버깅)
+htool.TransmitRawData += (packet) => {
+    Console.WriteLine($"TX: {BitConverter.ToString(packet)}");
+};
+htool.ReceivedRawData += (packet) => {
+    Console.WriteLine($"RX: {BitConverter.ToString(packet)}");
+};</pre>
+        </section>
+
+        <!-- FormatInfo -->
+        <section id="format-info">
+            <h2>FormatInfo - 장치 정보</h2>
+            <p>Gen.2 장치 정보 (200바이트, 100 레지스터)</p>
+
+            <div class="info-box note">
+                <strong>참고:</strong> 이 클래스는 Gen.2 장치 전용입니다. Gen.1/1+ 장치는 FormatSimpleInfo를 사용하세요.
+            </div>
+
+            <table>
+                <tr>
+                    <th>필드</th>
+                    <th>타입</th>
+                    <th>크기</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>DriverModelName</code></td>
+                    <td>string</td>
+                    <td>32</td>
+                    <td>드라이버 모델명 (ASCII)</td>
+                </tr>
+                <tr>
+                    <td><code>DriverSerialNumber</code></td>
+                    <td>string</td>
+                    <td>10</td>
+                    <td>드라이버 시리얼 번호</td>
+                </tr>
+                <tr>
+                    <td><code>ControllerModelName</code></td>
+                    <td>string</td>
+                    <td>32</td>
+                    <td>컨트롤러 모델명 (ASCII)</td>
+                </tr>
+                <tr>
+                    <td><code>FirmwareVersion</code></td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>펌웨어 버전 문자열</td>
+                </tr>
+                <tr>
+                    <td><code>MacAddressString</code></td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>MAC 주소 (xx:xx:xx:xx:xx:xx)</td>
+                </tr>
+                <tr>
+                    <td><code>Manufacturer</code></td>
+                    <td>int</td>
+                    <td>2</td>
+                    <td>제조사 (1=Hantas, 2=Mountz)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatStatus -->
+        <section id="format-status">
+            <h2>FormatStatus - 상태 데이터</h2>
+            <p>실시간 장치 상태 정보</p>
+
+            <table>
+                <tr>
+                    <th>필드</th>
+                    <th>Gen.1/1+</th>
+                    <th>Gen.2</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>Torque</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>현재 토크</td>
+                </tr>
+                <tr>
+                    <td><code>Speed</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>현재 속도 (RPM)</td>
+                </tr>
+                <tr>
+                    <td><code>Current</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>현재 전류</td>
+                </tr>
+                <tr>
+                    <td><code>Preset</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>선택된 프리셋</td>
+                </tr>
+                <tr>
+                    <td><code>TorqueUp</code></td>
+                    <td>bool</td>
+                    <td>bool</td>
+                    <td>토크업 상태</td>
+                </tr>
+                <tr>
+                    <td><code>FastenOk</code></td>
+                    <td>bool</td>
+                    <td>bool</td>
+                    <td>체결 OK 상태</td>
+                </tr>
+                <tr>
+                    <td><code>Alarm</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>알람 코드</td>
+                </tr>
+                <tr>
+                    <td><code>Direction</code></td>
+                    <td>DirectionTypes</td>
+                    <td>DirectionTypes</td>
+                    <td>체결 방향</td>
+                </tr>
+                <tr>
+                    <td><code>Temperature</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>온도</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatEvent -->
+        <section id="format-event">
+            <h2>FormatEvent - 이벤트 데이터</h2>
+            <p>체결 결과 및 이벤트 정보</p>
+
+            <h3>주요 필드</h3>
+            <table>
+                <tr>
+                    <th>필드</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>Id</code></td>
+                    <td>이벤트 ID</td>
+                </tr>
+                <tr>
+                    <td><code>Date / Time</code></td>
+                    <td>이벤트 발생 일시 (Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>FastenTime</code></td>
+                    <td>체결 시간 (ms)</td>
+                </tr>
+                <tr>
+                    <td><code>TargetTorque</code></td>
+                    <td>목표 토크</td>
+                </tr>
+                <tr>
+                    <td><code>Torque</code></td>
+                    <td>실제 토크</td>
+                </tr>
+                <tr>
+                    <td><code>Speed</code></td>
+                    <td>속도 (RPM)</td>
+                </tr>
+                <tr>
+                    <td><code>Angle</code></td>
+                    <td>각도</td>
+                </tr>
+                <tr>
+                    <td><code>Event</code></td>
+                    <td>이벤트 상태 (OK, NG, Reject 등)</td>
+                </tr>
+                <tr>
+                    <td><code>Barcode</code></td>
+                    <td>바코드 (최대 64자)</td>
+                </tr>
+                <tr>
+                    <td><code>SeatingTorque</code></td>
+                    <td>시팅 토크 (Gen.1+, Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>ClampTorque</code></td>
+                    <td>클램프 토크 (Gen.1+, Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>SamplingRate</code></td>
+                    <td>샘플링 레이트 (Gen.2)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatGraph -->
+        <section id="format-graph">
+            <h2>FormatGraph - 그래프 데이터</h2>
+            <p>실시간 그래프 데이터를 담는 클래스</p>
+
+            <table>
+                <tr>
+                    <th>필드</th>
+                    <th>타입</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>Type</code></td>
+                    <td>GenerationTypes</td>
+                    <td>세대 타입</td>
+                </tr>
+                <tr>
+                    <td><code>Channel</code></td>
+                    <td>int</td>
+                    <td>채널 번호</td>
+                </tr>
+                <tr>
+                    <td><code>Count</code></td>
+                    <td>int</td>
+                    <td>데이터 포인트 수</td>
+                </tr>
+                <tr>
+                    <td><code>Values</code></td>
+                    <td>float[]</td>
+                    <td>그래프 값 배열</td>
+                </tr>
+            </table>
+
+            <h3>그래프 채널 타입</h3>
+            <table>
+                <tr>
+                    <th>값</th>
+                    <th>타입</th>
+                    <th>설명</th>
+                    <th>값 처리</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>None</td>
+                    <td>사용 안함</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Torque</td>
+                    <td>토크</td>
+                    <td>float 값 (음수 가능)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Current</td>
+                    <td>전류</td>
+                    <td>float 값 (음수 가능)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Speed</td>
+                    <td>속도</td>
+                    <td>정수 값 (float 저장)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Angle</td>
+                    <td>각도</td>
+                    <td>정수 값 (float 저장)</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>SpeedCmd</td>
+                    <td>속도 명령</td>
+                    <td>정수 값 (float 저장)</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>CurrentCmd</td>
+                    <td>전류 명령</td>
+                    <td>float 값 (음수 가능)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>SnugAngle</td>
+                    <td>Snug 각도</td>
+                    <td>정수 값 (float 저장)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>TorqueAngle</td>
+                    <td>토크/각도</td>
+                    <td>float 값 (음수 가능)</td>
+                </tr>
+            </table>
+
+            <div class="info-box note">
+                <strong>참고:</strong> Values 배열은 float 타입으로 파싱되어 있습니다. Torque, Current, CurrentCmd, TorqueAngle은 실수값(음수
+                가능)이며,
+                Speed, Angle, SpeedCmd, SnugAngle은 정수값만 가집니다.
+            </div>
+        </section>
+
+        <!-- BinarySpanReader -->
+        <section id="binaryspanreader">
+            <h2>BinarySpanReader</h2>
+            <p>Big-Endian 바이너리 데이터 읽기를 위한 정적 유틸리티</p>
+
+            <pre>var span = data.AsSpan();
+var pos = 0;
+
+// 기본 타입 읽기
+byte b = BinarySpanReader.ReadByte(span, ref pos);
+short s = BinarySpanReader.ReadInt16(span, ref pos);
+ushort us = BinarySpanReader.ReadUInt16(span, ref pos);
+int i = BinarySpanReader.ReadInt32(span, ref pos);
+uint ui = BinarySpanReader.ReadUInt32(span, ref pos);
+float f = BinarySpanReader.ReadSingle(span, ref pos);
+double d = BinarySpanReader.ReadDouble(span, ref pos);
+
+// ASCII 문자열 읽기 (null/공백 trim)
+string str = BinarySpanReader.ReadAsciiString(span, ref pos, 32);
+
+// 위치 없이 읽기 (첫 바이트부터)
+ushort value = BinarySpanReader.ReadUInt16(span);</pre>
+
+            <div class="info-box note">
+                <strong>중요:</strong> MODBUS 데이터는 Big-Endian이므로 <code>BitConverter</code>나
+                <code>BinaryReader</code>를 직접 사용하지 마세요. (Windows는 Little-Endian)
+            </div>
+        </section>
+
+        <!-- KeyedQueue -->
+        <section id="keyedqueue">
+            <h2>KeyedQueue&lt;T, TKey&gt;</h2>
+            <p>스레드 안전하고 중복을 방지하는 고성능 큐</p>
+
+            <pre>// 생성
+var queue = KeyedQueue&lt;MyMessage, string&gt;
+    .Create(m =&gt; m.Id, capacity: 100);
+
+// 단일 항목 추가
+queue.TryEnqueue(msg, EnqueueMode.EnforceUnique);  // 중복 방지
+queue.TryEnqueue(msg, EnqueueMode.AllowDuplicate); // 중복 허용
+
+// 제거
+if (queue.TryDequeue(out var item)) { /* 처리 */ }
+
+// 키 기반 연산
+bool exists = queue.ContainsKey(key);
+queue.TryRemoveByKey(key);
+
+// 상태 확인
+int count = queue.Count;
+bool empty = queue.IsEmpty;</pre>
+        </section>
+
+        <!-- RingBuffer -->
+        <section id="ringbuffer">
+            <h2>RingBuffer</h2>
+            <p>패킷 파싱을 위한 순환 버퍼</p>
+
+            <pre>// 생성 (용량은 2의 제곱으로 조정됨)
+var buffer = new RingBuffer(16 * 1024);
+
+// 쓰기
+buffer.Write(singleByte);
+buffer.WriteBytes(byteArray);
+
+// Peek (제거 없이 읽기)
+byte b = buffer.Peek(offset);
+ReadOnlySpan&lt;byte&gt; data = buffer.PeekBytes();
+
+// 읽기 (제거하며 읽기)
+byte[] packet = buffer.ReadBytes(length);
+
+// 상태
+int capacity = buffer.Capacity;
+int available = buffer.Available;</pre>
+        </section>
+
+        <!-- Utils -->
+        <section id="utils">
+            <h2>Utils</h2>
+            <p>다양한 유틸리티 메서드</p>
+
+            <pre>// CRC 계산 (MODBUS RTU)
+var (low, high) = Utils.CalculateCrc(packet);
+bool valid = Utils.ValidateCrc(packetWithCrc);
+
+// 토크 단위 변환
+float converted = Utils.ConvertTorqueUnit(10.0f, UnitTypes.Nm, UnitTypes.KgfCm);
+UnitTypes unit = Utils.ParseToUnit("N.m");
+
+// 바이트 → 값 변환
+Utils.ConvertValue(bytes, out float floatValue);
+Utils.ConvertValue(bytes, out ushort ushortValue);
+
+// 문자열 변환
+ushort[] words = Utils.GetWordValuesFromText("HANTAS");
+string text = Utils.ToAsciiTrimEnd(byteSpan);</pre>
+        </section>
+
+        <!-- MODBUS 프로토콜 -->
+        <section id="modbus">
+            <h2>MODBUS 프로토콜</h2>
+
+            <h3>Function Code</h3>
+            <table>
+                <tr>
+                    <th>코드</th>
+                    <th>값</th>
+                    <th>설명</th>
+                    <th>타입</th>
+                </tr>
+                <tr>
+                    <td><code>ReadHoldingReg</code></td>
+                    <td>0x03</td>
+                    <td>Holding 레지스터 읽기</td>
+                    <td>표준</td>
+                </tr>
+                <tr>
+                    <td><code>ReadInputReg</code></td>
+                    <td>0x04</td>
+                    <td>Input 레지스터 읽기</td>
+                    <td>표준</td>
+                </tr>
+                <tr>
+                    <td><code>WriteSingleReg</code></td>
+                    <td>0x06</td>
+                    <td>단일 레지스터 쓰기</td>
+                    <td>표준</td>
+                </tr>
+                <tr>
+                    <td><code>WriteMultiReg</code></td>
+                    <td>0x10</td>
+                    <td>다중 레지스터 쓰기</td>
+                    <td>표준</td>
+                </tr>
+                <tr>
+                    <td><code>ReadInfoReg</code></td>
+                    <td>0x11</td>
+                    <td>장치 정보 읽기</td>
+                    <td>HANTAS</td>
+                </tr>
+                <tr>
+                    <td><code>Graph</code></td>
+                    <td>0x64</td>
+                    <td>그래프 데이터</td>
+                    <td>HANTAS</td>
+                </tr>
+                <tr>
+                    <td><code>GraphRes</code></td>
+                    <td>0x65</td>
+                    <td>그래프 결과</td>
+                    <td>HANTAS</td>
+                </tr>
+            </table>
+
+            <h3>RTU vs TCP 프레임 구조</h3>
+            <h4>MODBUS-RTU</h4>
+            <pre>[Device ID (1)] [Function Code (1)] [Data (N)] [CRC Low (1)] [CRC High (1)]</pre>
+
+            <h4>MODBUS-TCP (MBAP Header)</h4>
+            <pre>[Transaction ID (2)] [Protocol ID (2)] [Length (2)] [Unit ID (1)] [FC (1)] [Data (N)]</pre>
+        </section>
+
+        <!-- 에러 처리 -->
+        <section id="errors">
+            <h2>에러 처리</h2>
+
+            <h3>에러 코드</h3>
+            <table>
+                <tr>
+                    <th>에러</th>
+                    <th>값</th>
+                    <th>설명</th>
+                </tr>
+                <tr>
+                    <td><code>InvalidFunction</code></td>
+                    <td>0x01</td>
+                    <td>지원하지 않는 Function Code</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidAddress</code></td>
+                    <td>0x02</td>
+                    <td>유효하지 않은 레지스터 주소</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidValue</code></td>
+                    <td>0x03</td>
+                    <td>유효하지 않은 데이터 값</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidCrc</code></td>
+                    <td>0x07</td>
+                    <td>CRC 체크섬 오류 (RTU)</td>
+                </tr>
+                <tr>
+                    <td><code>Timeout</code></td>
+                    <td>0x0F</td>
+                    <td>요청 타임아웃</td>
+                </tr>
+            </table>
+
+            <h3>에러 처리 예제</h3>
+            <pre>htool.ReceiveError += (reason, param) => {
+    switch (reason) {
+        case ComErrorTypes.Timeout:
+            Console.WriteLine($"타임아웃 - 버퍼 크기: {param}");
+            break;
+        case ComErrorTypes.InvalidCrc:
+            Console.WriteLine("CRC 에러 - 케이블/보드레이트 확인 필요");
+            break;
+        case ComErrorTypes.InvalidAddress:
+            Console.WriteLine("유효하지 않은 레지스터 주소");
+            break;
+    }
+};</pre>
+        </section>
+
+        <!-- 문제 해결 -->
+        <section id="troubleshooting">
+            <h2>문제 해결</h2>
+
+            <h3>TCP 연결 실패</h3>
+            <ul>
+                <li>IP 주소 및 포트 확인 (기본 HANTAS: 5000)</li>
+                <li>방화벽 설정 확인</li>
+                <li>같은 네트워크/VLAN인지 확인</li>
+                <li>ping 테스트</li>
+            </ul>
+
+            <h3>RTU 연결 실패</h3>
+            <ul>
+                <li>COM 포트명 확인 (장치 관리자)</li>
+                <li>보드레이트 확인 (일반적: 115200, 9600)</li>
+                <li>다른 프로그램이 포트 사용 중인지 확인</li>
+                <li>케이블 연결 상태 확인</li>
+            </ul>
+
+            <h3>CRC 에러 (RTU)</h3>
+            <ul>
+                <li>보드레이트 불일치</li>
+                <li>케이블 품질 문제</li>
+                <li>전자기 간섭</li>
+                <li>Parity/Stop bits 설정 불일치</li>
+            </ul>
+
+            <h3>타임아웃 에러</h3>
+            <ul>
+                <li>장치 응답 지연</li>
+                <li>잘못된 레지스터 주소</li>
+                <li>네트워크 지연</li>
+            </ul>
+
+            <div class="info-box warning">
+                <strong>팁:</strong> Raw 패킷 모니터링(<code>TransmitRawData</code>, <code>ReceivedRawData</code>)을
+                활성화하여 실제 통신 내용을 확인하세요.
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2025 HANTAS. All rights reserved.</p>
+            <p>HTool - MODBUS 통신 라이브러리 v1.1.22</p>
+            <p>작성자: Eloiz |
+                <a href="https://github.com/KyungtackKim/HToolEx/tree/master/HTool" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

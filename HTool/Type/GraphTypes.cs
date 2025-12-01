@@ -3,6 +3,7 @@
 namespace HTool.Type;
 
 /// <summary>
+///     그래프 채널 타입
 ///     Graph channel types
 /// </summary>
 public enum GraphTypes {

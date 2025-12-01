@@ -3,9 +3,11 @@
 namespace HTool.Type;
 
 /// <summary>
+///     한타스 도구 모델 타입
 ///     Hantas tool model types
 /// </summary>
 public enum ModelTypes {
+    // 한타스 모델 코드
     // Hantas model codes
     [Description("MD")]
     Md = 1,
@@ -24,7 +26,8 @@ public enum ModelTypes {
     [Description("BMT40")]
     Bmt40 = 29,
 
-    // Mount model codes
+    // Mountz 모델 코드
+    // Mountz model codes
     [Description("EC")]
     Ec = 1001,
     [Description("ECT")]

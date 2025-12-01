@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>HTool - MODBUS Communication Library</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section {
+            margin-bottom: 16px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 6px 12px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-link.sub {
+            padding-left: 24px;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 300px;
+            padding: 48px 64px;
+            max-width: 960px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        h1 .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            vertical-align: middle;
+            margin-left: 12px;
+        }
+
+        .description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 48px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+        }
+
+        p code, li code, td code {
+            background: #f1f5f9;
+            color: #dc2626;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .info-box.note {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .info-box.warning {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .info-box.error {
+            background: #fef2f2;
+            border-left: 4px solid var(--error-color);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-header">HTool</div>
+        <div class="sidebar-subtitle">MODBUS Communication Library v1.1.22</div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Getting Started</div>
+            <a class="nav-link" href="#overview">Overview</a>
+            <a class="nav-link" href="#features">Key Features</a>
+            <a class="nav-link" href="#installation">Installation</a>
+            <a class="nav-link" href="#quickstart">Quick Start</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">API</div>
+            <a class="nav-link" href="#htool-class">HTool Class</a>
+            <a class="nav-link sub" href="#properties">Properties</a>
+            <a class="nav-link sub" href="#methods">Methods</a>
+            <a class="nav-link sub" href="#events">Events</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Data Formats</div>
+            <a class="nav-link" href="#format-info">FormatInfo</a>
+            <a class="nav-link" href="#format-status">FormatStatus</a>
+            <a class="nav-link" href="#format-event">FormatEvent</a>
+            <a class="nav-link" href="#format-graph">FormatGraph</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Utilities</div>
+            <a class="nav-link" href="#binaryspanreader">BinarySpanReader</a>
+            <a class="nav-link" href="#keyedqueue">KeyedQueue</a>
+            <a class="nav-link" href="#ringbuffer">RingBuffer</a>
+            <a class="nav-link" href="#utils">Utils</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Reference</div>
+            <a class="nav-link" href="#modbus">MODBUS Protocol</a>
+            <a class="nav-link" href="#errors">Error Handling</a>
+            <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1>HTool <span class="badge">v1.1.22</span></h1>
+        <p class="description">
+            A comprehensive C# library for MODBUS communication with HANTAS industrial torque tools and controllers.
+            Supports both MODBUS RTU/TCP protocols with an event-driven architecture.
+        </p>
+
+        <div style="margin-bottom: 32px; padding: 12px 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #2563eb;">
+            <strong>📖 Language / 언어:</strong>
+            <a href="HTool-Documentation-Korean.html" style="color: #2563eb; text-decoration: none;">한국어</a> |
+            <span style="color: #2563eb; font-weight: 600;">English</span> |
+            <a href="HTool-Documentation-Korean.md" style="color: #64748b; text-decoration: none;">Markdown (KOR)</a> |
+            <a href="HTool-Documentation-English.md" style="color: #64748b; text-decoration: none;">Markdown (ENG)</a>
+        </div>
+
+        <!-- Overview -->
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                <strong>HTool</strong> is a comprehensive C# library providing MODBUS RTU/TCP communication capabilities
+                for HANTAS torque tools and controllers. It features an event-driven architecture with automatic message
+                queuing, register auto-splitting, and thread-safe operations, making it easy to integrate HANTAS devices
+                into your .NET applications.
+            </p>
+
+            <h3>System Requirements</h3>
+            <table>
+                <tr>
+                    <th>Item</th>
+                    <th>Requirement</th>
+                </tr>
+                <tr>
+                    <td><strong>.NET</strong></td>
+                    <td>8.0 or later</td>
+                </tr>
+                <tr>
+                    <td><strong>OS</strong></td>
+                    <td>Windows 10.0.17763.0 or later</td>
+                </tr>
+                <tr>
+                    <td><strong>RTU Communication</strong></td>
+                    <td>Available COM port</td>
+                </tr>
+                <tr>
+                    <td><strong>TCP Communication</strong></td>
+                    <td>Network access to device</td>
+                </tr>
+            </table>
+
+            <h3>Dependencies</h3>
+            <table>
+                <tr>
+                    <th>Package</th>
+                    <th>Version</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>SuperSimpleTcp</code></td>
+                    <td>3.0.20</td>
+                    <td>TCP socket communication</td>
+                </tr>
+                <tr>
+                    <td><code>System.IO.Ports</code></td>
+                    <td>10.0.0</td>
+                    <td>Serial port communication</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Key Features -->
+        <section id="features">
+            <h2>Key Features</h2>
+
+            <h3>Communication</h3>
+            <ul>
+                <li><strong>Dual Protocol Support</strong>: MODBUS RTU (serial) and MODBUS TCP/IP</li>
+                <li><strong>Automatic Connection Management</strong>: Connection state tracking and auto-reconnect
+                    support
+                </li>
+                <li><strong>Keep-Alive Mechanism</strong>: Automatic connection monitoring (3-second interval)</li>
+            </ul>
+
+            <h3>Message Processing</h3>
+            <ul>
+                <li><strong>Thread-Safe Message Queue</strong>: Duplicate prevention and retry logic via KeyedQueue</li>
+                <li><strong>Smart Register Operations</strong>: Automatic chunking for large read/write operations
+                    <ul>
+                        <li>Max read: 125 registers/request</li>
+                        <li>Max write: 123 registers/request</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Data Parsing</h3>
+            <ul>
+                <li><strong>Automatic Device Info Parsing</strong>: Model, serial, firmware, generation info</li>
+                <li><strong>Status Data</strong>: Real-time torque, speed, current, alarm, etc.</li>
+                <li><strong>Event Data</strong>: Fastening results, barcode, graph steps</li>
+                <li><strong>Graph Data</strong>: Torque/angle graph collection</li>
+            </ul>
+
+            <h3>Debugging</h3>
+            <ul>
+                <li><strong>Raw Packet Monitoring</strong>: Real-time TX/RX packet inspection</li>
+                <li><strong>Error Events</strong>: Detailed error information</li>
+            </ul>
+        </section>
+
+        <!-- Installation -->
+        <section id="installation">
+            <h2>Installation</h2>
+
+            <h3>NuGet (Recommended)</h3>
+            <pre>dotnet add package HTool</pre>
+
+            <p>Or via Package Manager Console:</p>
+            <pre>Install-Package HTool</pre>
+
+            <h3>Build from Source</h3>
+            <pre>git clone https://github.com/KyungtackKim/HToolEx.git
+cd HToolEx/HTool
+dotnet build -c Release</pre>
+
+            <h3>Create NuGet Package</h3>
+            <pre>dotnet pack HTool.csproj -c Release
+# Output: bin/Release/HTool.1.1.22.nupkg</pre>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quickstart">
+            <h2>Quick Start</h2>
+
+            <h3>MODBUS TCP Example</h3>
+            <pre>using HTool;
+using HTool.Type;
+using HTool.Format;
+
+// Create HTool instance
+var htool = new HTool.HTool(ComTypes.Tcp);
+
+// Subscribe to connection events
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine($"Connected: {htool.Info.Model}");
+        Console.WriteLine($"Serial: {htool.Info.Serial}");
+        Console.WriteLine($"Firmware: {htool.Info.Firmware}");
+        
+        // Read registers after connection
+        htool.ReadHoldingReg(addr: 0, count: 10);
+    }
+};
+
+// Subscribe to data events
+htool.ReceivedData += (code, addr, data) => {
+    Console.WriteLine($"Received: Code={code}, Address={addr}");
+};
+
+// Connect to device (IP address, port, device ID)
+htool.Connect("192.168.1.100", 5000, id: 0x01);
+
+// Close when done
+htool.Close();</pre>
+
+            <h3>MODBUS RTU (Serial) Example</h3>
+            <pre>var htool = new HTool.HTool(ComTypes.Rtu);
+
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine($"Connected: {htool.Info.Serial}");
+    }
+};
+
+// Connect via COM port (port name, baud rate, device ID)
+htool.Connect("COM3", 115200, id: 0x01);</pre>
+
+            <h3>Supported Baud Rates</h3>
+            <pre>int[] baudRates = [9600, 19200, 38400, 57600, 115200, 230400];</pre>
+        </section>
+
+        <!-- HTool Class -->
+        <section id="htool-class">
+            <h2>HTool Class</h2>
+            <p>Main library class providing all communication functionality.</p>
+
+            <h3>Constructors</h3>
+            <pre>// Default constructor
+public HTool()
+
+// Constructor with communication type
+public HTool(ComTypes type)</pre>
+
+            <h3 id="properties">Properties</h3>
+            <table>
+                <tr>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td><code>Type</code></td>
+                    <td><code>ComTypes</code></td>
+                    <td>Communication type (RTU/TCP)</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><code>ConnectionState</code></td>
+                    <td><code>ConnectionTypes</code></td>
+                    <td>Current connection state</td>
+                    <td><code>Close</code></td>
+                </tr>
+                <tr>
+                    <td><code>Info</code></td>
+                    <td><code>FormatInfo</code></td>
+                    <td>Device information (after connection)</td>
+                    <td>Empty instance</td>
+                </tr>
+                <tr>
+                    <td><code>Gen</code></td>
+                    <td><code>GenerationTypes</code></td>
+                    <td>Device generation/revision</td>
+                    <td><code>GenRev2</code></td>
+                </tr>
+                <tr>
+                    <td><code>EnableKeepAlive</code></td>
+                    <td><code>bool</code></td>
+                    <td>Enable keep-alive</td>
+                    <td><code>false</code></td>
+                </tr>
+            </table>
+
+            <h4>Static Properties</h4>
+            <table>
+                <tr>
+                    <th>Property</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>ReadRegMaxSize</code></td>
+                    <td><code>int</code></td>
+                    <td>125</td>
+                    <td>Max registers per read</td>
+                </tr>
+                <tr>
+                    <td><code>WriteRegMaxSize</code></td>
+                    <td><code>int</code></td>
+                    <td>123</td>
+                    <td>Max registers per write</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Methods -->
+        <section id="methods">
+            <h2>Methods</h2>
+
+            <h3>Connection Management</h3>
+            <pre>// Set communication type (before connection)
+public void SetType(ComTypes type)
+
+// Connect to device
+// target: TCP=IP address, RTU=COM port name
+// option: TCP=port number, RTU=baud rate
+// id: MODBUS device ID (1-15)
+public bool Connect(string target, int option, byte id = 0x01)
+
+// Close connection
+public void Close()</pre>
+
+            <h3>Register Read</h3>
+            <pre>// Read Holding registers (FC 0x03)
+public bool ReadHoldingReg(ushort addr, ushort count, 
+                           int split = 0, bool check = true)
+
+// Read Input registers (FC 0x04)
+public bool ReadInputReg(ushort addr, ushort count, 
+                         int split = 0, bool check = true)
+
+// Read device information (FC 0x11, HANTAS specific)
+public bool ReadInfoReg(bool check = true)</pre>
+
+            <h3>Register Write</h3>
+            <pre>// Write single register (FC 0x06)
+public bool WriteSingleReg(ushort addr, ushort value, bool check = true)
+
+// Write multiple registers (FC 0x10)
+public bool WriteMultiReg(ushort addr, ushort[] values, bool check = true)
+public bool WriteMultiReg(ushort addr, ReadOnlySpan&lt;ushort&gt; values, 
+                          bool check = true)
+
+// Write string to registers (ASCII, 2 bytes per register)
+// length: Total length including padding (0=use string length)
+public bool WriteStrReg(ushort addr, string str, 
+                        int length = 0, bool check = true)</pre>
+        </section>
+
+        <!-- Events -->
+        <section id="events">
+            <h2>Events</h2>
+
+            <pre>// Connection state changed event
+// state: true=connected, false=disconnected
+public event PerformChangedConnect? ChangedConnect;
+
+// Data received event
+// codeTypes: MODBUS Function Code
+// addr: Register address
+// data: Received data
+public event PerformReceivedData? ReceivedData;
+
+// Error occurred event
+// reason: Error type
+// param: Additional error info
+public event ITool.PerformReceiveError? ReceiveError;
+
+// Raw data received event (for debugging)
+public event PerformRawData? ReceivedRawData;
+
+// Raw data transmitted event (for debugging)
+public event PerformRawData? TransmitRawData;</pre>
+
+            <h3>Event Usage Example</h3>
+            <pre>// Connection state monitoring
+htool.ChangedConnect += (connected) => {
+    if (connected) {
+        Console.WriteLine("Device connected");
+    } else {
+        Console.WriteLine("Device disconnected");
+    }
+};
+
+// Data reception handling
+htool.ReceivedData += (code, addr, data) => {
+    switch (code) {
+        case CodeTypes.ReadHoldingReg:
+            Console.WriteLine($"Holding register received: {data.Length} bytes");
+            break;
+        case CodeTypes.ReadInputReg:
+            Console.WriteLine($"Input register received: {data.Length} bytes");
+            break;
+    }
+};
+
+// Error handling
+htool.ReceiveError += (reason, param) => {
+    Console.WriteLine($"Error occurred: {reason}");
+};
+
+// Raw packet monitoring (debugging)
+htool.TransmitRawData += (packet) => {
+    Console.WriteLine($"TX: {BitConverter.ToString(packet)}");
+};
+htool.ReceivedRawData += (packet) => {
+    Console.WriteLine($"RX: {BitConverter.ToString(packet)}");
+};</pre>
+        </section>
+
+        <!-- FormatInfo -->
+        <section id="format-info">
+            <h2>FormatInfo - Device Information</h2>
+            <p>Gen.2 device information (200 bytes, 100 registers)</p>
+
+            <div class="info-box note">
+                <strong>Note:</strong> This class is only for Gen.2 devices. Use FormatSimpleInfo for Gen.1/1+ devices.
+            </div>
+
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>DriverModelName</code></td>
+                    <td>string</td>
+                    <td>32</td>
+                    <td>Driver model name (ASCII)</td>
+                </tr>
+                <tr>
+                    <td><code>DriverSerialNumber</code></td>
+                    <td>string</td>
+                    <td>10</td>
+                    <td>Driver serial number</td>
+                </tr>
+                <tr>
+                    <td><code>ControllerModelName</code></td>
+                    <td>string</td>
+                    <td>32</td>
+                    <td>Controller model name (ASCII)</td>
+                </tr>
+                <tr>
+                    <td><code>FirmwareVersion</code></td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>Firmware version string</td>
+                </tr>
+                <tr>
+                    <td><code>MacAddressString</code></td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>MAC address (xx:xx:xx:xx:xx:xx)</td>
+                </tr>
+                <tr>
+                    <td><code>Manufacturer</code></td>
+                    <td>int</td>
+                    <td>2</td>
+                    <td>Manufacturer (1=Hantas, 2=Mountz)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatStatus -->
+        <section id="format-status">
+            <h2>FormatStatus - Status Data</h2>
+            <p>Real-time device status information</p>
+
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Gen.1/1+</th>
+                    <th>Gen.2</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>Torque</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>Current torque</td>
+                </tr>
+                <tr>
+                    <td><code>Speed</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>Current speed (RPM)</td>
+                </tr>
+                <tr>
+                    <td><code>Current</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>Current (A)</td>
+                </tr>
+                <tr>
+                    <td><code>Preset</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>Selected preset</td>
+                </tr>
+                <tr>
+                    <td><code>TorqueUp</code></td>
+                    <td>bool</td>
+                    <td>bool</td>
+                    <td>Torque up state</td>
+                </tr>
+                <tr>
+                    <td><code>FastenOk</code></td>
+                    <td>bool</td>
+                    <td>bool</td>
+                    <td>Fasten OK state</td>
+                </tr>
+                <tr>
+                    <td><code>Alarm</code></td>
+                    <td>ushort</td>
+                    <td>ushort</td>
+                    <td>Alarm code</td>
+                </tr>
+                <tr>
+                    <td><code>Direction</code></td>
+                    <td>DirectionTypes</td>
+                    <td>DirectionTypes</td>
+                    <td>Fastening direction</td>
+                </tr>
+                <tr>
+                    <td><code>Temperature</code></td>
+                    <td>ushort</td>
+                    <td>float</td>
+                    <td>Temperature</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatEvent -->
+        <section id="format-event">
+            <h2>FormatEvent - Event Data</h2>
+            <p>Fastening results and event information</p>
+
+            <h3>Main Fields</h3>
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>Id</code></td>
+                    <td>Event ID</td>
+                </tr>
+                <tr>
+                    <td><code>Date / Time</code></td>
+                    <td>Event date/time (Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>FastenTime</code></td>
+                    <td>Fastening time (ms)</td>
+                </tr>
+                <tr>
+                    <td><code>TargetTorque</code></td>
+                    <td>Target torque</td>
+                </tr>
+                <tr>
+                    <td><code>Torque</code></td>
+                    <td>Measured torque</td>
+                </tr>
+                <tr>
+                    <td><code>Speed</code></td>
+                    <td>Speed (RPM)</td>
+                </tr>
+                <tr>
+                    <td><code>Angle</code></td>
+                    <td>Angle</td>
+                </tr>
+                <tr>
+                    <td><code>Event</code></td>
+                    <td>Event status (OK, NG, Reject, etc.)</td>
+                </tr>
+                <tr>
+                    <td><code>Barcode</code></td>
+                    <td>Barcode (max 64 chars)</td>
+                </tr>
+                <tr>
+                    <td><code>SeatingTorque</code></td>
+                    <td>Seating torque (Gen.1+, Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>ClampTorque</code></td>
+                    <td>Clamp torque (Gen.1+, Gen.2)</td>
+                </tr>
+                <tr>
+                    <td><code>SamplingRate</code></td>
+                    <td>Sampling rate (Gen.2)</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- FormatGraph -->
+        <section id="format-graph">
+            <h2>FormatGraph - Graph Data</h2>
+            <p>Real-time graph data container</p>
+
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>Type</code></td>
+                    <td>GenerationTypes</td>
+                    <td>Generation type</td>
+                </tr>
+                <tr>
+                    <td><code>Channel</code></td>
+                    <td>int</td>
+                    <td>Channel number</td>
+                </tr>
+                <tr>
+                    <td><code>Count</code></td>
+                    <td>int</td>
+                    <td>Data point count</td>
+                </tr>
+                <tr>
+                    <td><code>Values</code></td>
+                    <td>float[]</td>
+                    <td>Graph value array</td>
+                </tr>
+            </table>
+
+            <h3>Graph Channel Types</h3>
+            <table>
+                <tr>
+                    <th>Value</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Value Processing</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>None</td>
+                    <td>Not used</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Torque</td>
+                    <td>Torque</td>
+                    <td>float value (negative allowed)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Current</td>
+                    <td>Current</td>
+                    <td>float value (negative allowed)</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Speed</td>
+                    <td>Speed</td>
+                    <td>Integer value (stored as float)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Angle</td>
+                    <td>Angle</td>
+                    <td>Integer value (stored as float)</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>SpeedCmd</td>
+                    <td>Speed command</td>
+                    <td>Integer value (stored as float)</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>CurrentCmd</td>
+                    <td>Current command</td>
+                    <td>float value (negative allowed)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>SnugAngle</td>
+                    <td>Snug angle</td>
+                    <td>Integer value (stored as float)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>TorqueAngle</td>
+                    <td>Torque/Angle</td>
+                    <td>float value (negative allowed)</td>
+                </tr>
+            </table>
+
+            <div class="info-box note">
+                <strong>Note:</strong> The Values array is parsed as float type. Torque, Current, CurrentCmd, and
+                TorqueAngle
+                are floating-point values (negative allowed), while Speed, Angle, SpeedCmd, and SnugAngle contain only
+                integer values.
+            </div>
+        </section>
+
+        <!-- BinarySpanReader -->
+        <section id="binaryspanreader">
+            <h2>BinarySpanReader</h2>
+            <p>Static utility for reading Big-Endian binary data</p>
+
+            <pre>var span = data.AsSpan();
+var pos = 0;
+
+// Read basic types
+byte b = BinarySpanReader.ReadByte(span, ref pos);
+short s = BinarySpanReader.ReadInt16(span, ref pos);
+ushort us = BinarySpanReader.ReadUInt16(span, ref pos);
+int i = BinarySpanReader.ReadInt32(span, ref pos);
+uint ui = BinarySpanReader.ReadUInt32(span, ref pos);
+float f = BinarySpanReader.ReadSingle(span, ref pos);
+double d = BinarySpanReader.ReadDouble(span, ref pos);
+
+// Read ASCII string (null/space trimmed)
+string str = BinarySpanReader.ReadAsciiString(span, ref pos, 32);
+
+// Read without position (from first byte)
+ushort value = BinarySpanReader.ReadUInt16(span);</pre>
+
+            <div class="info-box note">
+                <strong>Important:</strong> MODBUS data is Big-Endian, so never use <code>BitConverter</code> or
+                <code>BinaryReader</code> directly (Windows is Little-Endian).
+            </div>
+        </section>
+
+        <!-- KeyedQueue -->
+        <section id="keyedqueue">
+            <h2>KeyedQueue&lt;T, TKey&gt;</h2>
+            <p>Thread-safe, high-performance queue with duplicate prevention</p>
+
+            <pre>// Create
+var queue = KeyedQueue&lt;MyMessage, string&gt;
+    .Create(m =&gt; m.Id, capacity: 100);
+
+// Add single item
+queue.TryEnqueue(msg, EnqueueMode.EnforceUnique);  // Prevent duplicates
+queue.TryEnqueue(msg, EnqueueMode.AllowDuplicate); // Allow duplicates
+
+// Remove
+if (queue.TryDequeue(out var item)) { /* process */ }
+
+// Key-based operations
+bool exists = queue.ContainsKey(key);
+queue.TryRemoveByKey(key);
+
+// State check
+int count = queue.Count;
+bool empty = queue.IsEmpty;</pre>
+        </section>
+
+        <!-- RingBuffer -->
+        <section id="ringbuffer">
+            <h2>RingBuffer</h2>
+            <p>Circular buffer for packet parsing</p>
+
+            <pre>// Create (capacity rounded to power of 2)
+var buffer = new RingBuffer(16 * 1024);
+
+// Write
+buffer.Write(singleByte);
+buffer.WriteBytes(byteArray);
+
+// Peek (read without removal)
+byte b = buffer.Peek(offset);
+ReadOnlySpan&lt;byte&gt; data = buffer.PeekBytes();
+
+// Read (with removal)
+byte[] packet = buffer.ReadBytes(length);
+
+// State
+int capacity = buffer.Capacity;
+int available = buffer.Available;</pre>
+        </section>
+
+        <!-- Utils -->
+        <section id="utils">
+            <h2>Utils</h2>
+            <p>Various utility methods</p>
+
+            <pre>// CRC calculation (MODBUS RTU)
+var (low, high) = Utils.CalculateCrc(packet);
+bool valid = Utils.ValidateCrc(packetWithCrc);
+
+// Torque unit conversion
+float converted = Utils.ConvertTorqueUnit(10.0f, UnitTypes.Nm, UnitTypes.KgfCm);
+UnitTypes unit = Utils.ParseToUnit("N.m");
+
+// Byte → value conversion
+Utils.ConvertValue(bytes, out float floatValue);
+Utils.ConvertValue(bytes, out ushort ushortValue);
+
+// String conversion
+ushort[] words = Utils.GetWordValuesFromText("HANTAS");
+string text = Utils.ToAsciiTrimEnd(byteSpan);</pre>
+        </section>
+
+        <!-- MODBUS Protocol -->
+        <section id="modbus">
+            <h2>MODBUS Protocol</h2>
+
+            <h3>Function Codes</h3>
+            <table>
+                <tr>
+                    <th>Code</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                </tr>
+                <tr>
+                    <td><code>ReadHoldingReg</code></td>
+                    <td>0x03</td>
+                    <td>Read Holding Registers</td>
+                    <td>Standard</td>
+                </tr>
+                <tr>
+                    <td><code>ReadInputReg</code></td>
+                    <td>0x04</td>
+                    <td>Read Input Registers</td>
+                    <td>Standard</td>
+                </tr>
+                <tr>
+                    <td><code>WriteSingleReg</code></td>
+                    <td>0x06</td>
+                    <td>Write Single Register</td>
+                    <td>Standard</td>
+                </tr>
+                <tr>
+                    <td><code>WriteMultiReg</code></td>
+                    <td>0x10</td>
+                    <td>Write Multiple Registers</td>
+                    <td>Standard</td>
+                </tr>
+                <tr>
+                    <td><code>ReadInfoReg</code></td>
+                    <td>0x11</td>
+                    <td>Read Device Information</td>
+                    <td>HANTAS</td>
+                </tr>
+                <tr>
+                    <td><code>Graph</code></td>
+                    <td>0x64</td>
+                    <td>Graph Data</td>
+                    <td>HANTAS</td>
+                </tr>
+                <tr>
+                    <td><code>GraphRes</code></td>
+                    <td>0x65</td>
+                    <td>Graph Result</td>
+                    <td>HANTAS</td>
+                </tr>
+            </table>
+
+            <h3>RTU vs TCP Frame Structure</h3>
+            <h4>MODBUS-RTU</h4>
+            <pre>[Device ID (1)] [Function Code (1)] [Data (N)] [CRC Low (1)] [CRC High (1)]</pre>
+
+            <h4>MODBUS-TCP (MBAP Header)</h4>
+            <pre>[Transaction ID (2)] [Protocol ID (2)] [Length (2)] [Unit ID (1)] [FC (1)] [Data (N)]</pre>
+        </section>
+
+        <!-- Error Handling -->
+        <section id="errors">
+            <h2>Error Handling</h2>
+
+            <h3>Error Codes</h3>
+            <table>
+                <tr>
+                    <th>Error</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>InvalidFunction</code></td>
+                    <td>0x01</td>
+                    <td>Unsupported Function Code</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidAddress</code></td>
+                    <td>0x02</td>
+                    <td>Invalid register address</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidValue</code></td>
+                    <td>0x03</td>
+                    <td>Invalid data value</td>
+                </tr>
+                <tr>
+                    <td><code>InvalidCrc</code></td>
+                    <td>0x07</td>
+                    <td>CRC checksum error (RTU)</td>
+                </tr>
+                <tr>
+                    <td><code>Timeout</code></td>
+                    <td>0x0F</td>
+                    <td>Request timeout</td>
+                </tr>
+            </table>
+
+            <h3>Error Handling Example</h3>
+            <pre>htool.ReceiveError += (reason, param) => {
+    switch (reason) {
+        case ComErrorTypes.Timeout:
+            Console.WriteLine($"Timeout - Buffer size: {param}");
+            break;
+        case ComErrorTypes.InvalidCrc:
+            Console.WriteLine("CRC error - Check cable/baud rate");
+            break;
+        case ComErrorTypes.InvalidAddress:
+            Console.WriteLine("Invalid register address");
+            break;
+    }
+};</pre>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+
+            <h3>TCP Connection Failure</h3>
+            <ul>
+                <li>Verify IP address and port (default HANTAS: 5000)</li>
+                <li>Check firewall settings</li>
+                <li>Ensure same network/VLAN</li>
+                <li>Test with ping</li>
+            </ul>
+
+            <h3>RTU Connection Failure</h3>
+            <ul>
+                <li>Verify COM port name (Device Manager)</li>
+                <li>Check baud rate (common: 115200, 9600)</li>
+                <li>Ensure port not in use by another program</li>
+                <li>Check cable connections</li>
+            </ul>
+
+            <h3>CRC Errors (RTU)</h3>
+            <ul>
+                <li>Baud rate mismatch</li>
+                <li>Poor cable quality</li>
+                <li>Electromagnetic interference</li>
+                <li>Incorrect parity/stop bits</li>
+            </ul>
+
+            <h3>Timeout Errors</h3>
+            <ul>
+                <li>Device response delay</li>
+                <li>Incorrect register address</li>
+                <li>Network latency</li>
+            </ul>
+
+            <div class="info-box warning">
+                <strong>Tip:</strong> Enable raw packet monitoring (<code>TransmitRawData</code>,
+                <code>ReceivedRawData</code>)
+                to inspect actual communication.
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2025 HANTAS. All rights reserved.</p>
+            <p>HTool - MODBUS Communication Library v1.1.22</p>
+            <p>Author: Eloiz |
+                <a href="https://github.com/KyungtackKim/HToolEx/tree/master/HTool" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

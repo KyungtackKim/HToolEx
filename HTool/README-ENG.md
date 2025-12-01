@@ -2,7 +2,7 @@
 
 A comprehensive C# library for MODBUS communication with HANTAS industrial torque tools and controllers.
 
-[![NuGet](https://img.shields.io/badge/nuget-v1.1.21-blue)](https://www.nuget.org/packages/HTool)
+[![NuGet](https://img.shields.io/badge/nuget-v1.1.22-blue)](https://www.nuget.org/packages/HTool)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue)](https://www.microsoft.com/windows)
@@ -115,7 +115,7 @@ dotnet build -c Release
 
 ```bash
 dotnet pack HTool.csproj -c Release
-# Output: bin/Release/HTool.1.1.21.nupkg
+# Output: bin/Release/HTool.1.1.22.nupkg
 ```
 
 ---
@@ -158,7 +158,7 @@ htool.ReceiveError += (reason, param) => {
 };
 
 // Connect to device (IP address, port, device ID)
-if (htool.Connect("192.168.1.100", 502, id: 0x01)) {
+if (htool.Connect("192.168.1.100", 5000, id: 0x01)) {
     Console.WriteLine("Connecting...");
 }
 
@@ -504,7 +504,7 @@ var htool = new HTool.HTool(ComTypes.Tcp);
 // Enable keep-alive (sends Info request every 3s when idle)
 htool.EnableKeepAlive = true;
 
-htool.Connect("192.168.1.100", 502, 0x01);
+htool.Connect("192.168.1.100", 5000, 0x01);
 
 // Auto-disconnect after 10s of no response
 ```
@@ -579,7 +579,8 @@ HTool/
 │   ├── HcRtuData.cs            # RTU data container
 │   └── HcTcpData.cs            # TCP data container
 ├── Format/
-│   ├── FormatInfo.cs           # Device information (13+ bytes)
+│   ├── FormatInfo.cs           # Device information (Gen.2, 200 bytes)
+│   ├── FormatSimpleInfo.cs     # Device information (Gen.1/1+, legacy)
 │   ├── FormatStatus.cs         # Status data (generation-dependent)
 │   ├── FormatEvent.cs          # Event data (generation-dependent)
 │   ├── FormatGraph.cs          # Graph data
@@ -675,27 +676,27 @@ MessageQue.TryEnqueue(msg, EnqueueMode.AllowDuplicate);
 
 > **Note**: This class is only for Gen.2 devices. Do not use for other device types.
 
-| Field                  | Type   | Offset | Size | Description                         |
-|------------------------|--------|--------|------|-------------------------------------|
-| SystemInfo             | int    | 0      | 2    | System info (reserved)              |
-| DriverId               | int    | 2      | 2    | Driver ID (1-15)                    |
-| DriverModelNumber      | int    | 4      | 2    | Driver model number                 |
-| DriverModelName        | string | 6      | 32   | Driver model name (ASCII)           |
-| DriverSerialNumber     | string | 38     | 10   | Driver serial number                |
-| ControllerModelNumber  | int    | 48     | 2    | Controller model number             |
-| ControllerModelName    | string | 50     | 32   | Controller model name (ASCII)       |
-| ControllerSerialNumber | string | 82     | 10   | Controller serial number            |
-| FirmwareVersionMajor   | int    | 92     | 2    | Firmware version Major              |
-| FirmwareVersionMinor   | int    | 94     | 2    | Firmware version Minor              |
-| FirmwareVersionPatch   | int    | 96     | 2    | Firmware version Patch              |
-| FirmwareVersion        | string | -      | -    | Firmware version string (computed)  |
-| ProductionDate         | uint   | 98     | 4    | Production date (YYYYMMDD)          |
-| AdvanceType            | int    | 102    | 2    | Advance type (0=Normal, 1=Plus)     |
-| MacAddress             | byte[] | 104    | 6    | MAC address                         |
-| MacAddressString       | string | -      | -    | MAC address string (computed)       |
-| EventDataRevision      | int    | 110    | 2    | Event data revision                 |
-| Manufacturer           | int    | 112    | 2    | Manufacturer (1=Hantas, 2=Mountz)   |
-| Reserved               | -      | 114    | 86   | Reserved area                       |
+| Field                  | Type   | Offset | Size | Description                        |
+|------------------------|--------|--------|------|------------------------------------|
+| SystemInfo             | int    | 0      | 2    | System info (reserved)             |
+| DriverId               | int    | 2      | 2    | Driver ID (1-15)                   |
+| DriverModelNumber      | int    | 4      | 2    | Driver model number                |
+| DriverModelName        | string | 6      | 32   | Driver model name (ASCII)          |
+| DriverSerialNumber     | string | 38     | 10   | Driver serial number               |
+| ControllerModelNumber  | int    | 48     | 2    | Controller model number            |
+| ControllerModelName    | string | 50     | 32   | Controller model name (ASCII)      |
+| ControllerSerialNumber | string | 82     | 10   | Controller serial number           |
+| FirmwareVersionMajor   | int    | 92     | 2    | Firmware version Major             |
+| FirmwareVersionMinor   | int    | 94     | 2    | Firmware version Minor             |
+| FirmwareVersionPatch   | int    | 96     | 2    | Firmware version Patch             |
+| FirmwareVersion        | string | -      | -    | Firmware version string (computed) |
+| ProductionDate         | uint   | 98     | 4    | Production date (YYYYMMDD)         |
+| AdvanceType            | int    | 102    | 2    | Advance type (0=Normal, 1=Plus)    |
+| MacAddress             | byte[] | 104    | 6    | MAC address                        |
+| MacAddressString       | string | -      | -    | MAC address string (computed)      |
+| EventDataRevision      | int    | 110    | 2    | Event data revision                |
+| Manufacturer           | int    | 112    | 2    | Manufacturer (1=Hantas, 2=Mountz)  |
+| Reserved               | -      | 114    | 86   | Reserved area                      |
 
 **Total Size**: 200 bytes (100 registers)
 
@@ -1032,12 +1033,12 @@ Constants defined in `HTool.Util.Constants` class:
 
 ```csharp
 // Checklist:
-// 1. Verify IP address and port (default MODBUS TCP: 502)
+// 1. Verify IP address and port (default HANTAS: 5000)
 // 2. Check firewall settings
 // 3. Ensure same network/VLAN
 // 4. Test with ping
 
-if (!htool.Connect("192.168.1.100", 502, 0x01)) {
+if (!htool.Connect("192.168.1.100", 5000, 0x01)) {
     Console.WriteLine("Connection start failed");
     // Check IP, port, network settings
 }
@@ -1174,8 +1175,8 @@ htool.ReceivedData += (code, addr, data) => {
 ### 1.1.22 - Current
 
 - FormatInfo class refactoring
-  - Existing FormatInfo → FormatSimpleInfo (legacy protocol)
-  - New FormatInfo (Gen.2 Modbus standard protocol, 200 bytes)
+    - Existing FormatInfo → FormatSimpleInfo (legacy protocol)
+    - New FormatInfo (Gen.2 Modbus standard protocol, 200 bytes)
 - Added BinarySpanReader.ReadAsciiString method
 
 ### 1.1.21
@@ -1238,7 +1239,8 @@ SOFTWARE.
 
 - **Company**: HANTAS
 - **Author**: Eloiz
-- **GitHub**: [https://github.com/KyungtackKim/HToolEx](https://github.com/KyungtackKim/HToolEx)
+- **GitHub
+  **: [https://github.com/KyungtackKim/HToolEx/tree/master/HTool](https://github.com/KyungtackKim/HToolEx/tree/master/HTool)
 - **Issues**: [GitHub Issues](https://github.com/KyungtackKim/HToolEx/issues)
 
 ---

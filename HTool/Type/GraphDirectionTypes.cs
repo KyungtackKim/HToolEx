@@ -3,6 +3,7 @@
 namespace HTool.Type;
 
 /// <summary>
+///     그래프 방향 타입
 ///     Graph direction types
 /// </summary>
 public enum GraphDirectionTypes {

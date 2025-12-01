@@ -2,7 +2,7 @@
 
 HANTAS 산업용 토크 툴 및 컨트롤러를 위한 MODBUS 통신 C# 라이브러리
 
-[![NuGet](https://img.shields.io/badge/nuget-v1.1.21-blue)](https://www.nuget.org/packages/HTool)
+[![NuGet](https://img.shields.io/badge/nuget-v1.1.22-blue)](https://www.nuget.org/packages/HTool)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue)](https://www.microsoft.com/windows)
@@ -114,7 +114,7 @@ dotnet build -c Release
 
 ```bash
 dotnet pack HTool.csproj -c Release
-# 출력: bin/Release/HTool.1.1.21.nupkg
+# 출력: bin/Release/HTool.1.1.22.nupkg
 ```
 
 ---
@@ -157,7 +157,7 @@ htool.ReceiveError += (reason, param) => {
 };
 
 // 장치 연결 (IP주소, 포트, 장치ID)
-if (htool.Connect("192.168.1.100", 502, id: 0x01)) {
+if (htool.Connect("192.168.1.100", 5000, id: 0x01)) {
     Console.WriteLine("연결 시도 중...");
 }
 
@@ -503,7 +503,7 @@ var htool = new HTool.HTool(ComTypes.Tcp);
 // Keep-Alive 활성화 (유휴 시 3초마다 Info 요청)
 htool.EnableKeepAlive = true;
 
-htool.Connect("192.168.1.100", 502, 0x01);
+htool.Connect("192.168.1.100", 5000, 0x01);
 
 // 10초간 응답 없으면 자동 연결 해제
 ```
@@ -674,27 +674,27 @@ MessageQue.TryEnqueue(msg, EnqueueMode.AllowDuplicate);
 
 > **참고**: 이 클래스는 Gen.2 장치 전용입니다. 다른 세대 장치에서는 사용하지 마세요.
 
-| 필드                     | 타입     | 오프셋 | 크기  | 설명                      |
-|------------------------|--------|-----|-----|-------------------------|
-| SystemInfo             | int    | 0   | 2   | 시스템 정보 (예약)             |
-| DriverId               | int    | 2   | 2   | 드라이버 ID (1-15)          |
-| DriverModelNumber      | int    | 4   | 2   | 드라이버 모델 번호              |
-| DriverModelName        | string | 6   | 32  | 드라이버 모델명 (ASCII)        |
-| DriverSerialNumber     | string | 38  | 10  | 드라이버 시리얼 번호             |
-| ControllerModelNumber  | int    | 48  | 2   | 컨트롤러 모델 번호              |
-| ControllerModelName    | string | 50  | 32  | 컨트롤러 모델명 (ASCII)        |
-| ControllerSerialNumber | string | 82  | 10  | 컨트롤러 시리얼 번호             |
-| FirmwareVersionMajor   | int    | 92  | 2   | 펌웨어 버전 Major            |
-| FirmwareVersionMinor   | int    | 94  | 2   | 펌웨어 버전 Minor            |
-| FirmwareVersionPatch   | int    | 96  | 2   | 펌웨어 버전 Patch            |
-| FirmwareVersion        | string | -   | -   | 펌웨어 버전 문자열 (계산됨)        |
-| ProductionDate         | uint   | 98  | 4   | 생산일 (YYYYMMDD)          |
-| AdvanceType            | int    | 102 | 2   | 어드밴스 타입 (0=Normal, 1=Plus) |
-| MacAddress             | byte[] | 104 | 6   | MAC 주소                  |
-| MacAddressString       | string | -   | -   | MAC 주소 문자열 (계산됨)        |
-| EventDataRevision      | int    | 110 | 2   | 이벤트 데이터 리비전             |
-| Manufacturer           | int    | 112 | 2   | 제조사 (1=Hantas, 2=Mountz) |
-| Reserved               | -      | 114 | 86  | 예약 영역                   |
+| 필드                     | 타입     | 오프셋 | 크기 | 설명                         |
+|------------------------|--------|-----|----|----------------------------|
+| SystemInfo             | int    | 0   | 2  | 시스템 정보 (예약)                |
+| DriverId               | int    | 2   | 2  | 드라이버 ID (1-15)             |
+| DriverModelNumber      | int    | 4   | 2  | 드라이버 모델 번호                 |
+| DriverModelName        | string | 6   | 32 | 드라이버 모델명 (ASCII)           |
+| DriverSerialNumber     | string | 38  | 10 | 드라이버 시리얼 번호                |
+| ControllerModelNumber  | int    | 48  | 2  | 컨트롤러 모델 번호                 |
+| ControllerModelName    | string | 50  | 32 | 컨트롤러 모델명 (ASCII)           |
+| ControllerSerialNumber | string | 82  | 10 | 컨트롤러 시리얼 번호                |
+| FirmwareVersionMajor   | int    | 92  | 2  | 펌웨어 버전 Major               |
+| FirmwareVersionMinor   | int    | 94  | 2  | 펌웨어 버전 Minor               |
+| FirmwareVersionPatch   | int    | 96  | 2  | 펌웨어 버전 Patch               |
+| FirmwareVersion        | string | -   | -  | 펌웨어 버전 문자열 (계산됨)           |
+| ProductionDate         | uint   | 98  | 4  | 생산일 (YYYYMMDD)             |
+| AdvanceType            | int    | 102 | 2  | 어드밴스 타입 (0=Normal, 1=Plus) |
+| MacAddress             | byte[] | 104 | 6  | MAC 주소                     |
+| MacAddressString       | string | -   | -  | MAC 주소 문자열 (계산됨)           |
+| EventDataRevision      | int    | 110 | 2  | 이벤트 데이터 리비전                |
+| Manufacturer           | int    | 112 | 2  | 제조사 (1=Hantas, 2=Mountz)   |
+| Reserved               | -      | 114 | 86 | 예약 영역                      |
 
 **총 크기**: 200 bytes (100 레지스터)
 
@@ -1031,12 +1031,12 @@ htool.ReceiveError += (reason, param) => {
 
 ```csharp
 // 체크리스트:
-// 1. IP 주소 및 포트 확인 (기본 MODBUS TCP: 502)
+// 1. IP 주소 및 포트 확인 (기본 HANTAS: 5000)
 // 2. 방화벽 설정 확인
 // 3. 같은 네트워크/VLAN인지 확인
 // 4. ping 테스트
 
-if (!htool.Connect("192.168.1.100", 502, 0x01)) {
+if (!htool.Connect("192.168.1.100", 5000, 0x01)) {
     Console.WriteLine("연결 시작 실패");
     // IP, 포트, 네트워크 설정 확인
 }
@@ -1173,8 +1173,8 @@ htool.ReceivedData += (code, addr, data) => {
 ### 1.1.22 - Current
 
 - FormatInfo 클래스 리팩토링
-  - 기존 FormatInfo → FormatSimpleInfo (레거시 프로토콜)
-  - 새 FormatInfo (Gen.2 Modbus 표준 프로토콜, 200 bytes)
+    - 기존 FormatInfo → FormatSimpleInfo (레거시 프로토콜)
+    - 새 FormatInfo (Gen.2 Modbus 표준 프로토콜, 200 bytes)
 - BinarySpanReader.ReadAsciiString 메서드 추가
 
 ### 1.1.21
@@ -1237,7 +1237,8 @@ SOFTWARE.
 
 - **회사**: HANTAS
 - **작성자**: Eloiz
-- **GitHub**: [https://github.com/KyungtackKim/HToolEx](https://github.com/KyungtackKim/HToolEx)
+- **GitHub
+  **: [https://github.com/KyungtackKim/HToolEx/tree/master/HTool](https://github.com/KyungtackKim/HToolEx/tree/master/HTool)
 - **이슈**: [GitHub Issues](https://github.com/KyungtackKim/HToolEx/issues)
 
 ---

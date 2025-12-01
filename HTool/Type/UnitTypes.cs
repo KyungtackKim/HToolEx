@@ -3,6 +3,7 @@
 namespace HTool.Type;
 
 /// <summary>
+///     토크 단위 타입
 ///     Torque unit types
 /// </summary>
 public enum UnitTypes {

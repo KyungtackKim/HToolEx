@@ -3,13 +3,14 @@
 namespace HTool.Type;
 
 /// <summary>
-///     Connection types
+///     장치 연결 상태 열거형. Close (닫힘) → Connecting (연결 중) → Connected (연결됨) 순서로 전환됩니다.
+///     Device connection state enum. Transitions: Close (closed) → Connecting (connecting) → Connected (connected).
 /// </summary>
 public enum ConnectionTypes {
-    [Description("Closed")]
+    [Description("닫힘 / Closed")]
     Close,
-    [Description("Connecting")]
+    [Description("연결 중 / Connecting")]
     Connecting,
-    [Description("Connected")]
+    [Description("연결됨 / Connected")]
     Connected
 }

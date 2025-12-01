@@ -3,6 +3,7 @@
 namespace HTool.Type;
 
 /// <summary>
+///     그래프 스텝 타입
 ///     Graph step types
 /// </summary>
 public enum GraphStepTypes {

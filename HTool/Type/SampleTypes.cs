@@ -3,6 +3,7 @@
 namespace HTool.Type;
 
 /// <summary>
+///     샘플링 시간 타입
 ///     Sample time types
 /// </summary>
 public enum SampleTypes {

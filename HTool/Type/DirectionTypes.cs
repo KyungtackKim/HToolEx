@@ -3,7 +3,8 @@
 namespace HTool.Type;
 
 /// <summary>
-///     Motor direction types
+///     모터 회전 방향 타입
+///     Motor rotation direction types
 /// </summary>
 public enum DirectionTypes {
     [Description("Fastening")]

@@ -4,7 +4,7 @@ A comprehensive C# library for MODBUS communication with HANTAS industrial torqu
 
 HANTAS 산업용 토크 툴 및 컨트롤러를 위한 MODBUS 통신 C# 라이브러리
 
-[![NuGet](https://img.shields.io/badge/nuget-v1.1.21-blue)](https://www.nuget.org/packages/HTool)
+[![NuGet](https://img.shields.io/badge/nuget-v1.1.22-blue)](https://www.nuget.org/packages/HTool)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue)](https://www.microsoft.com/windows)
@@ -28,7 +28,7 @@ Complete English documentation with detailed API reference, examples, and usage 
 ## Quick Links
 
 - **NuGet Package**: [HTool on NuGet](https://www.nuget.org/packages/HTool)
-- **GitHub Repository**: [HToolEx](https://github.com/KyungtackKim/HToolEx)
+- **GitHub Repository**: [HToolEx/HTool](https://github.com/KyungtackKim/HToolEx/tree/master/HTool)
 - **Issues**: [GitHub Issues](https://github.com/KyungtackKim/HToolEx/issues)
 
 ---
@@ -58,7 +58,7 @@ htool.ChangedConnect += (connected) => {
 };
 
 // Connect to device
-htool.Connect("192.168.1.100", 502, id: 0x01);
+htool.Connect("192.168.1.100", 5000, id: 0x01);
 ```
 
 For more details, please refer to the full documentation in your preferred language.

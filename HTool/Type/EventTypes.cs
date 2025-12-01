@@ -3,7 +3,8 @@
 namespace HTool.Type;
 
 /// <summary>
-///     Event status types
+///     체결 작업 이벤트 종류 열거형. FormatEvent에서 발생한 이벤트 유형(OK, NG, 오류 등)을 나타냅니다.
+///     Fastening operation event type enum. Represents event type (OK, NG, error, etc.) from FormatEvent.
 /// </summary>
 public enum EventTypes {
     [Description("Etc.")]
@@ -29,6 +30,7 @@ public enum EventTypes {
 }
 
 /// <summary>
+///     이벤트 상태 플래그 타입
 ///     Event status flag types
 /// </summary>
 [Flags]

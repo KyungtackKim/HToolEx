@@ -9,33 +9,50 @@ using Timer = System.Timers.Timer;
 namespace HTool;
 
 /// <summary>
-///     HTool library class
+///     HTool 라이브러리의 메인 클래스. HANTAS 토크 도구와의 MODBUS 통신을 관리하는 고수준 API를 제공합니다.
+///     Main class of HTool library. Provides high-level API for managing MODBUS communication with HANTAS torque tools.
 /// </summary>
+/// <remarks>
+///     <para>주요 기능 / Key Features:</para>
+///     <list type="bullet">
+///         <item>MODBUS RTU/TCP 프로토콜 지원 / Supports MODBUS RTU/TCP protocols</item>
+///         <item>자동 메시지 큐 관리 및 중복 방지 / Automatic message queue management with duplicate prevention</item>
+///         <item>대용량 레지스터 읽기/쓰기 자동 분할 (125/123 레지스터) / Auto-splits large read/write operations (125/123 registers)</item>
+///         <item>타임아웃 및 자동 재시도 / Timeout and automatic retry</item>
+///         <item>Keep-Alive 메커니즘 (3초 주기, 10초 타임아웃) / Keep-Alive mechanism (3s period, 10s timeout)</item>
+///         <item>이벤트 기반 비동기 통신 / Event-driven asynchronous communication</item>
+///     </list>
+/// </remarks>
 public sealed class HTool {
     /// <summary>
-    ///     Changed connection state delegate
+    ///     연결 상태 변경 델리게이트
+    ///     Connection state changed delegate
     /// </summary>
-    /// <param name="state">Connection state (true: connected, false: disconnected)</param>
+    /// <param name="state">연결 상태 (true: 연결됨, false: 연결 해제) / connection state (true: connected, false: disconnected)</param>
     public delegate void PerformChangedConnect(bool state);
 
     /// <summary>
-    ///     Received raw data delegate
+    ///     원시 데이터 수신 델리게이트
+    ///     Raw data received delegate
     /// </summary>
-    /// <param name="data">Raw packet data</param>
+    /// <param name="data">원시 패킷 데이터 / raw packet data</param>
     public delegate void PerformRawData(byte[] data);
 
     /// <summary>
-    ///     Received data delegate
+    ///     파싱된 데이터 수신 델리게이트
+    ///     Parsed data received delegate
     /// </summary>
-    /// <param name="codeTypes">MODBUS function code</param>
-    /// <param name="addr">Register address</param>
-    /// <param name="data">Received data</param>
+    /// <param name="codeTypes">MODBUS 함수 코드 / MODBUS function code</param>
+    /// <param name="addr">레지스터 주소 / register address</param>
+    /// <param name="data">수신 데이터 / received data</param>
     public delegate void PerformReceivedData(CodeTypes codeTypes, int addr, IReceivedData data);
 
     /// <summary>
-    ///     Constructor
+    ///     기본 생성자
+    ///     Default constructor
     /// </summary>
     public HTool() {
+        // 타이머 옵션 설정
         // set timer option
         ProcessTimer.Interval  =  Constants.ProcessPeriod;
         ProcessTimer.AutoReset =  true;
@@ -43,154 +60,228 @@ public sealed class HTool {
     }
 
     /// <summary>
-    ///     Constructor
+    ///     통신 타입을 지정하는 생성자
+    ///     Constructor with communication type
     /// </summary>
-    /// <param name="type">type</param>
+    /// <param name="type">통신 타입 (RTU 또는 TCP) / communication type (RTU or TCP)</param>
     public HTool(ComTypes type) : this() {
+        // 통신 타입 설정
         // set the communication type
         SetType(type);
     }
 
+    /// <summary>
+    ///     통신 도구 인스턴스
+    ///     Communication tool instance
+    /// </summary>
     private ITool? Tool { get; set; }
+
+    /// <summary>
+    ///     메시지 큐 처리 타이머. 20ms 주기로 큐에서 메시지를 추출하여 전송하고 타임아웃을 관리합니다.
+    ///     Message queue processing timer. Extracts and sends messages from queue every 20ms, manages timeouts.
+    /// </summary>
+    /// <remarks>
+    ///     ProcessTimer는 메시지 전송, 타임아웃 확인, 재시도, Keep-Alive 등의 핵심 기능을 담당합니다.
+    ///     ProcessTimer handles core functions: message transmission, timeout checking, retry, and keep-alive.
+    /// </remarks>
     private Timer ProcessTimer { get; } = new();
 
+    /// <summary>
+    ///     메시지 전송 큐. 중복 방지 기능이 있는 KeyedQueue를 사용하여 동일 주소/함수 코드 메시지가 큐에 중복 추가되지 않도록 합니다.
+    ///     Message transmission queue. Uses KeyedQueue with duplicate prevention to avoid adding duplicate messages with same
+    ///     address/function code.
+    /// </summary>
+    /// <remarks>
+    ///     최대 64개 메시지 저장 가능. 메시지 키는 (FunctionCode, Address)로 구성되어 중복을 식별합니다.
+    ///     Capacity of 64 messages. Message key consists of (FunctionCode, Address) to identify duplicates.
+    /// </remarks>
     private KeyedQueue<FormatMessage, FormatMessage.MessageKey> MessageQue { get; } =
         KeyedQueue<FormatMessage, FormatMessage.MessageKey>.Create(static m => m.Key, capacity: 64);
 
+    /// <summary>
+    ///     연결 시작 시간
+    ///     Connection start time
+    /// </summary>
     private DateTime ConnectionTime { get; set; }
+
+    /// <summary>
+    ///     마지막 Keep-Alive 요청 시간
+    ///     Last keep-alive request time
+    /// </summary>
     private DateTime KeepAliveRequestTime { get; set; } = DateTime.Now;
+
+    /// <summary>
+    ///     마지막 Keep-Alive 응답 수신 시간
+    ///     Last keep-alive response received time
+    /// </summary>
     private DateTime KeepAliveTime { get; set; } = DateTime.Now;
 
     /// <summary>
-    ///     Communication type
+    ///     통신 타입 (RTU 또는 TCP)
+    ///     Communication type (RTU or TCP)
     /// </summary>
     public ComTypes Type { get; private set; }
 
     /// <summary>
+    ///     연결 상태
     ///     Connection state
     /// </summary>
     public ConnectionTypes ConnectionState { get; set; }
 
     /// <summary>
-    ///     Communication tool generation type
+    ///     도구 프로토콜 세대 (Gen.1, Gen.2 등)
+    ///     Tool protocol generation (Gen.1, Gen.2, etc.)
     /// </summary>
     public GenerationTypes Gen { get; private set; } = GenerationTypes.GenRev2;
 
     /// <summary>
-    ///     Device information
+    ///     장치 기본 정보
+    ///     Device basic information
     /// </summary>
     public FormatSimpleInfo Info { get; private set; } = new();
 
     /// <summary>
-    ///     Enable for keep alive
+    ///     Keep-Alive 기능 활성화 여부. 활성화 시 3초마다 장치 정보 요청을 보내 연결을 유지하고, 10초 응답 없으면 자동 종료합니다.
+    ///     Keep-Alive feature enabled flag. When enabled, sends device info request every 3s to maintain connection,
+    ///     auto-disconnects after 10s no response.
     /// </summary>
+    /// <remarks>
+    ///     장기 연결 모니터링 애플리케이션에 권장. 짧은 작업에는 불필요한 트래픽을 유발할 수 있습니다.
+    ///     Recommended for long-running monitoring applications. May cause unnecessary traffic for short operations.
+    /// </remarks>
     public bool EnableKeepAlive { get; set; }
 
     /// <summary>
-    ///     Read max register count
+    ///     한 번에 읽을 수 있는 최대 레지스터 수. MODBUS 프로토콜 제약사항으로 인한 제한값입니다.
+    ///     Maximum register count for single read operation. Limited by MODBUS protocol constraints.
     /// </summary>
+    /// <remarks>
+    ///     이 값을 초과하는 읽기 요청은 자동으로 여러 메시지로 분할됩니다.
+    ///     Read requests exceeding this value are automatically split into multiple messages.
+    /// </remarks>
     public static int ReadRegMaxSize => 125;
 
     /// <summary>
-    ///     Write max register count
+    ///     한 번에 쓸 수 있는 최대 레지스터 수. MODBUS 프로토콜 제약사항으로 인한 제한값입니다.
+    ///     Maximum register count for single write operation. Limited by MODBUS protocol constraints.
     /// </summary>
+    /// <remarks>
+    ///     이 값을 초과하는 쓰기 요청은 자동으로 여러 메시지로 분할됩니다.
+    ///     Write requests exceeding this value are automatically split into multiple messages.
+    /// </remarks>
     public static int WriteRegMaxSize => 123;
 
     /// <summary>
-    ///     Changed connection state event
+    ///     연결 상태 변경 이벤트
+    ///     Connection state changed event
     /// </summary>
     public event PerformChangedConnect? ChangedConnect;
 
     /// <summary>
-    ///     Received message data event
+    ///     파싱된 데이터 수신 이벤트
+    ///     Parsed data received event
     /// </summary>
     public event PerformReceivedData? ReceivedData;
 
     /// <summary>
-    ///     Received message data error event
+    ///     수신 오류 이벤트
+    ///     Receive error event
     /// </summary>
     public event ITool.PerformReceiveError? ReceiveError;
 
     /// <summary>
-    ///     Received raw data event
+    ///     원시 데이터 수신 이벤트
+    ///     Raw data received event
     /// </summary>
     public event PerformRawData? ReceivedRawData;
 
     /// <summary>
-    ///     Transmitted raw data event
+    ///     원시 데이터 전송 이벤트
+    ///     Raw data transmitted event
     /// </summary>
     public event PerformRawData? TransmitRawData;
 
     /// <summary>
+    ///     통신 타입 설정
     ///     Set the communication type
     /// </summary>
-    /// <param name="type">Communication type (RTU or TCP)</param>
+    /// <param name="type">통신 타입 (RTU 또는 TCP) / communication type (RTU or TCP)</param>
     public void SetType(ComTypes type) {
-        // check communication tool
+        // 기존 통신 도구 확인
+        // check existing communication tool
         if (Tool != null) {
-            // check connection state
+            // 연결 중이면 변경 불가
+            // cannot change while connected
             if (ConnectionState == ConnectionTypes.Connected)
                 return;
-            // reset event
+            // 이벤트 해제
+            // unsubscribe events
             Tool.ChangedConnect -= OnChangedConnect;
             Tool.ReceivedData   -= OnReceivedData;
             Tool.ReceivedRaw    -= OnReceivedRaw;
             Tool.TransmitRaw    -= OnTransmitRaw;
+            // 도구 해제
             // dispose tool
             Tool = null;
         }
 
-        // try catch
         try {
+            // 통신 타입 설정
             // set communication type
             Type = type;
+            // 통신 도구 생성
             // create communication tool
             Tool = Device.Tool.Create(type);
-            // check tool
+            // 도구 생성 확인
+            // check tool creation
             if (Tool == null)
-                // exception for tool
                 throw new Exception("Unable to create a Tool communication object.");
-            // set event
+            // 이벤트 등록
+            // subscribe events
             Tool.ChangedConnect += OnChangedConnect;
         } catch (Exception e) {
-            // console
             Console.WriteLine(e.Message);
         }
     }
 
     /// <summary>
+    ///     장치에 연결
     ///     Connect to the device
     /// </summary>
-    /// <param name="target">target</param>
-    /// <param name="option">option</param>
-    /// <param name="id">id</param>
-    /// <returns>result</returns>
+    /// <param name="target">대상 (COM 포트 또는 IP 주소) / target (COM port or IP address)</param>
+    /// <param name="option">옵션 (보드레이트 또는 포트) / option (baud rate or port)</param>
+    /// <param name="id">장치 ID / device ID</param>
+    /// <returns>연결 성공 여부 / connection success result</returns>
     public bool Connect(string target, int option, byte id = 0x01) {
-        // try catch
         try {
-            // check communication
+            // 통신 도구 확인
+            // check communication tool
             if (Tool == null)
                 return false;
-            // connect
+            // 연결 시도
+            // attempt connection
             if (!Tool.Connect(target, option, id))
                 return false;
+            // 메시지 큐 초기화
             // clear message queue
             MessageQue.Clear();
-            // change connection state
+            // 연결 중 상태로 변경
+            // change to connecting state
             ConnectionState = ConnectionTypes.Connecting;
-            // set connection time
+            // 연결 시작 시간 기록
+            // record connection start time
             ConnectionTime = DateTime.Now;
-            // set event
+            // 이벤트 등록
+            // subscribe events
             Tool.ReceivedData  += OnReceivedData;
             Tool.ReceivedError += OnReceivedError;
             Tool.ReceivedRaw   += OnReceivedRaw;
             Tool.TransmitRaw   += OnTransmitRaw;
+            // 처리 타이머 시작
             // start process timer
             ProcessTimer.Start();
-            // result
             return true;
         } catch (Exception ex) {
-            // debug
             Console.WriteLine(ex.Message);
         }
 
@@ -198,186 +289,232 @@ public sealed class HTool {
     }
 
     /// <summary>
-    ///     Close the device
+    ///     장치 연결 해제
+    ///     Close the device connection
     /// </summary>
     public void Close() {
+        // 타이머 정지
         // stop timer
         ProcessTimer.Stop();
+        // 통신 도구 확인
         // check communication tool
         if (Tool == null)
             return;
-        // reset information
+        // 장치 정보 초기화
+        // reset device information
         Info = new FormatSimpleInfo();
-        // reset event
+        // 이벤트 해제
+        // unsubscribe events
         Tool.ReceivedData  -= OnReceivedData;
         Tool.ReceivedError -= OnReceivedError;
         Tool.ReceivedRaw   -= OnReceivedRaw;
         Tool.TransmitRaw   -= OnTransmitRaw;
-        // close
+        // 연결 종료
+        // close connection
         Tool.Close();
     }
 
     /// <summary>
-    ///     Insert message at the message
+    ///     메시지 큐에 단일 메시지 추가
+    ///     Insert single message to queue
     /// </summary>
-    /// <param name="msg">message</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="msg">메시지 / message</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>추가 성공 여부 / insert success result</returns>
     private bool Insert(FormatMessage msg, bool check = true) {
-        // get the unique check option
+        // 중복 확인 모드 설정
+        // set duplicate check mode
         var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
-        // try enqueue
+        // 큐에 추가
+        // enqueue message
         return MessageQue.TryEnqueue(msg, mode);
     }
 
     /// <summary>
-    ///     Insert messages at the message
+    ///     메시지 큐에 여러 메시지 추가
+    ///     Insert multiple messages to queue
     /// </summary>
-    /// <param name="messages">messages</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="messages">메시지 목록 / message list</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>추가 성공 여부 / insert success result</returns>
     private bool InsertRange(IReadOnlyList<FormatMessage> messages, bool check = true) {
-        // get the unique check option
+        // 중복 확인 모드 설정
+        // set duplicate check mode
         var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
-        // try enqueue the messages
+        // 큐에 추가
+        // enqueue messages
         return MessageQue.TryEnqueueRange(messages, mode).Accepted > 0;
     }
 
     /// <summary>
-    ///     Read holding register
+    ///     홀딩 레지스터 읽기 (MODBUS 함수 코드 0x03)
+    ///     Read holding registers (MODBUS function code 0x03)
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="count">count</param>
-    /// <param name="split">split address count</param>
-    /// <param name="check">check the duplicate</param>
-    /// <returns>result</returns>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="count">읽을 레지스터 수 / register count to read</param>
+    /// <param name="split">분할 단위 (0=자동) / split size (0=auto)</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool ReadHoldingReg(ushort addr, ushort count, int split = 0, bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
-        // check the count
+        // 개수 확인
+        // check count
         if (count == 0)
             return true;
 
         var address = addr;
+        // 분할 단위 확인
         // check split count
         if (split <= 0)
-            // set max split count
             split = ReadRegMaxSize;
-        // get block
+        // 블록 수 계산
+        // calculate block count
         var block = (count + split - 1) / split;
-        // create the messages
+        // 메시지 목록 생성
+        // create message list
         var messages = new List<FormatMessage>(block);
-        // check block count
+        // 블록별 메시지 생성
+        // create message for each block
         for (var i = 0; i < block; i++) {
-            // get the remaining
+            // 남은 수량 계산
+            // calculate remaining count
             var remaining = count - i * split;
-            // get the request count
+            // 요청 수량 결정
+            // determine request count
             var request = (ushort)Math.Min(split, remaining);
+            // 메시지 추가
             // add message
             messages.Add(new FormatMessage(CodeTypes.ReadHoldingReg, address, Tool.GetReadHoldingRegPacket(address, request)));
-            // update the address
+            // 주소 갱신
+            // update address
             address += request;
         }
 
+        // 메시지 삽입
         // insert messages
         return InsertRange(messages, check);
     }
 
     /// <summary>
-    ///     Read input register
+    ///     입력 레지스터 읽기 (MODBUS 함수 코드 0x04)
+    ///     Read input registers (MODBUS function code 0x04)
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="count">count</param>
-    /// <param name="split">split address count</param>
-    /// <param name="check">check the duplicate</param>
-    /// <returns>result</returns>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="count">읽을 레지스터 수 / register count to read</param>
+    /// <param name="split">분할 단위 (0=자동) / split size (0=auto)</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool ReadInputReg(ushort addr, ushort count, int split = 0, bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
-        // check the count
+        // 개수 확인
+        // check count
         if (count == 0)
             return true;
 
         var address = addr;
+        // 분할 단위 확인
         // check split count
         if (split <= 0)
-            // set max split count
             split = ReadRegMaxSize;
-        // get block
+        // 블록 수 계산
+        // calculate block count
         var block = (count + split - 1) / split;
-        // create the messages
+        // 메시지 목록 생성
+        // create message list
         var messages = new List<FormatMessage>(block);
-        // check block count
+        // 블록별 메시지 생성
+        // create message for each block
         for (var i = 0; i < block; i++) {
-            // get the remaining
+            // 남은 수량 계산
+            // calculate remaining count
             var remaining = count - i * split;
-            // get the request count
+            // 요청 수량 결정
+            // determine request count
             var request = (ushort)Math.Min(split, remaining);
+            // 메시지 추가
             // add message
             messages.Add(new FormatMessage(CodeTypes.ReadInputReg, address, Tool.GetReadInputRegPacket(address, request)));
-            // update the address
+            // 주소 갱신
+            // update address
             address += request;
         }
 
+        // 메시지 삽입
         // insert messages
         return InsertRange(messages, check);
     }
 
     /// <summary>
-    ///     Write single register
+    ///     단일 레지스터 쓰기 (MODBUS 함수 코드 0x06)
+    ///     Write single register (MODBUS function code 0x06)
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="value">value</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="addr">레지스터 주소 / register address</param>
+    /// <param name="value">쓸 값 / value to write</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool WriteSingleReg(ushort addr, ushort value, bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
 
+        // 메시지 생성
         // create message
         var msg = new FormatMessage(CodeTypes.WriteSingleReg, addr, Tool.SetSingleRegPacket(addr, value));
+        // 메시지 삽입
         // insert message
         return Insert(msg, check);
     }
 
     /// <summary>
-    ///     Write multiple register
+    ///     다중 레지스터 쓰기 (MODBUS 함수 코드 0x10)
+    ///     Write multiple registers (MODBUS function code 0x10)
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="values">values</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="values">쓸 값 배열 / values array to write</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool WriteMultiReg(ushort addr, ushort[] values, bool check = true) {
         return WriteMultiReg(addr, values.AsSpan(), check);
     }
 
     /// <summary>
-    ///     Write multiple register
+    ///     다중 레지스터 쓰기 (MODBUS 함수 코드 0x10)
+    ///     Write multiple registers (MODBUS function code 0x10)
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="values">values</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="values">쓸 값 스팬 / values span to write</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool WriteMultiReg(ushort addr, ReadOnlySpan<ushort> values, bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
-        // check the values
+        // 값 배열 확인
+        // check values array
         if (values.Length == 0)
             return true;
 
@@ -385,104 +522,140 @@ public sealed class HTool {
         var total    = values.Length;
         var blocks   = (total + WriteRegMaxSize - 1) / WriteRegMaxSize;
         var messages = new List<FormatMessage>(blocks);
-        // check the offset
+        // 오프셋별 메시지 생성
+        // create message for each offset
         while (offset < total) {
-            // get the length
+            // 길이 계산
+            // calculate length
             var len = Math.Min(total - offset, WriteRegMaxSize);
-            // get the address
+            // 주소 계산
+            // calculate address
             var address = (ushort)(addr + offset);
-            // get the buf
+            // 버퍼 생성
+            // create buffer
             var buf = GC.AllocateUninitializedArray<ushort>(len);
-            // copy to the buf
+            // 버퍼에 복사
+            // copy to buffer
             values.Slice(offset, len).CopyTo(buf);
-            // get the packet
+            // 패킷 생성
+            // create packet
             var packet = Tool.SetMultiRegPacket(address, buf);
+            // 메시지 추가
             // add message
             messages.Add(new FormatMessage(CodeTypes.WriteMultiReg, address, packet));
 
-            // update the information
+            // 오프셋 갱신
+            // update offset
             offset += len;
         }
 
+        // 메시지 삽입
         // insert messages
         return InsertRange(messages, check);
     }
 
     /// <summary>
-    ///     Write string register
+    ///     문자열 레지스터 쓰기
+    ///     Write string to registers
     /// </summary>
-    /// <param name="addr">address</param>
-    /// <param name="str">string value</param>
-    /// <param name="length">length</param>
-    /// <param name="check">check contains for the message</param>
-    /// <returns>result</returns>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="str">문자열 값 / string value</param>
+    /// <param name="length">문자열 길이 (0=자동) / string length (0=auto)</param>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool WriteStrReg(ushort addr, string str, int length = 0, bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
 
-        // check length
+        // 길이 검증 및 조정
+        // validate and adjust length
         if (length < str.Length)
-            // set length
             length = str.Length;
+        // 메시지 생성
         // create message
         var msg = new FormatMessage(CodeTypes.WriteMultiReg, addr, Tool.SetMultiRegStrPacket(addr, str, length));
+        // 메시지 삽입
         // insert message
         return Insert(msg, check);
     }
 
     /// <summary>
-    ///     Read information register
+    ///     장치 정보 레지스터 읽기 (MODBUS 함수 코드 0x11)
+    ///     Read device information register (MODBUS function code 0x11)
     /// </summary>
-    /// <param name="check">Check the duplicate</param>
-    /// <returns>Result of the operation</returns>
+    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
+    /// <returns>요청 성공 여부 / request success result</returns>
     public bool ReadInfoReg(bool check = true) {
-        // check communication
+        // 통신 도구 확인
+        // check communication tool
         if (Tool == null)
             return false;
+        // 연결 상태 확인
         // check connection state
         if (ConnectionState != ConnectionTypes.Connected)
             return false;
 
+        // 메시지 생성
         // create message
         var msg = new FormatMessage(CodeTypes.ReadInfoReg, FormatMessage.EmptyAddr, Tool.GetInfoRegPacket());
+        // 메시지 삽입
         // insert message
         return Insert(msg, check);
     }
 
+    /// <summary>
+    ///     메시지 처리 타이머 이벤트 핸들러
+    ///     Message processing timer event handler
+    /// </summary>
+    /// <param name="sender">이벤트 발생 객체 / event sender</param>
+    /// <param name="e">타이머 이벤트 인자 / timer event args</param>
     private void OnElapsed(object? sender, ElapsedEventArgs e) {
+        // 통신 도구 확인
         // check communication tool
         if (Tool == null)
             return;
-        // check state
+        // 상태별 처리
+        // process by state
         switch (ConnectionState) {
             case ConnectionTypes.Connecting
                 when (DateTime.Now - ConnectionTime).TotalSeconds < Constants.ConnectTimeout:
+                // 정보 요청
                 // request information
                 Insert(new FormatMessage(CodeTypes.ReadInfoReg, FormatMessage.EmptyAddr, Tool.GetInfoRegPacket()));
                 break;
             case ConnectionTypes.Connecting:
-                // close
+                // 연결 종료
+                // close connection
                 Close();
                 break;
             case ConnectionTypes.Close:
             case ConnectionTypes.Connected:
-                // check enable for keep-alive
+                // Keep-Alive 활성화 확인
+                // check keep-alive enabled
                 if (EnableKeepAlive) {
-                    // check request keep-alive time laps
+                    // Keep-Alive 요청 시간 확인
+                    // check keep-alive request time
                     if ((DateTime.Now - KeepAliveRequestTime).TotalMilliseconds >= Constants.KeepAlivePeriod)
-                        // check the empty
+                        // 큐 비어있는지 확인
+                        // check queue empty
                         if (MessageQue.IsEmpty)
-                            // insert the keep alive message
+                            // Keep-Alive 메시지 삽입
+                            // insert keep-alive message
                             if (ReadInfoReg())
-                                // set keep alive time
+                                // Keep-Alive 시간 갱신
+                                // update keep-alive time
                                 KeepAliveRequestTime = DateTime.Now;
+                    // Keep-Alive 타임아웃 확인
                     // check keep-alive timeout
                     if ((DateTime.Now - KeepAliveTime).TotalSeconds >= Constants.KeepAliveTimeout)
-                        // disconnect for tool
+                        // 연결 종료
+                        // close connection
                         Close();
                 }
 
@@ -491,82 +664,118 @@ public sealed class HTool {
                 throw new ArgumentOutOfRangeException(string.Empty);
         }
 
-        // check the empty
+        // 큐 비어있는지 확인
+        // check queue empty
         if (MessageQue.IsEmpty)
             return;
-        // peek the message
+        // 메시지 조회
+        // peek message
         if (!MessageQue.TryPeek(out var msg))
             return;
-        // check activated state
+        // 활성화 상태 확인
+        // check activation state
         if (!msg.Activated) {
-            // get packet values
+            // 패킷 데이터 가져오기
+            // get packet data
             var packet = msg.Packet.ToArray();
-            // write packet
+            // 패킷 전송
+            // send packet
             if (!Tool.Write(packet, packet.Length))
                 return;
-            // set activate
+            // 메시지 활성화
+            // activate message
             msg.Activate();
-            // check the not check
+            // 응답 확인 안 함이면 종료
+            // exit if no check required
             if (!msg.NotCheck)
                 return;
         } else {
+            // 타임아웃 확인
             // check timeout
             if ((DateTime.Now - msg.ActiveTime).TotalMilliseconds < Constants.MessageTimeout)
                 return;
-            // deactivate message
+            // 메시지 비활성화 (재시도 가능)
+            // deactivate message (allows retry)
             if (msg.Deactivate() > 0)
                 return;
         }
 
-        // try dequeue (remove the message)
+        // 메시지 제거
+        // remove message
         MessageQue.TryDequeue(out _);
     }
 
+    /// <summary>
+    ///     연결 상태 변경 이벤트 핸들러
+    ///     Connection state changed event handler
+    /// </summary>
+    /// <param name="state">연결 상태 / connection state</param>
     private void OnChangedConnect(bool state) {
+        // Keep-Alive 시간 갱신
         // update keep-alive time
         KeepAliveRequestTime = DateTime.Now;
         KeepAliveTime        = DateTime.Now;
-        // check state
+        // 연결 상태 확인
+        // check connection state
         if (state)
             return;
+        // 상태 변경
         // change state
         ConnectionState = ConnectionTypes.Close;
-        // changed connection state event
+        // 연결 상태 변경 이벤트 발생
+        // raise connection state changed event
         ChangedConnect?.Invoke(false);
     }
 
+    /// <summary>
+    ///     데이터 수신 이벤트 핸들러
+    ///     Data received event handler
+    /// </summary>
+    /// <param name="code">함수 코드 / function code</param>
+    /// <param name="packet">패킷 데이터 / packet data</param>
     private void OnReceivedData(CodeTypes code, byte[] packet) {
+        // 통신 도구 확인
         // check communication tool
         if (Tool == null)
             return;
 
         var addr = FormatMessage.EmptyAddr;
-        // peek the message
+        // 메시지 조회
+        // peek message
         if (MessageQue.TryPeek(out var msg))
-            // check queue
+            // 활성화된 메시지 확인
+            // check activated message
             if (msg is { Activated: true })
-                // check code
+                // 코드 일치 확인
+                // check code match
                 if (code == msg.Code || code == CodeTypes.Error) {
+                    // 주소 설정
                     // set address
                     addr = msg.Address;
-                    // try dequeue
+                    // 메시지 제거
+                    // remove message
                     MessageQue.TryDequeue(out _);
                 }
 
-        // new message
+        // 수신 데이터 생성
+        // create received data
         IReceivedData? data = Type switch {
             ComTypes.Rtu => new HcRtuData(packet),
             ComTypes.Tcp => new HcTcpData(packet),
             _            => null
         };
 
-        // check read information register
+        // 장치 정보 읽기 응답 처리
+        // process device info read response
         if (code == CodeTypes.ReadInfoReg && data != null) {
-            // set information
+            // 장치 정보 설정
+            // set device information
             Info = new FormatSimpleInfo(data.Data);
-            // check connection state
+            // 연결 중 상태인 경우
+            // if connecting state
             if (ConnectionState == ConnectionTypes.Connecting) {
-                // set revision
+                // 프로토콜 세대 설정
+                // set protocol revision
                 Tool.Revision = Info.Firmware switch {
                     > (int)GenerationTypes.GenRev2                                  => GenerationTypes.GenRev2,
                     > (int)GenerationTypes.GenRev1Plus                              => GenerationTypes.GenRev1Plus,
@@ -574,37 +783,62 @@ public sealed class HTool {
                     _                                                               => GenerationTypes.GenRev1
                 };
                 Gen = Tool.Revision;
+                // 상태 변경
                 // change state
                 ConnectionState = ConnectionTypes.Connected;
-                // changed connection state event
+                // 연결 상태 변경 이벤트 발생
+                // raise connection state changed event
                 ChangedConnect?.Invoke(true);
             }
         }
 
+        // 수신 데이터 확인
         // check received data
         if (data == null)
             return;
-        // received data
+        // 수신 이벤트 발생
+        // raise receive event
         ReceivedData?.Invoke(code, addr, data);
-        // check enable the keep-alive
+        // Keep-Alive 활성화 확인
+        // check keep-alive enabled
         if (!EnableKeepAlive)
             return;
-        // update the keep alive time
+        // Keep-Alive 시간 갱신
+        // update keep-alive time
         KeepAliveTime = DateTime.Now;
     }
 
+    /// <summary>
+    ///     수신 오류 이벤트 핸들러
+    ///     Receive error event handler
+    /// </summary>
+    /// <param name="reason">오류 사유 / error reason</param>
+    /// <param name="param">추가 파라미터 / additional parameter</param>
     private void OnReceivedError(ComErrorTypes reason, object? param) {
-        // error event
+        // 오류 이벤트 발생
+        // raise error event
         ReceiveError?.Invoke(reason, param);
     }
 
+    /// <summary>
+    ///     원시 데이터 수신 이벤트 핸들러
+    ///     Raw data received event handler
+    /// </summary>
+    /// <param name="packet">패킷 데이터 / packet data</param>
     private void OnReceivedRaw(byte[] packet) {
-        // received event
+        // 수신 이벤트 발생
+        // raise receive event
         ReceivedRawData?.Invoke(packet);
     }
 
+    /// <summary>
+    ///     원시 데이터 전송 이벤트 핸들러
+    ///     Raw data transmit event handler
+    /// </summary>
+    /// <param name="packet">패킷 데이터 / packet data</param>
     private void OnTransmitRaw(byte[] packet) {
-        // transmit event
+        // 전송 이벤트 발생
+        // raise transmit event
         TransmitRawData?.Invoke(packet);
     }
 }
