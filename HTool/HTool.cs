@@ -79,7 +79,7 @@ public sealed class HTool {
     /// <summary>
     ///     Device information
     /// </summary>
-    public FormatInfo Info { get; private set; } = new();
+    public FormatSimpleInfo Info { get; private set; } = new();
 
     /// <summary>
     ///     Enable for keep alive
@@ -207,7 +207,7 @@ public sealed class HTool {
         if (Tool == null)
             return;
         // reset information
-        Info = new FormatInfo();
+        Info = new FormatSimpleInfo();
         // reset event
         Tool.ReceivedData  -= OnReceivedData;
         Tool.ReceivedError -= OnReceivedError;
@@ -563,7 +563,7 @@ public sealed class HTool {
         // check read information register
         if (code == CodeTypes.ReadInfoReg && data != null) {
             // set information
-            Info = new FormatInfo(data.Data);
+            Info = new FormatSimpleInfo(data.Data);
             // check connection state
             if (ConnectionState == ConnectionTypes.Connecting) {
                 // set revision

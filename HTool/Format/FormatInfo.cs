@@ -1,24 +1,36 @@
-﻿using System.ComponentModel;
-using HTool.Type;
+using System.ComponentModel;
 using HTool.Util;
 
 namespace HTool.Format;
 
 /// <summary>
-///     Device information format function class
+///     Device information format class (Modbus standard protocol)
 /// </summary>
+/// <remarks>
+///     This class is only for Gen.2 devices. Do not use for other device types.
+/// </remarks>
 public sealed class FormatInfo {
     /// <summary>
     ///     Constructor
     /// </summary>
     public FormatInfo() {
         // reset values
-        Id         = 0;
-        Controller = 0;
-        Driver     = 0;
-        Firmware   = 0;
-        Serial     = "0000000000";
-        Model      = 0;
+        SystemInfo             = 0;
+        DriverId               = 0;
+        DriverModelNumber      = 0;
+        DriverModelName        = string.Empty;
+        DriverSerialNumber     = string.Empty;
+        ControllerModelNumber  = 0;
+        ControllerModelName    = string.Empty;
+        ControllerSerialNumber = string.Empty;
+        FirmwareVersionMajor   = 0;
+        FirmwareVersionMinor   = 0;
+        FirmwareVersionPatch   = 0;
+        ProductionDate         = 0;
+        AdvanceType            = 0;
+        MacAddress             = new byte[6];
+        EventDataRevision      = 0;
+        Manufacturer           = 0;
     }
 
     /// <summary>
@@ -26,46 +38,46 @@ public sealed class FormatInfo {
     /// </summary>
     /// <param name="values">values</param>
     public FormatInfo(byte[] values) {
-        // check size
-        if (values.Length < Size)
-            return;
-
         // get span
         var span = values.AsSpan();
         var pos  = 0;
 
-        // get values
-        Id         = BinarySpanReader.ReadUInt16(span, ref pos);
-        Controller = BinarySpanReader.ReadUInt16(span, ref pos);
-        Driver     = BinarySpanReader.ReadUInt16(span, ref pos);
-        Firmware   = BinarySpanReader.ReadUInt16(span, ref pos);
-        // get serial raw values
-        var s = span.Slice(pos, 5);
-        pos += 5;
-        // set serial number
-        Serial = $"{s[^1]:D2}{s[^2]:D2}{s[^3]:D2}{s[^4]:D2}{s[^5]:D2}";
-        // check length (255255xx255255)
-        if (Serial.Length == 14)
-            // set default model code
-            Serial = $"0000{s[^3]:D2}0000";
-        // check position
-        if (pos <= span.Length - sizeof(uint))
-            // set used count
-            Used = BinarySpanReader.ReadUInt32(span, ref pos);
-        // check defined model
-        if (Enum.IsDefined(typeof(ModelTypes), Convert.ToInt32(Serial[4..6])))
-            // set model types
-            Model = (ModelTypes)Convert.ToInt32(Serial[4..6]);
-        else
-            // set default model type
-            Model = ModelTypes.Ad;
-        // check ad model type
-        if (Model == ModelTypes.Ad)
-            // skip the dummy data
-            pos += 1;
+        // skip system info (2 bytes)
+        SystemInfo = BinarySpanReader.ReadUInt16(span, ref pos);
+
+        // get driver info
+        DriverId           = BinarySpanReader.ReadUInt16(span, ref pos);
+        DriverModelNumber  = BinarySpanReader.ReadUInt16(span, ref pos);
+        DriverModelName    = BinarySpanReader.ReadAsciiString(span, ref pos, 32);
+        DriverSerialNumber = BinarySpanReader.ReadAsciiString(span, ref pos, 10);
+
+        // get controller info
+        ControllerModelNumber  = BinarySpanReader.ReadUInt16(span, ref pos);
+        ControllerModelName    = BinarySpanReader.ReadAsciiString(span, ref pos, 32);
+        ControllerSerialNumber = BinarySpanReader.ReadAsciiString(span, ref pos, 10);
+
+        // get firmware version
+        FirmwareVersionMajor = BinarySpanReader.ReadUInt16(span, ref pos);
+        FirmwareVersionMinor = BinarySpanReader.ReadUInt16(span, ref pos);
+        FirmwareVersionPatch = BinarySpanReader.ReadUInt16(span, ref pos);
+
+        // get production info
+        ProductionDate = BinarySpanReader.ReadUInt32(span, ref pos);
+        AdvanceType    = BinarySpanReader.ReadUInt16(span, ref pos);
+
+        // get mac address
+        MacAddress =  span.Slice(pos, 6).ToArray();
+        pos        += 6;
+
+        // get metadata
+        EventDataRevision = BinarySpanReader.ReadUInt16(span, ref pos);
+        Manufacturer      = BinarySpanReader.ReadUInt16(span, ref pos);
+
+        // skip reserved (86 bytes)
+        pos += 86;
 
         // get check sum
-        CheckSum = values.Sum(v => v);
+        CheckSum = Utils.CalculateCheckSum(span);
         // throw an error if not all data has been read
         if (pos != span.Length)
             // throw exception
@@ -76,42 +88,98 @@ public sealed class FormatInfo {
     /// <summary>
     ///     Information data size
     /// </summary>
-    public static int Size => 13;
+    public static int Size => 200;
 
     /// <summary>
-    ///     Device id
+    ///     System info (reserved)
     /// </summary>
-    public int Id { get; }
+    [Browsable(false)]
+    public int SystemInfo { get; }
 
     /// <summary>
-    ///     Controller model number
+    ///     Driver id
     /// </summary>
-    public int Controller { get; }
+    public int DriverId { get; }
 
     /// <summary>
     ///     Driver model number
     /// </summary>
-    public int Driver { get; }
+    public int DriverModelNumber { get; }
 
     /// <summary>
-    ///     Firmware version
+    ///     Driver model name
     /// </summary>
-    public int Firmware { get; }
+    public string DriverModelName { get; } = string.Empty;
 
     /// <summary>
-    ///     Serial number
+    ///     Driver serial number
     /// </summary>
-    public string Serial { get; } = string.Empty;
+    public string DriverSerialNumber { get; } = string.Empty;
 
     /// <summary>
-    ///     Used count
+    ///     Controller model number
     /// </summary>
-    public uint Used { get; }
+    public int ControllerModelNumber { get; }
 
     /// <summary>
-    ///     Model types
+    ///     Controller model name
     /// </summary>
-    public ModelTypes Model { get; }
+    public string ControllerModelName { get; } = string.Empty;
+
+    /// <summary>
+    ///     Controller serial number
+    /// </summary>
+    public string ControllerSerialNumber { get; } = string.Empty;
+
+    /// <summary>
+    ///     Firmware version major
+    /// </summary>
+    public int FirmwareVersionMajor { get; }
+
+    /// <summary>
+    ///     Firmware version minor
+    /// </summary>
+    public int FirmwareVersionMinor { get; }
+
+    /// <summary>
+    ///     Firmware version patch
+    /// </summary>
+    public int FirmwareVersionPatch { get; }
+
+    /// <summary>
+    ///     Firmware version string
+    /// </summary>
+    public string FirmwareVersion => $"{FirmwareVersionMajor}.{FirmwareVersionMinor}.{FirmwareVersionPatch}";
+
+    /// <summary>
+    ///     Production date (YYYYMMDD)
+    /// </summary>
+    public uint ProductionDate { get; }
+
+    /// <summary>
+    ///     Advance type (0=Normal, 1=Plus)
+    /// </summary>
+    public int AdvanceType { get; }
+
+    /// <summary>
+    ///     Mac address bytes
+    /// </summary>
+    public byte[] MacAddress { get; } = new byte[6];
+
+    /// <summary>
+    ///     Mac address string (xx:xx:xx:xx:xx:xx)
+    /// </summary>
+    public string MacAddressString => string.Join(":", MacAddress.Select(b => b.ToString("X2")));
+
+    /// <summary>
+    ///     Event data revision
+    /// </summary>
+    public int EventDataRevision { get; }
+
+    /// <summary>
+    ///     Manufacturer (1=Hantas, 2=Mountz)
+    /// </summary>
+    public int Manufacturer { get; }
 
     /// <summary>
     ///     Check sum

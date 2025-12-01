@@ -36,30 +36,36 @@ A comprehensive C# library for MODBUS communication with HANTAS industrial torqu
 
 ## Overview
 
-**HTool** is a comprehensive C# library providing MODBUS RTU/TCP communication capabilities for HANTAS torque tools and controllers. It features an event-driven architecture with automatic message queuing, register auto-splitting, and thread-safe operations, making it easy to integrate HANTAS devices into your .NET applications.
+**HTool** is a comprehensive C# library providing MODBUS RTU/TCP communication capabilities for HANTAS torque tools and
+controllers. It features an event-driven architecture with automatic message queuing, register auto-splitting, and
+thread-safe operations, making it easy to integrate HANTAS devices into your .NET applications.
 
 ---
 
 ## Key Features
 
 ### Communication
+
 - **Dual Protocol Support**: MODBUS RTU (serial) and MODBUS TCP/IP
 - **Automatic Connection Management**: Connection state tracking and auto-reconnect support
 - **Keep-Alive Mechanism**: Automatic connection monitoring (3-second interval)
 
 ### Message Processing
+
 - **Thread-Safe Message Queue**: Duplicate prevention and retry logic via `KeyedQueue`
 - **Smart Register Operations**: Automatic chunking for large read/write operations
-  - Max read: 125 registers/request
-  - Max write: 123 registers/request
+    - Max read: 125 registers/request
+    - Max write: 123 registers/request
 
 ### Data Parsing
+
 - **Automatic Device Info Parsing**: Model, serial, firmware, generation info
 - **Status Data**: Real-time torque, speed, current, alarm, etc.
 - **Event Data**: Fastening results, barcode, graph steps
 - **Graph Data**: Torque/angle graph collection
 
 ### Debugging
+
 - **Raw Packet Monitoring**: Real-time TX/RX packet inspection
 - **Error Events**: Detailed error information
 
@@ -67,19 +73,19 @@ A comprehensive C# library for MODBUS communication with HANTAS industrial torqu
 
 ## System Requirements
 
-| Item | Requirement |
-|------|------------|
-| **.NET** | 8.0 or later |
-| **OS** | Windows 10.0.17763.0 or later |
-| **RTU Communication** | Available COM port |
-| **TCP Communication** | Network access to device |
+| Item                  | Requirement                   |
+|-----------------------|-------------------------------|
+| **.NET**              | 8.0 or later                  |
+| **OS**                | Windows 10.0.17763.0 or later |
+| **RTU Communication** | Available COM port            |
+| **TCP Communication** | Network access to device      |
 
 ### Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| [SuperSimpleTcp](https://www.nuget.org/packages/SuperSimpleTcp) | 3.0.20 | TCP socket communication |
-| [System.IO.Ports](https://www.nuget.org/packages/System.IO.Ports) | 10.0.0 | Serial port communication (RS-232/RS-485) |
+| Package                                                           | Version | Purpose                                   |
+|-------------------------------------------------------------------|---------|-------------------------------------------|
+| [SuperSimpleTcp](https://www.nuget.org/packages/SuperSimpleTcp)   | 3.0.20  | TCP socket communication                  |
+| [System.IO.Ports](https://www.nuget.org/packages/System.IO.Ports) | 10.0.0  | Serial port communication (RS-232/RS-485) |
 
 ---
 
@@ -205,20 +211,20 @@ public HTool(ComTypes type)
 
 #### Properties
 
-| Property | Type | Description | Default |
-|----------|------|-------------|---------|
-| `Type` | `ComTypes` | Communication type (RTU/TCP) | - |
-| `ConnectionState` | `ConnectionTypes` | Current connection state | `Close` |
-| `Info` | `FormatInfo` | Device information (after connection) | Empty instance |
-| `Gen` | `GenerationTypes` | Device generation/revision | `GenRev2` |
-| `EnableKeepAlive` | `bool` | Enable keep-alive | `false` |
+| Property          | Type              | Description                           | Default        |
+|-------------------|-------------------|---------------------------------------|----------------|
+| `Type`            | `ComTypes`        | Communication type (RTU/TCP)          | -              |
+| `ConnectionState` | `ConnectionTypes` | Current connection state              | `Close`        |
+| `Info`            | `FormatInfo`      | Device information (after connection) | Empty instance |
+| `Gen`             | `GenerationTypes` | Device generation/revision            | `GenRev2`      |
+| `EnableKeepAlive` | `bool`            | Enable keep-alive                     | `false`        |
 
 #### Static Properties
 
-| Property | Type | Value | Description |
-|----------|------|-------|-------------|
-| `ReadRegMaxSize` | `int` | 125 | Max registers per read |
-| `WriteRegMaxSize` | `int` | 123 | Max registers per write |
+| Property          | Type  | Value | Description             |
+|-------------------|-------|-------|-------------------------|
+| `ReadRegMaxSize`  | `int` | 125   | Max registers per read  |
+| `WriteRegMaxSize` | `int` | 123   | Max registers per write |
 
 #### Methods
 
@@ -372,6 +378,7 @@ htool.ChangedConnect += (connected) => {
 ```
 
 **Connection Flow:**
+
 1. `Connect()` called → `ConnectionState = Connecting`
 2. Library automatically sends `ReadInfoReg()` request
 3. Device info received → `ConnectionState = Connected` → `ChangedConnect(true)` fired
@@ -650,89 +657,119 @@ MessageQue.TryEnqueue(msg, EnqueueMode.AllowDuplicate);
 
 ## Data Formats
 
-### FormatInfo - Device Information
+### FormatSimpleInfo - Device Information (Legacy Protocol)
 
-| Field | Type | Size | Description |
-|-------|------|------|-------------|
-| Id | int | 2 | Device ID |
-| Controller | int | 2 | Controller model number |
-| Driver | int | 2 | Driver model number |
-| Firmware | int | 2 | Firmware version |
-| Serial | string | 5 | Serial number (10-char string) |
-| Used | uint | 4 | Usage count |
-| Model | ModelTypes | - | Model type (extracted from serial) |
+> **Note**: This class is for Gen.1/1+ legacy protocol.
+
+| Field      | Type       | Size | Description                        |
+|------------|------------|------|------------------------------------|
+| Id         | int        | 2    | Device ID                          |
+| Controller | int        | 2    | Controller model number            |
+| Driver     | int        | 2    | Driver model number                |
+| Firmware   | int        | 2    | Firmware version                   |
+| Serial     | string     | 5    | Serial number (10-char string)     |
+| Used       | uint       | 4    | Usage count                        |
+| Model      | ModelTypes | -    | Model type (extracted from serial) |
+
+### FormatInfo - Device Information (Gen.2 Modbus Standard Protocol)
+
+> **Note**: This class is only for Gen.2 devices. Do not use for other device types.
+
+| Field                  | Type   | Offset | Size | Description                         |
+|------------------------|--------|--------|------|-------------------------------------|
+| SystemInfo             | int    | 0      | 2    | System info (reserved)              |
+| DriverId               | int    | 2      | 2    | Driver ID (1-15)                    |
+| DriverModelNumber      | int    | 4      | 2    | Driver model number                 |
+| DriverModelName        | string | 6      | 32   | Driver model name (ASCII)           |
+| DriverSerialNumber     | string | 38     | 10   | Driver serial number                |
+| ControllerModelNumber  | int    | 48     | 2    | Controller model number             |
+| ControllerModelName    | string | 50     | 32   | Controller model name (ASCII)       |
+| ControllerSerialNumber | string | 82     | 10   | Controller serial number            |
+| FirmwareVersionMajor   | int    | 92     | 2    | Firmware version Major              |
+| FirmwareVersionMinor   | int    | 94     | 2    | Firmware version Minor              |
+| FirmwareVersionPatch   | int    | 96     | 2    | Firmware version Patch              |
+| FirmwareVersion        | string | -      | -    | Firmware version string (computed)  |
+| ProductionDate         | uint   | 98     | 4    | Production date (YYYYMMDD)          |
+| AdvanceType            | int    | 102    | 2    | Advance type (0=Normal, 1=Plus)     |
+| MacAddress             | byte[] | 104    | 6    | MAC address                         |
+| MacAddressString       | string | -      | -    | MAC address string (computed)       |
+| EventDataRevision      | int    | 110    | 2    | Event data revision                 |
+| Manufacturer           | int    | 112    | 2    | Manufacturer (1=Hantas, 2=Mountz)   |
+| Reserved               | -      | 114    | 86   | Reserved area                       |
+
+**Total Size**: 200 bytes (100 registers)
 
 ### FormatStatus - Status Data
 
-| Field | Gen.1/1+ | Gen.2 | Description |
-|-------|----------|-------|-------------|
-| Torque | ushort | float | Current torque |
-| Speed | ushort | ushort | Current speed (RPM) |
-| Current | ushort | float | Current (A) |
-| Preset | ushort | ushort | Selected preset |
-| Model | - | ushort | Selected model |
-| TorqueUp | bool | bool | Torque up state |
-| FastenOk | bool | bool | Fasten OK state |
-| Ready | bool | bool | Ready state |
-| Run | bool | bool | Running state |
-| Alarm | ushort | ushort | Alarm code |
-| Direction | DirectionTypes | DirectionTypes | Fastening direction |
-| RemainScrew | ushort | ushort | Remaining screws |
-| Input | bool[16] | bool[16] | Input signals |
-| Output | bool[16] | bool[16] | Output signals |
-| Temperature | ushort | float | Temperature |
-| IsLock | - | bool | Lock state |
+| Field       | Gen.1/1+       | Gen.2          | Description         |
+|-------------|----------------|----------------|---------------------|
+| Torque      | ushort         | float          | Current torque      |
+| Speed       | ushort         | ushort         | Current speed (RPM) |
+| Current     | ushort         | float          | Current (A)         |
+| Preset      | ushort         | ushort         | Selected preset     |
+| Model       | -              | ushort         | Selected model      |
+| TorqueUp    | bool           | bool           | Torque up state     |
+| FastenOk    | bool           | bool           | Fasten OK state     |
+| Ready       | bool           | bool           | Ready state         |
+| Run         | bool           | bool           | Running state       |
+| Alarm       | ushort         | ushort         | Alarm code          |
+| Direction   | DirectionTypes | DirectionTypes | Fastening direction |
+| RemainScrew | ushort         | ushort         | Remaining screws    |
+| Input       | bool[16]       | bool[16]       | Input signals       |
+| Output      | bool[16]       | bool[16]       | Output signals      |
+| Temperature | ushort         | float          | Temperature         |
+| IsLock      | -              | bool           | Lock state          |
 
 ### FormatEvent - Event Data
 
 **Gen.1/1+ Common Fields:**
 
-| Field | Description |
-|-------|-------------|
-| Id | Event ID |
-| FastenTime | Fastening time (ms) |
-| Preset | Preset number |
-| TargetTorque | Target torque |
-| Torque | Measured torque |
-| Speed | Speed |
-| Angle1, Angle2, Angle | Angle values |
-| RemainScrew | Remaining screws |
-| Error | Error code |
-| Direction | Fastening direction |
-| Event | Event status |
-| SnugAngle | Snug angle |
-| Barcode | Barcode (64 bytes) |
+| Field                 | Description         |
+|-----------------------|---------------------|
+| Id                    | Event ID            |
+| FastenTime            | Fastening time (ms) |
+| Preset                | Preset number       |
+| TargetTorque          | Target torque       |
+| Torque                | Measured torque     |
+| Speed                 | Speed               |
+| Angle1, Angle2, Angle | Angle values        |
+| RemainScrew           | Remaining screws    |
+| Error                 | Error code          |
+| Direction             | Fastening direction |
+| Event                 | Event status        |
+| SnugAngle             | Snug angle          |
+| Barcode               | Barcode (64 bytes)  |
 
 **Gen.1+ Additional Fields:**
 
-| Field | Description |
-|-------|-------------|
-| SeatingTorque | Seating torque |
-| ClampTorque | Clamp torque |
+| Field            | Description       |
+|------------------|-------------------|
+| SeatingTorque    | Seating torque    |
+| ClampTorque      | Clamp torque      |
 | PrevailingTorque | Prevailing torque |
-| SnugTorque | Snug torque |
+| SnugTorque       | Snug torque       |
 
 **Gen.2 Additional Fields:**
 
-| Field | Description |
-|-------|-------------|
-| Revision | Event format revision |
-| Date/Time | Fastening date/time (with ms) |
-| Unit | Torque unit |
-| TypeOfChannel1/2 | Graph channel type |
-| CountOfChannel1/2 | Graph point count |
-| SamplingRate | Sampling rate |
-| GraphSteps[16] | Graph step information |
+| Field             | Description                   |
+|-------------------|-------------------------------|
+| Revision          | Event format revision         |
+| Date/Time         | Fastening date/time (with ms) |
+| Unit              | Torque unit                   |
+| TypeOfChannel1/2  | Graph channel type            |
+| CountOfChannel1/2 | Graph point count             |
+| SamplingRate      | Sampling rate                 |
+| GraphSteps[16]    | Graph step information        |
 
 ### FormatGraph - Graph Data
 
-| Field | Type | Description |
-|-------|------|-------------|
-| Type | GenerationTypes | Generation type |
-| Channel | int | Channel number |
-| Count | int | Data point count |
-| Values | float[] | Graph value array |
-| CheckSum | int | Checksum |
+| Field    | Type            | Description       |
+|----------|-----------------|-------------------|
+| Type     | GenerationTypes | Generation type   |
+| Channel  | int             | Channel number    |
+| Count    | int             | Data point count  |
+| Values   | float[]         | Graph value array |
+| CheckSum | int             | Checksum          |
 
 ---
 
@@ -755,6 +792,7 @@ long l = BinarySpanReader.ReadInt64(span, ref pos);
 ulong ul = BinarySpanReader.ReadUInt64(span, ref pos);
 float f = BinarySpanReader.ReadSingle(span, ref pos);
 double d = BinarySpanReader.ReadDouble(span, ref pos);
+string str = BinarySpanReader.ReadAsciiString(span, ref pos, 32);  // ASCII string (null/space trimmed)
 
 // Read without position (from first byte)
 ushort value = BinarySpanReader.ReadUInt16(span);
@@ -884,17 +922,17 @@ Utils.Swap(list, sourceIndex, destIndex);
 
 ### Function Codes
 
-| Code | Value | Description | Type |
-|------|-------|-------------|------|
-| `ReadHoldingReg` | 0x03 | Read Holding Registers | Standard |
-| `ReadInputReg` | 0x04 | Read Input Registers | Standard |
-| `WriteSingleReg` | 0x06 | Write Single Register | Standard |
-| `WriteMultiReg` | 0x10 | Write Multiple Registers | Standard |
-| `ReadInfoReg` | 0x11 | Read Device Information | HANTAS |
-| `Graph` | 0x64 | Graph Data | HANTAS |
-| `GraphRes` | 0x65 | Graph Result | HANTAS |
-| `HighResGraph` | 0x66 | High Resolution Graph | HANTAS |
-| `Error` | 0x80 | Error Response | Standard |
+| Code             | Value | Description              | Type     |
+|------------------|-------|--------------------------|----------|
+| `ReadHoldingReg` | 0x03  | Read Holding Registers   | Standard |
+| `ReadInputReg`   | 0x04  | Read Input Registers     | Standard |
+| `WriteSingleReg` | 0x06  | Write Single Register    | Standard |
+| `WriteMultiReg`  | 0x10  | Write Multiple Registers | Standard |
+| `ReadInfoReg`    | 0x11  | Read Device Information  | HANTAS   |
+| `Graph`          | 0x64  | Graph Data               | HANTAS   |
+| `GraphRes`       | 0x65  | Graph Result             | HANTAS   |
+| `HighResGraph`   | 0x66  | High Resolution Graph    | HANTAS   |
+| `Error`          | 0x80  | Error Response           | Standard |
 
 ### RTU Frame Structure
 
@@ -914,15 +952,15 @@ Utils.Swap(list, sourceIndex, destIndex);
 
 ### Error Codes
 
-| Error | Value | Description |
-|-------|-------|-------------|
-| `InvalidFunction` | 0x01 | Unsupported Function Code |
-| `InvalidAddress` | 0x02 | Invalid register address |
-| `InvalidValue` | 0x03 | Invalid data value |
-| `InvalidCrc` | 0x07 | CRC checksum error (RTU) |
-| `InvalidFrame` | 0x0C | Malformed frame |
-| `InvalidValueRange` | 0x0E | Value out of range |
-| `Timeout` | 0x0F | Request timeout |
+| Error               | Value | Description               |
+|---------------------|-------|---------------------------|
+| `InvalidFunction`   | 0x01  | Unsupported Function Code |
+| `InvalidAddress`    | 0x02  | Invalid register address  |
+| `InvalidValue`      | 0x03  | Invalid data value        |
+| `InvalidCrc`        | 0x07  | CRC checksum error (RTU)  |
+| `InvalidFrame`      | 0x0C  | Malformed frame           |
+| `InvalidValueRange` | 0x0E  | Value out of range        |
+| `Timeout`           | 0x0F  | Request timeout           |
 
 ### Error Handling Example
 
@@ -967,24 +1005,24 @@ htool.ReceiveError += (reason, param) => {
 
 Constants defined in `HTool.Util.Constants` class:
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `BarcodeLength` | 64 | Barcode field length |
-| `BaudRates` | [9600, 19200, 38400, 57600, 115200, 230400] | Supported baud rates |
-| `ProcessPeriod` | 20ms | Message processing interval |
-| `ProcessLockTime` | 2ms | Processing lock timeout |
-| `ProcessTimeout` | 500ms | Processing timeout |
-| `ConnectTimeout` | 5000ms | Connection timeout |
-| `MessageTimeout` | 1000ms | Message timeout |
-| `KeepAlivePeriod` | 3000ms | Keep-alive request interval |
-| `KeepAliveTimeout` | 10s | Keep-alive timeout |
+| Constant           | Value                                       | Description                 |
+|--------------------|---------------------------------------------|-----------------------------|
+| `BarcodeLength`    | 64                                          | Barcode field length        |
+| `BaudRates`        | [9600, 19200, 38400, 57600, 115200, 230400] | Supported baud rates        |
+| `ProcessPeriod`    | 20ms                                        | Message processing interval |
+| `ProcessLockTime`  | 2ms                                         | Processing lock timeout     |
+| `ProcessTimeout`   | 500ms                                       | Processing timeout          |
+| `ConnectTimeout`   | 5000ms                                      | Connection timeout          |
+| `MessageTimeout`   | 1000ms                                      | Message timeout             |
+| `KeepAlivePeriod`  | 3000ms                                      | Keep-alive request interval |
+| `KeepAliveTimeout` | 10s                                         | Keep-alive timeout          |
 
 **HTool Class Constants:**
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `ReadRegMaxSize` | 125 | Max registers per read request |
-| `WriteRegMaxSize` | 123 | Max registers per write request |
+| Constant          | Value | Description                     |
+|-------------------|-------|---------------------------------|
+| `ReadRegMaxSize`  | 125   | Max registers per read request  |
+| `WriteRegMaxSize` | 123   | Max registers per write request |
 
 ---
 
@@ -1065,6 +1103,7 @@ bool SendWithRetry(ushort addr, ushort count) {
 ### No Data Received
 
 1. Check connection state:
+
 ```csharp
 if (htool.ConnectionState != ConnectionTypes.Connected) {
     Console.WriteLine("Not connected");
@@ -1073,6 +1112,7 @@ if (htool.ConnectionState != ConnectionTypes.Connected) {
 ```
 
 2. Monitor traffic with raw packet monitoring:
+
 ```csharp
 htool.TransmitRawData += (p) => Console.WriteLine($"TX: {BitConverter.ToString(p)}");
 htool.ReceivedRawData += (p) => Console.WriteLine($"RX: {BitConverter.ToString(p)}");
@@ -1131,7 +1171,14 @@ htool.ReceivedData += (code, addr, data) => {
 
 ## Version History
 
-### 1.1.21 - Current
+### 1.1.22 - Current
+
+- FormatInfo class refactoring
+  - Existing FormatInfo → FormatSimpleInfo (legacy protocol)
+  - New FormatInfo (Gen.2 Modbus standard protocol, 200 bytes)
+- Added BinarySpanReader.ReadAsciiString method
+
+### 1.1.21
 
 - Added BinarySpanReader (replaces BinaryReaderBigEndian)
 - Improved XML comments and fixed errors

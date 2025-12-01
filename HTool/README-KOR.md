@@ -36,30 +36,35 @@ HANTAS 산업용 토크 툴 및 컨트롤러를 위한 MODBUS 통신 C# 라이�
 
 ## 개요
 
-**HTool**은 HANTAS 토크 툴 및 컨트롤러와 MODBUS RTU/TCP 통신을 위한 종합적인 C# 라이브러리입니다. 이벤트 기반 아키텍처와 자동 메시지 큐잉, 레지스터 자동 분할, 스레드 안전 연산 기능을 제공하여 .NET 애플리케이션에 HANTAS 장비를 쉽게 통합할 수 있습니다.
+**HTool**은 HANTAS 토크 툴 및 컨트롤러와 MODBUS RTU/TCP 통신을 위한 종합적인 C# 라이브러리입니다. 이벤트 기반 아키텍처와 자동 메시지 큐잉, 레지스터 자동 분할, 스레드 안전 연산 기능을
+제공하여 .NET 애플리케이션에 HANTAS 장비를 쉽게 통합할 수 있습니다.
 
 ---
 
 ## 주요 기능
 
 ### 통신
+
 - **듀얼 프로토콜 지원**: MODBUS RTU (시리얼) 및 MODBUS TCP/IP
 - **자동 연결 관리**: 연결 상태 추적 및 자동 재연결 지원
 - **Keep-Alive 메커니즘**: 연결 상태 자동 모니터링 (3초 주기)
 
 ### 메시지 처리
+
 - **스레드 안전 메시지 큐**: `KeyedQueue`를 통한 중복 방지 및 재시도 로직
 - **스마트 레지스터 연산**: 대용량 읽기/쓰기 시 자동 청크 분할
-  - 최대 읽기: 125 레지스터/요청
-  - 최대 쓰기: 123 레지스터/요청
+    - 최대 읽기: 125 레지스터/요청
+    - 최대 쓰기: 123 레지스터/요청
 
 ### 데이터 파싱
+
 - **장치 정보 자동 파싱**: 모델, 시리얼, 펌웨어, 세대 정보
 - **상태 데이터**: 실시간 토크, 속도, 전류, 알람 등
 - **이벤트 데이터**: 체결 결과, 바코드, 그래프 스텝
 - **그래프 데이터**: 토크/각도 그래프 수집
 
 ### 디버깅
+
 - **Raw 패킷 모니터링**: TX/RX 패킷 실시간 확인
 - **에러 이벤트**: 상세한 에러 정보 제공
 
@@ -67,18 +72,18 @@ HANTAS 산업용 토크 툴 및 컨트롤러를 위한 MODBUS 통신 C# 라이�
 
 ## 시스템 요구사항
 
-| 항목 | 요구사항 |
-|-----|---------|
-| **.NET** | 8.0 이상 |
-| **OS** | Windows 10.0.17763.0 이상 |
-| **RTU 통신** | 사용 가능한 COM 포트 |
-| **TCP 통신** | 장치 네트워크 접근 |
+| 항목         | 요구사항                    |
+|------------|-------------------------|
+| **.NET**   | 8.0 이상                  |
+| **OS**     | Windows 10.0.17763.0 이상 |
+| **RTU 통신** | 사용 가능한 COM 포트           |
+| **TCP 통신** | 장치 네트워크 접근              |
 
 ### 의존성
 
-| 패키지 | 버전 | 용도 |
-|-------|------|------|
-| [SuperSimpleTcp](https://www.nuget.org/packages/SuperSimpleTcp) | 3.0.20 | TCP 소켓 통신 |
+| 패키지                                                               | 버전     | 용도                        |
+|-------------------------------------------------------------------|--------|---------------------------|
+| [SuperSimpleTcp](https://www.nuget.org/packages/SuperSimpleTcp)   | 3.0.20 | TCP 소켓 통신                 |
 | [System.IO.Ports](https://www.nuget.org/packages/System.IO.Ports) | 10.0.0 | 시리얼 포트 통신 (RS-232/RS-485) |
 
 ---
@@ -205,19 +210,19 @@ public HTool(ComTypes type)
 
 #### 속성
 
-| 속성 | 타입 | 설명 | 기본값 |
-|-----|------|------|-------|
-| `Type` | `ComTypes` | 통신 타입 (RTU/TCP) | - |
-| `ConnectionState` | `ConnectionTypes` | 현재 연결 상태 | `Close` |
-| `Info` | `FormatInfo` | 장치 정보 (연결 후) | 빈 인스턴스 |
-| `Gen` | `GenerationTypes` | 장치 세대/리비전 | `GenRev2` |
-| `EnableKeepAlive` | `bool` | Keep-Alive 활성화 | `false` |
+| 속성                | 타입                | 설명              | 기본값       |
+|-------------------|-------------------|-----------------|-----------|
+| `Type`            | `ComTypes`        | 통신 타입 (RTU/TCP) | -         |
+| `ConnectionState` | `ConnectionTypes` | 현재 연결 상태        | `Close`   |
+| `Info`            | `FormatInfo`      | 장치 정보 (연결 후)    | 빈 인스턴스    |
+| `Gen`             | `GenerationTypes` | 장치 세대/리비전       | `GenRev2` |
+| `EnableKeepAlive` | `bool`            | Keep-Alive 활성화  | `false`   |
 
 #### 정적 속성
 
-| 속성 | 타입 | 값 | 설명 |
-|-----|------|---|------|
-| `ReadRegMaxSize` | `int` | 125 | 최대 읽기 레지스터 수 |
+| 속성                | 타입    | 값   | 설명           |
+|-------------------|-------|-----|--------------|
+| `ReadRegMaxSize`  | `int` | 125 | 최대 읽기 레지스터 수 |
 | `WriteRegMaxSize` | `int` | 123 | 최대 쓰기 레지스터 수 |
 
 #### 메서드
@@ -372,6 +377,7 @@ htool.ChangedConnect += (connected) => {
 ```
 
 **연결 흐름:**
+
 1. `Connect()` 호출 → `ConnectionState = Connecting`
 2. 라이브러리가 자동으로 `ReadInfoReg()` 요청 전송
 3. 장치 정보 수신 → `ConnectionState = Connected` → `ChangedConnect(true)` 발생
@@ -650,89 +656,119 @@ MessageQue.TryEnqueue(msg, EnqueueMode.AllowDuplicate);
 
 ## 데이터 포맷
 
-### FormatInfo - 장치 정보
+### FormatSimpleInfo - 장치 정보 (레거시 프로토콜)
 
-| 필드 | 타입 | 크기 | 설명 |
-|-----|------|-----|------|
-| Id | int | 2 | 장치 ID |
-| Controller | int | 2 | 컨트롤러 모델 번호 |
-| Driver | int | 2 | 드라이버 모델 번호 |
-| Firmware | int | 2 | 펌웨어 버전 |
-| Serial | string | 5 | 시리얼 번호 (10자리 문자열) |
-| Used | uint | 4 | 사용 횟수 |
-| Model | ModelTypes | - | 모델 타입 (시리얼에서 추출) |
+> **참고**: 이 클래스는 Gen.1/1+ 레거시 프로토콜용입니다.
+
+| 필드         | 타입         | 크기 | 설명                |
+|------------|------------|----|-------------------|
+| Id         | int        | 2  | 장치 ID             |
+| Controller | int        | 2  | 컨트롤러 모델 번호        |
+| Driver     | int        | 2  | 드라이버 모델 번호        |
+| Firmware   | int        | 2  | 펌웨어 버전            |
+| Serial     | string     | 5  | 시리얼 번호 (10자리 문자열) |
+| Used       | uint       | 4  | 사용 횟수             |
+| Model      | ModelTypes | -  | 모델 타입 (시리얼에서 추출)  |
+
+### FormatInfo - 장치 정보 (Gen.2 Modbus 표준 프로토콜)
+
+> **참고**: 이 클래스는 Gen.2 장치 전용입니다. 다른 세대 장치에서는 사용하지 마세요.
+
+| 필드                     | 타입     | 오프셋 | 크기  | 설명                      |
+|------------------------|--------|-----|-----|-------------------------|
+| SystemInfo             | int    | 0   | 2   | 시스템 정보 (예약)             |
+| DriverId               | int    | 2   | 2   | 드라이버 ID (1-15)          |
+| DriverModelNumber      | int    | 4   | 2   | 드라이버 모델 번호              |
+| DriverModelName        | string | 6   | 32  | 드라이버 모델명 (ASCII)        |
+| DriverSerialNumber     | string | 38  | 10  | 드라이버 시리얼 번호             |
+| ControllerModelNumber  | int    | 48  | 2   | 컨트롤러 모델 번호              |
+| ControllerModelName    | string | 50  | 32  | 컨트롤러 모델명 (ASCII)        |
+| ControllerSerialNumber | string | 82  | 10  | 컨트롤러 시리얼 번호             |
+| FirmwareVersionMajor   | int    | 92  | 2   | 펌웨어 버전 Major            |
+| FirmwareVersionMinor   | int    | 94  | 2   | 펌웨어 버전 Minor            |
+| FirmwareVersionPatch   | int    | 96  | 2   | 펌웨어 버전 Patch            |
+| FirmwareVersion        | string | -   | -   | 펌웨어 버전 문자열 (계산됨)        |
+| ProductionDate         | uint   | 98  | 4   | 생산일 (YYYYMMDD)          |
+| AdvanceType            | int    | 102 | 2   | 어드밴스 타입 (0=Normal, 1=Plus) |
+| MacAddress             | byte[] | 104 | 6   | MAC 주소                  |
+| MacAddressString       | string | -   | -   | MAC 주소 문자열 (계산됨)        |
+| EventDataRevision      | int    | 110 | 2   | 이벤트 데이터 리비전             |
+| Manufacturer           | int    | 112 | 2   | 제조사 (1=Hantas, 2=Mountz) |
+| Reserved               | -      | 114 | 86  | 예약 영역                   |
+
+**총 크기**: 200 bytes (100 레지스터)
 
 ### FormatStatus - 상태 데이터
 
-| 필드 | Gen.1/1+ | Gen.2 | 설명 |
-|-----|---------|-------|------|
-| Torque | ushort | float | 현재 토크 |
-| Speed | ushort | ushort | 현재 속도 (RPM) |
-| Current | ushort | float | 현재 전류 |
-| Preset | ushort | ushort | 선택된 프리셋 |
-| Model | - | ushort | 선택된 모델 |
-| TorqueUp | bool | bool | 토크업 상태 |
-| FastenOk | bool | bool | 체결 OK 상태 |
-| Ready | bool | bool | 준비 상태 |
-| Run | bool | bool | 동작 상태 |
-| Alarm | ushort | ushort | 알람 코드 |
-| Direction | DirectionTypes | DirectionTypes | 체결 방향 |
-| RemainScrew | ushort | ushort | 남은 스크류 수 |
-| Input | bool[16] | bool[16] | 입력 신호 |
-| Output | bool[16] | bool[16] | 출력 신호 |
-| Temperature | ushort | float | 온도 |
-| IsLock | - | bool | 잠금 상태 |
+| 필드          | Gen.1/1+       | Gen.2          | 설명          |
+|-------------|----------------|----------------|-------------|
+| Torque      | ushort         | float          | 현재 토크       |
+| Speed       | ushort         | ushort         | 현재 속도 (RPM) |
+| Current     | ushort         | float          | 현재 전류       |
+| Preset      | ushort         | ushort         | 선택된 프리셋     |
+| Model       | -              | ushort         | 선택된 모델      |
+| TorqueUp    | bool           | bool           | 토크업 상태      |
+| FastenOk    | bool           | bool           | 체결 OK 상태    |
+| Ready       | bool           | bool           | 준비 상태       |
+| Run         | bool           | bool           | 동작 상태       |
+| Alarm       | ushort         | ushort         | 알람 코드       |
+| Direction   | DirectionTypes | DirectionTypes | 체결 방향       |
+| RemainScrew | ushort         | ushort         | 남은 스크류 수    |
+| Input       | bool[16]       | bool[16]       | 입력 신호       |
+| Output      | bool[16]       | bool[16]       | 출력 신호       |
+| Temperature | ushort         | float          | 온도          |
+| IsLock      | -              | bool           | 잠금 상태       |
 
 ### FormatEvent - 이벤트 데이터
 
 **Gen.1/1+ 공통 필드:**
 
-| 필드 | 설명 |
-|-----|------|
-| Id | 이벤트 ID |
-| FastenTime | 체결 시간 (ms) |
-| Preset | 프리셋 번호 |
-| TargetTorque | 목표 토크 |
-| Torque | 측정 토크 |
-| Speed | 속도 |
-| Angle1, Angle2, Angle | 각도 값 |
-| RemainScrew | 남은 스크류 |
-| Error | 에러 코드 |
-| Direction | 체결 방향 |
-| Event | 이벤트 상태 |
-| SnugAngle | 스너그 각도 |
-| Barcode | 바코드 (64바이트) |
+| 필드                    | 설명          |
+|-----------------------|-------------|
+| Id                    | 이벤트 ID      |
+| FastenTime            | 체결 시간 (ms)  |
+| Preset                | 프리셋 번호      |
+| TargetTorque          | 목표 토크       |
+| Torque                | 측정 토크       |
+| Speed                 | 속도          |
+| Angle1, Angle2, Angle | 각도 값        |
+| RemainScrew           | 남은 스크류      |
+| Error                 | 에러 코드       |
+| Direction             | 체결 방향       |
+| Event                 | 이벤트 상태      |
+| SnugAngle             | 스너그 각도      |
+| Barcode               | 바코드 (64바이트) |
 
 **Gen.1+ 추가 필드:**
 
-| 필드 | 설명 |
-|-----|------|
-| SeatingTorque | 시팅 토크 |
-| ClampTorque | 클램프 토크 |
+| 필드               | 설명       |
+|------------------|----------|
+| SeatingTorque    | 시팅 토크    |
+| ClampTorque      | 클램프 토크   |
 | PrevailingTorque | 프리베일링 토크 |
-| SnugTorque | 스너그 토크 |
+| SnugTorque       | 스너그 토크   |
 
 **Gen.2 추가 필드:**
 
-| 필드 | 설명 |
-|-----|------|
-| Revision | 이벤트 포맷 리비전 |
-| Date/Time | 체결 일시 (ms 포함) |
-| Unit | 토크 단위 |
-| TypeOfChannel1/2 | 그래프 채널 타입 |
-| CountOfChannel1/2 | 그래프 포인트 수 |
-| SamplingRate | 샘플링 레이트 |
-| GraphSteps[16] | 그래프 스텝 정보 |
+| 필드                | 설명            |
+|-------------------|---------------|
+| Revision          | 이벤트 포맷 리비전    |
+| Date/Time         | 체결 일시 (ms 포함) |
+| Unit              | 토크 단위         |
+| TypeOfChannel1/2  | 그래프 채널 타입     |
+| CountOfChannel1/2 | 그래프 포인트 수     |
+| SamplingRate      | 샘플링 레이트       |
+| GraphSteps[16]    | 그래프 스텝 정보     |
 
 ### FormatGraph - 그래프 데이터
 
-| 필드 | 타입 | 설명 |
-|-----|------|------|
-| Type | GenerationTypes | 세대 타입 |
-| Channel | int | 채널 번호 |
-| Count | int | 데이터 포인트 수 |
-| Values | float[] | 그래프 값 배열 |
-| CheckSum | int | 체크섬 |
+| 필드       | 타입              | 설명        |
+|----------|-----------------|-----------|
+| Type     | GenerationTypes | 세대 타입     |
+| Channel  | int             | 채널 번호     |
+| Count    | int             | 데이터 포인트 수 |
+| Values   | float[]         | 그래프 값 배열  |
+| CheckSum | int             | 체크섬       |
 
 ---
 
@@ -755,6 +791,7 @@ long l = BinarySpanReader.ReadInt64(span, ref pos);
 ulong ul = BinarySpanReader.ReadUInt64(span, ref pos);
 float f = BinarySpanReader.ReadSingle(span, ref pos);
 double d = BinarySpanReader.ReadDouble(span, ref pos);
+string str = BinarySpanReader.ReadAsciiString(span, ref pos, 32);  // ASCII 문자열 (null/공백 trim)
 
 // 위치 없이 읽기 (첫 바이트부터)
 ushort value = BinarySpanReader.ReadUInt16(span);
@@ -884,17 +921,17 @@ Utils.Swap(list, sourceIndex, destIndex);
 
 ### Function Code
 
-| 코드 | 값 | 설명 | 타입 |
-|-----|---|------|-----|
-| `ReadHoldingReg` | 0x03 | Holding 레지스터 읽기 | 표준 |
-| `ReadInputReg` | 0x04 | Input 레지스터 읽기 | 표준 |
-| `WriteSingleReg` | 0x06 | 단일 레지스터 쓰기 | 표준 |
-| `WriteMultiReg` | 0x10 | 다중 레지스터 쓰기 | 표준 |
-| `ReadInfoReg` | 0x11 | 장치 정보 읽기 | HANTAS |
-| `Graph` | 0x64 | 그래프 데이터 | HANTAS |
-| `GraphRes` | 0x65 | 그래프 결과 | HANTAS |
-| `HighResGraph` | 0x66 | 고해상도 그래프 | HANTAS |
-| `Error` | 0x80 | 에러 응답 | 표준 |
+| 코드               | 값    | 설명              | 타입     |
+|------------------|------|-----------------|--------|
+| `ReadHoldingReg` | 0x03 | Holding 레지스터 읽기 | 표준     |
+| `ReadInputReg`   | 0x04 | Input 레지스터 읽기   | 표준     |
+| `WriteSingleReg` | 0x06 | 단일 레지스터 쓰기      | 표준     |
+| `WriteMultiReg`  | 0x10 | 다중 레지스터 쓰기      | 표준     |
+| `ReadInfoReg`    | 0x11 | 장치 정보 읽기        | HANTAS |
+| `Graph`          | 0x64 | 그래프 데이터         | HANTAS |
+| `GraphRes`       | 0x65 | 그래프 결과          | HANTAS |
+| `HighResGraph`   | 0x66 | 고해상도 그래프        | HANTAS |
+| `Error`          | 0x80 | 에러 응답           | 표준     |
 
 ### RTU 프레임 구조
 
@@ -914,15 +951,15 @@ Utils.Swap(list, sourceIndex, destIndex);
 
 ### 에러 코드
 
-| 에러 | 값 | 설명 |
-|-----|---|------|
-| `InvalidFunction` | 0x01 | 지원하지 않는 Function Code |
-| `InvalidAddress` | 0x02 | 유효하지 않은 레지스터 주소 |
-| `InvalidValue` | 0x03 | 유효하지 않은 데이터 값 |
-| `InvalidCrc` | 0x07 | CRC 체크섬 오류 (RTU) |
-| `InvalidFrame` | 0x0C | 잘못된 프레임 형식 |
-| `InvalidValueRange` | 0x0E | 값 범위 초과 |
-| `Timeout` | 0x0F | 요청 타임아웃 |
+| 에러                  | 값    | 설명                    |
+|---------------------|------|-----------------------|
+| `InvalidFunction`   | 0x01 | 지원하지 않는 Function Code |
+| `InvalidAddress`    | 0x02 | 유효하지 않은 레지스터 주소       |
+| `InvalidValue`      | 0x03 | 유효하지 않은 데이터 값         |
+| `InvalidCrc`        | 0x07 | CRC 체크섬 오류 (RTU)      |
+| `InvalidFrame`      | 0x0C | 잘못된 프레임 형식            |
+| `InvalidValueRange` | 0x0E | 값 범위 초과               |
+| `Timeout`           | 0x0F | 요청 타임아웃               |
 
 ### 에러 처리 예제
 
@@ -967,23 +1004,23 @@ htool.ReceiveError += (reason, param) => {
 
 `HTool.Util.Constants` 클래스에 정의된 상수들:
 
-| 상수 | 값 | 설명 |
-|-----|---|------|
-| `BarcodeLength` | 64 | 바코드 필드 길이 |
-| `BaudRates` | [9600, 19200, 38400, 57600, 115200, 230400] | 지원 보드레이트 |
-| `ProcessPeriod` | 20ms | 메시지 처리 주기 |
-| `ProcessLockTime` | 2ms | 처리 락 타임아웃 |
-| `ProcessTimeout` | 500ms | 처리 타임아웃 |
-| `ConnectTimeout` | 5000ms | 연결 타임아웃 |
-| `MessageTimeout` | 1000ms | 메시지 타임아웃 |
-| `KeepAlivePeriod` | 3000ms | Keep-Alive 요청 주기 |
-| `KeepAliveTimeout` | 10s | Keep-Alive 타임아웃 |
+| 상수                 | 값                                           | 설명               |
+|--------------------|---------------------------------------------|------------------|
+| `BarcodeLength`    | 64                                          | 바코드 필드 길이        |
+| `BaudRates`        | [9600, 19200, 38400, 57600, 115200, 230400] | 지원 보드레이트         |
+| `ProcessPeriod`    | 20ms                                        | 메시지 처리 주기        |
+| `ProcessLockTime`  | 2ms                                         | 처리 락 타임아웃        |
+| `ProcessTimeout`   | 500ms                                       | 처리 타임아웃          |
+| `ConnectTimeout`   | 5000ms                                      | 연결 타임아웃          |
+| `MessageTimeout`   | 1000ms                                      | 메시지 타임아웃         |
+| `KeepAlivePeriod`  | 3000ms                                      | Keep-Alive 요청 주기 |
+| `KeepAliveTimeout` | 10s                                         | Keep-Alive 타임아웃  |
 
 **HTool 클래스 상수:**
 
-| 상수 | 값 | 설명 |
-|-----|---|------|
-| `ReadRegMaxSize` | 125 | 요청당 최대 읽기 레지스터 |
+| 상수                | 값   | 설명             |
+|-------------------|-----|----------------|
+| `ReadRegMaxSize`  | 125 | 요청당 최대 읽기 레지스터 |
 | `WriteRegMaxSize` | 123 | 요청당 최대 쓰기 레지스터 |
 
 ---
@@ -1065,6 +1102,7 @@ bool SendWithRetry(ushort addr, ushort count) {
 ### 데이터 미수신
 
 1. 연결 상태 확인:
+
 ```csharp
 if (htool.ConnectionState != ConnectionTypes.Connected) {
     Console.WriteLine("연결되지 않음");
@@ -1073,6 +1111,7 @@ if (htool.ConnectionState != ConnectionTypes.Connected) {
 ```
 
 2. Raw 패킷 모니터링으로 트래픽 확인:
+
 ```csharp
 htool.TransmitRawData += (p) => Console.WriteLine($"TX: {BitConverter.ToString(p)}");
 htool.ReceivedRawData += (p) => Console.WriteLine($"RX: {BitConverter.ToString(p)}");
@@ -1131,7 +1170,14 @@ htool.ReceivedData += (code, addr, data) => {
 
 ## 버전 히스토리
 
-### 1.1.21 - Current
+### 1.1.22 - Current
+
+- FormatInfo 클래스 리팩토링
+  - 기존 FormatInfo → FormatSimpleInfo (레거시 프로토콜)
+  - 새 FormatInfo (Gen.2 Modbus 표준 프로토콜, 200 bytes)
+- BinarySpanReader.ReadAsciiString 메서드 추가
+
+### 1.1.21
 
 - BinarySpanReader 추가 (BinaryReaderBigEndian 대체)
 - XML 주석 개선 및 오류 수정

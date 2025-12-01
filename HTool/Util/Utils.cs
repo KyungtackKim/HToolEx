@@ -564,6 +564,40 @@ public static class Utils {
     }
 
     /// <summary>
+    ///     Convert byte span to hex string
+    /// </summary>
+    /// <param name="values">byte span</param>
+    /// <param name="separator">separator (default: space)</param>
+    /// <param name="lineBreakAt">line break position (0 = no break)</param>
+    /// <returns>hex string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ConvertHexString(ReadOnlySpan<byte> values, string separator = " ", int lineBreakAt = 16) {
+        // check the empty
+        if (values.IsEmpty)
+            // return the empty hex string
+            return string.Empty;
+
+        // create the string builder
+        var sb = new StringBuilder(values.Length * 3);
+        // check the length
+        for (var i = 0; i < values.Length; i++) {
+            // append hex string
+            sb.Append(values[i].ToString("X2"));
+            // check the index
+            if (i < values.Length - 1)
+                // append the separator
+                sb.Append(separator);
+            // check the line break
+            if (lineBreakAt > 0 && (i + 1) % lineBreakAt == 0)
+                // append the line break
+                sb.AppendLine();
+        }
+
+        // return the hex string
+        return sb.ToString();
+    }
+
+    /// <summary>
     ///     Set value for single type
     /// </summary>
     /// <param name="values">values</param>
@@ -593,6 +627,18 @@ public static class Utils {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ConvertValue(byte[] values, out int value, WordOrderTypes wordOrder = WordOrderTypes.HighLow) {
         ConvertValue(values.AsSpan(), out value, wordOrder);
+    }
+
+    /// <summary>
+    ///     Convert byte span to hex string
+    /// </summary>
+    /// <param name="values">byte span</param>
+    /// <param name="separator">separator (default: space)</param>
+    /// <param name="lineBreakAt">line break position (0 = no break)</param>
+    /// <returns>hex string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ConvertHexString(byte[] values, string separator = " ", int lineBreakAt = 16) {
+        return ConvertHexString(values.AsSpan(), separator, lineBreakAt);
     }
 
     /// <summary>

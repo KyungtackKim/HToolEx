@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace HTool.Util;
 
@@ -231,6 +232,23 @@ public static class BinarySpanReader {
         var value = BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64BigEndian(span[pos..]));
         // update the position
         pos += 8;
+        // return the value
+        return value;
+    }
+
+    /// <summary>
+    ///     Reads an ASCII string and advances position
+    /// </summary>
+    /// <param name="span">span</param>
+    /// <param name="pos">position</param>
+    /// <param name="length">byte length to read</param>
+    /// <returns>trimmed string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ReadAsciiString(ReadOnlySpan<byte> span, ref int pos, int length) {
+        // get the string value
+        var value = Encoding.ASCII.GetString(span.Slice(pos, length)).Trim('\0').Trim();
+        // update the position
+        pos += length;
         // return the value
         return value;
     }
