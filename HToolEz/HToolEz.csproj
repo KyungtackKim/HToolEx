@@ -10,8 +10,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
         <Title>HToolEz</Title>
-        <Version>0.0.14</Version>
-        <PackageVersion>0.0.14</PackageVersion>
+        <Version>0.0.16</Version>
+        <PackageVersion>0.0.16</PackageVersion>
         <PackageIcon>Resources\icon.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>

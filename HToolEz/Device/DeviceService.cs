@@ -344,12 +344,13 @@ public class DeviceService : IDeviceService {
             timer.Elapsed -= TimerOnElapsed;
             // dispose
             timer.Dispose();
+            return;
         }
 
-        // try enter
+        // enter the monitor
         if (!Monitor.TryEnter(AnalyzeBuf, Constants.ProcessLockTime))
             return;
-        // try finally
+        // process without lock
         try {
             var isUpdateForAnalyzeBuf = false;
             // get the data block
@@ -382,8 +383,32 @@ public class DeviceService : IDeviceService {
                 return;
 
             // check the STX bytes
-            if (AnalyzeBuf.Peek(0) != DeviceHelper.HeaderStx[0] || AnalyzeBuf.Peek(1) != DeviceHelper.HeaderStx[1])
+            if (AnalyzeBuf.Peek(0) != DeviceHelper.HeaderStx[0] || AnalyzeBuf.Peek(1) != DeviceHelper.HeaderStx[1]) {
+                var foundIndex = -1;
+                // find STX pattern in buffer
+                var buffer = AnalyzeBuf.PeekBytes();
+                // check the length
+                for (var i = 1; i < buffer.Length - 1; i++) {
+                    // check the STX bytes
+                    if (buffer[i] != DeviceHelper.HeaderStx[0] || buffer[i + 1] != DeviceHelper.HeaderStx[1])
+                        continue;
+                    // set the index
+                    foundIndex = i;
+                    // end of find
+                    break;
+                }
+
+                // check the index
+                if (foundIndex > 0)
+                    // found STX - remove bytes before it
+                    AnalyzeBuf.RemoveBytes(foundIndex);
+                else
+                    // STX not found - keep only last byte (might be start of STX)
+                    AnalyzeBuf.RemoveBytes(buffer.Length - 1);
+                // end of parse
                 return;
+            }
+
             // get the frame length
             var frame = ((AnalyzeBuf.Peek(3) << 8) | AnalyzeBuf.Peek(2)) + DeviceHelper.HeaderSize;
             // check the frame length
@@ -395,6 +420,9 @@ public class DeviceService : IDeviceService {
             var packet = AnalyzeBuf.ReadBytes(frame);
             // invoke the received data event
             ReceivedData?.Invoke(cmd, packet);
+        } catch (Exception ex) {
+            // debug log
+            Console.WriteLine($"[DeviceService] TimerOnElapsed error: {ex.Message}");
         } finally {
             // exit monitor
             Monitor.Exit(AnalyzeBuf);

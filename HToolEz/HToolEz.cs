@@ -385,17 +385,19 @@ public class HToolEz : IDisposable {
                 }
                 // detect sensor value from REP_CURRENT_ADC (0xA0)
                 case DeviceCommandTypes.RepAdc:
-
-                    int value;
+                    var value = 0;
+                    var isValidRange = true;
                     // check the mode
                     if (Body == BodyTypes.Separated) {
                         // convert to sensor value (integer-32bit)
                         Utils.ConvertValue(data.Span[5..], out int v);
                         // check the value range
-                        if (v is < -131072 or > 131072)
-                            return;
-                        // set the value
-                        value = v;
+                        if (v is < -131072 or > 131072) {
+                            // out of range - skip EMA update
+                            isValidRange = false;
+                        } else {
+                            value = v;
+                        }
                     } else {
                         // convert to sensor value (ushort-16bit)
                         Utils.ConvertValue(data.Span[5..], out ushort v);
@@ -403,15 +405,18 @@ public class HToolEz : IDisposable {
                         value = v;
                     }
 
-                    // check first value
-                    if (!_hasFirstValue) {
-                        // set value
-                        _emaValue = value;
-                        // set first value
-                        _hasFirstValue = true;
-                    } else {
-                        // set value
-                        _emaValue = value * _emaAlpha + _emaValue * _emaNegAlpha;
+                    // update EMA only for valid range
+                    if (isValidRange) {
+                        // check first value
+                        if (!_hasFirstValue) {
+                            // set value
+                            _emaValue = value;
+                            // set first value
+                            _hasFirstValue = true;
+                        } else {
+                            // set value
+                            _emaValue = value * _emaAlpha + _emaValue * _emaNegAlpha;
+                        }
                     }
 
                     break;
