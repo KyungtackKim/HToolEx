@@ -47,7 +47,7 @@ public sealed class FormatCalData {
         [CalPointTypes.Point80M]  = 3,
         [CalPointTypes.Point100M] = 4
     };
-
+    
     /// <summary>
     ///     Constructor
     /// </summary>
@@ -236,15 +236,16 @@ public sealed class FormatCalData {
     /// <returns>byte array (41 bytes for Integrated, 63 bytes for Separated)</returns>
     public byte[] ToBytes() {
         // determine size based on body type
-        var size  = Body == BodyTypes.Separated ? Size[1] : Size[0];
+        var size = Body == BodyTypes.Separated ? Size[1] : Size[0];
+        // create the array
         var bytes = new byte[size];
 
         // common information (0-18, little-endian)
         bytes[0] = (byte)Body;
-        Utils.WriteValue(bytes, 1, (int)Model);
-        Utils.WriteValue(bytes, 5, (int)(MaxTorque * 100.0f));
-        Utils.WriteValue(bytes, 9, (int)BodySerial);
-        Utils.WriteValue(bytes, 13, (int)SensorSerial);
+        Utils.WriteValue(bytes, 1, (int)Model, false);
+        Utils.WriteValue(bytes, 5, (int)(MaxTorque * 100.0f), false);
+        Utils.WriteValue(bytes, 9, (int)BodySerial, false);
+        Utils.WriteValue(bytes, 13, (int)SensorSerial, false);
         bytes[17] = (byte)Unit;
         bytes[18] = (byte)CalType;
 
@@ -252,21 +253,21 @@ public sealed class FormatCalData {
         switch (Body) {
             case BodyTypes.Separated:
                 // 4 bytes each (int32, little-endian)
-                Utils.WriteValue(bytes, 19, Offset);
+                Utils.WriteValue(bytes, 19, Offset, false);
                 for (var i = 0; i < 5; i++)
-                    Utils.WriteValue(bytes, 23 + i * 4, Positives[i]);
+                    Utils.WriteValue(bytes, 23 + i * 4, Positives[i], false);
                 for (var i = 0; i < 5; i++)
-                    Utils.WriteValue(bytes, 43 + i * 4, Negatives[i]);
+                    Utils.WriteValue(bytes, 43 + i * 4, Negatives[i], false);
                 break;
 
             case BodyTypes.Integrated:
             default:
                 // 2 bytes each (ushort, little-endian)
-                Utils.WriteValue(bytes, 19, (ushort)Offset);
+                Utils.WriteValue(bytes, 19, (ushort)Offset, false);
                 for (var i = 0; i < 5; i++)
-                    Utils.WriteValue(bytes, 21 + i * 2, (ushort)Positives[i]);
+                    Utils.WriteValue(bytes, 21 + i * 2, (ushort)Positives[i], false);
                 for (var i = 0; i < 5; i++)
-                    Utils.WriteValue(bytes, 31 + i * 2, (ushort)Negatives[i]);
+                    Utils.WriteValue(bytes, 31 + i * 2, (ushort)Negatives[i], false);
                 break;
         }
 
