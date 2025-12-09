@@ -76,6 +76,11 @@ public class HToolEz : IDisposable {
     public BodyTypes Body { get; private set; } = BodyTypes.Separated;
 
     /// <summary>
+    ///     Device setting data
+    /// </summary>
+    public FormatSetData? SetInfo { get; private set; }
+
+    /// <summary>
     ///     Device calibration data
     /// </summary>
     public FormatCalData? CalInfo { get; private set; }
@@ -152,6 +157,7 @@ public class HToolEz : IDisposable {
             // start process timer
             ProcessTimer.Start();
             // request the calibration data
+            SendCommandAsync(DeviceCommandTypes.ReqSetData, DeviceHelper.CreateReqSetPacket(), token: token);
             SendCommandAsync(DeviceCommandTypes.ReqCalData, DeviceHelper.CreateReqCalPacket(), token: token);
             // result
             return Task.FromResult(true);
@@ -383,21 +389,25 @@ public class HToolEz : IDisposable {
 
                     break;
                 }
+                case DeviceCommandTypes.ResSetData when data.Length > 5: {
+                    // check the information state
+                    SetInfo ??= new FormatSetData(data[5..]);
+                    break;
+                }
                 // detect sensor value from REP_CURRENT_ADC (0xA0)
                 case DeviceCommandTypes.RepAdc:
-                    var value = 0;
+                    var value        = 0;
                     var isValidRange = true;
                     // check the mode
                     if (Body == BodyTypes.Separated) {
                         // convert to sensor value (integer-32bit)
                         Utils.ConvertValue(data.Span[5..], out int v);
                         // check the value range
-                        if (v is < -131072 or > 131072) {
+                        if (v is < -131072 or > 131072)
                             // out of range - skip EMA update
                             isValidRange = false;
-                        } else {
+                        else
                             value = v;
-                        }
                     } else {
                         // convert to sensor value (ushort-16bit)
                         Utils.ConvertValue(data.Span[5..], out ushort v);
@@ -420,6 +430,13 @@ public class HToolEz : IDisposable {
                     }
 
                     break;
+                case DeviceCommandTypes.ResTorque when data.Length >= 9:
+                    // convert to torque
+                    Utils.ConvertValue(data.Span[5..9], out float torque);
+                    // invoke received torque event
+                    ReceivedTorque?.Invoke(torque, SetInfo?.Unit ?? UnitTypes.KgfCm);
+                    // end of data received
+                    return;
                 case DeviceCommandTypes.ReqCalData:
                 case DeviceCommandTypes.ReqCalSetPoint:
                 case DeviceCommandTypes.ReqCalSave:

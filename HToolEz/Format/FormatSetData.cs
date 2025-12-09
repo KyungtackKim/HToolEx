@@ -10,7 +10,7 @@ public sealed class FormatSetData {
     /// <summary>
     ///     Format setting data size
     /// </summary>
-    private const int Size = 14;
+    public const int Size = 14;
 
     /// <summary>
     ///     Constructor

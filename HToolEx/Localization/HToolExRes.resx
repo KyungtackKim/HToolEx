@@ -1,558 +1,563 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
+    <!-- 
+      Microsoft ResX Schema 
+      
+      Version 2.0
+      
+      The primary goals of this format is to allow a simple XML format 
+      that is mostly human readable. The generation and parsing of the 
+      various data types are done through the TypeConverter classes 
+      associated with the data types.
+      
+      Example:
+      
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+                  
+      There are any number of "resheader" rows that contain simple 
+      name/value pairs.
+      
+      Each data row contains a name, and value. The row also contains a 
+      type or mimetype. Type corresponds to a .NET class that support 
+      text/value conversion through the TypeConverter architecture. 
+      Classes that don't support this are serialized and stored with the 
+      mimetype set.
+      
+      The mimetype is used for serialized objects, and tells the 
+      ResXResourceReader how to depersist the object. This is currently not 
+      extensible. For a given mimetype the value must be set accordingly:
+      
+      Note - application/x-microsoft.net.object.binary.base64 is the format 
+      that the ResXResourceWriter will generate, however the reader can 
+      read any of the formats listed below.
+      
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+      
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+  
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array 
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
             </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="EventAlarmReset" xml:space="preserve">
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="EventAlarmReset" xml:space="preserve">
     <value>Alarm reset</value>
   </data>
-  <data name="EventBarcode" xml:space="preserve">
+    <data name="EventBarcode" xml:space="preserve">
     <value>Barcode</value>
   </data>
-  <data name="EventDir" xml:space="preserve">
+    <data name="EventDir" xml:space="preserve">
     <value>F / L</value>
   </data>
-  <data name="EventError" xml:space="preserve">
+    <data name="EventError" xml:space="preserve">
     <value>Error</value>
   </data>
-  <data name="EventEtc" xml:space="preserve">
+    <data name="EventEtc" xml:space="preserve">
     <value>Etc.</value>
   </data>
-  <data name="EventFastenNg" xml:space="preserve">
+    <data name="EventFastenNg" xml:space="preserve">
     <value>Fastening NG</value>
   </data>
-  <data name="EventFastenOk" xml:space="preserve">
+    <data name="EventFastenOk" xml:space="preserve">
     <value>Fastening OK</value>
   </data>
-  <data name="EventNone" xml:space="preserve">
+    <data name="EventNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="EventPreset" xml:space="preserve">
+    <data name="EventPreset" xml:space="preserve">
     <value>Preset change</value>
   </data>
-  <data name="EventScrewCancel" xml:space="preserve">
+    <data name="EventScrewCancel" xml:space="preserve">
     <value>Screw count - 1</value>
   </data>
-  <data name="EventScrewReset" xml:space="preserve">
+    <data name="EventScrewReset" xml:space="preserve">
     <value>Screw count reset</value>
   </data>
-  <data name="DirTypeFastening" xml:space="preserve">
+    <data name="DirTypeFastening" xml:space="preserve">
     <value>Fastening</value>
   </data>
-  <data name="GraphDirAll" xml:space="preserve">
+    <data name="GraphDirAll" xml:space="preserve">
     <value>All</value>
   </data>
-  <data name="GraphDirBoth" xml:space="preserve">
+    <data name="GraphDirBoth" xml:space="preserve">
     <value>Both</value>
   </data>
-  <data name="GraphDirFasten" xml:space="preserve">
+    <data name="GraphDirFasten" xml:space="preserve">
     <value>Fasten Only</value>
   </data>
-  <data name="GraphDirLoosen" xml:space="preserve">
+    <data name="GraphDirLoosen" xml:space="preserve">
     <value>Loosen Only</value>
   </data>
-  <data name="GraphStepClamp" xml:space="preserve">
+    <data name="GraphStepClamp" xml:space="preserve">
     <value>Clamp</value>
   </data>
-  <data name="GraphStepComplete" xml:space="preserve">
+    <data name="GraphStepComplete" xml:space="preserve">
     <value>Torque complete</value>
   </data>
-  <data name="GraphStepEngaging" xml:space="preserve">
+    <data name="GraphStepEngaging" xml:space="preserve">
     <value>Engaging</value>
   </data>
-  <data name="GraphStepFasten" xml:space="preserve">
+    <data name="GraphStepFasten" xml:space="preserve">
     <value>Fastening</value>
   </data>
-  <data name="GraphStepFreeReverse" xml:space="preserve">
+    <data name="GraphStepFreeReverse" xml:space="preserve">
     <value>Free reverse rotation</value>
   </data>
-  <data name="GraphStepFreeRotation" xml:space="preserve">
+    <data name="GraphStepFreeRotation" xml:space="preserve">
     <value>Free rotation</value>
   </data>
-  <data name="GraphStepNone" xml:space="preserve">
+    <data name="GraphStepNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="GraphStepPrevailingStart" xml:space="preserve">
+    <data name="GraphStepPrevailingStart" xml:space="preserve">
     <value>Prevailing start</value>
   </data>
-  <data name="GraphStepRotateAfterTorqueUp" xml:space="preserve">
+    <data name="GraphStepRotateAfterTorqueUp" xml:space="preserve">
     <value>Rotation after torque-up</value>
   </data>
-  <data name="GraphStepSeating" xml:space="preserve">
+    <data name="GraphStepSeating" xml:space="preserve">
     <value>Seating</value>
   </data>
-  <data name="GraphStepSnugTorque" xml:space="preserve">
+    <data name="GraphStepSnugTorque" xml:space="preserve">
     <value>Snug torque</value>
   </data>
-  <data name="GraphStepThreadTap" xml:space="preserve">
+    <data name="GraphStepThreadTap" xml:space="preserve">
     <value>Thread tap</value>
   </data>
-  <data name="GraphTypeAngle" xml:space="preserve">
+    <data name="GraphTypeAngle" xml:space="preserve">
     <value>Angle</value>
   </data>
-  <data name="GraphTypeCurrent" xml:space="preserve">
+    <data name="GraphTypeCurrent" xml:space="preserve">
     <value>Current</value>
   </data>
-  <data name="GraphTypeCurrentCmd" xml:space="preserve">
+    <data name="GraphTypeCurrentCmd" xml:space="preserve">
     <value>Current command</value>
   </data>
-  <data name="GraphTypeNone" xml:space="preserve">
+    <data name="GraphTypeNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="GraphTypeSnugAngle" xml:space="preserve">
+    <data name="GraphTypeSnugAngle" xml:space="preserve">
     <value>Snug angle</value>
   </data>
-  <data name="GraphTypeSpeed" xml:space="preserve">
+    <data name="GraphTypeSpeed" xml:space="preserve">
     <value>Speed</value>
   </data>
-  <data name="GraphTypeSpeedCmd" xml:space="preserve">
+    <data name="GraphTypeSpeedCmd" xml:space="preserve">
     <value>Speed command</value>
   </data>
-  <data name="GraphTypeTorque" xml:space="preserve">
+    <data name="GraphTypeTorque" xml:space="preserve">
     <value>Torque</value>
   </data>
-  <data name="GraphTypeTorqueAngle" xml:space="preserve">
+    <data name="GraphTypeTorqueAngle" xml:space="preserve">
     <value>Torque / Angle</value>
   </data>
-  <data name="LockTypeFastenLock" xml:space="preserve">
+    <data name="LockTypeFastenLock" xml:space="preserve">
     <value>Fasten lock</value>
   </data>
-  <data name="LockTypeLock" xml:space="preserve">
+    <data name="LockTypeLock" xml:space="preserve">
     <value>Lock</value>
   </data>
-  <data name="LockTypeLoosenLock" xml:space="preserve">
+    <data name="LockTypeLoosenLock" xml:space="preserve">
     <value>Loosen lock</value>
   </data>
-  <data name="LockTypeUnLock" xml:space="preserve">
+    <data name="LockTypeUnLock" xml:space="preserve">
     <value>Unlock</value>
   </data>
-  <data name="DirTypeLoosening" xml:space="preserve">
+    <data name="DirTypeLoosening" xml:space="preserve">
     <value>Loosening</value>
   </data>
-  <data name="ModelCmdNone" xml:space="preserve">
+    <data name="ModelCmdNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="ModelCmdFastening" xml:space="preserve">
+    <data name="ModelCmdFastening" xml:space="preserve">
     <value>Fastening</value>
   </data>
-  <data name="ModelCmdDelay" xml:space="preserve">
+    <data name="ModelCmdDelay" xml:space="preserve">
     <value>Delay</value>
   </data>
-  <data name="ModelCmdInput" xml:space="preserve">
+    <data name="ModelCmdInput" xml:space="preserve">
     <value>Input</value>
   </data>
-  <data name="ModelCmdOutput" xml:space="preserve">
+    <data name="ModelCmdOutput" xml:space="preserve">
     <value>Output</value>
   </data>
-  <data name="ModelCmdBarcode" xml:space="preserve">
+    <data name="ModelCmdBarcode" xml:space="preserve">
     <value>Barcode</value>
   </data>
-  <data name="ModelInputTypeNone" xml:space="preserve">
+    <data name="ModelInputTypeNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="ModelInputTypeActiveHigh" xml:space="preserve">
+    <data name="ModelInputTypeActiveHigh" xml:space="preserve">
     <value>Active high</value>
   </data>
-  <data name="ModelInputTypeActiveLow" xml:space="preserve">
+    <data name="ModelInputTypeActiveLow" xml:space="preserve">
     <value>Active low</value>
   </data>
-  <data name="ModelInputTypeStatusHigh" xml:space="preserve">
+    <data name="ModelInputTypeStatusHigh" xml:space="preserve">
     <value>Status high</value>
   </data>
-  <data name="ModelInputTypeStatusLow" xml:space="preserve">
+    <data name="ModelInputTypeStatusLow" xml:space="preserve">
     <value>Status low</value>
   </data>
-  <data name="ModelOutputTypeNone" xml:space="preserve">
+    <data name="ModelOutputTypeNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="ModelOutputTypeOn" xml:space="preserve">
+    <data name="ModelOutputTypeOn" xml:space="preserve">
     <value>On</value>
   </data>
-  <data name="ModelOutputTypeOff" xml:space="preserve">
+    <data name="ModelOutputTypeOff" xml:space="preserve">
     <value>Off</value>
   </data>
-  <data name="ModelOutputTypeHalfSec" xml:space="preserve">
+    <data name="ModelOutputTypeHalfSec" xml:space="preserve">
     <value>On for 0.5 sec</value>
   </data>
-  <data name="ModelOutputTypeSec" xml:space="preserve">
+    <data name="ModelOutputTypeSec" xml:space="preserve">
     <value>On for 1.0 sec</value>
   </data>
-  <data name="MsCmdTypeNone" xml:space="preserve">
+    <data name="MsCmdTypeNone" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="MsCmdTypeFastening" xml:space="preserve">
+    <data name="MsCmdTypeFastening" xml:space="preserve">
     <value>Fastening</value>
   </data>
-  <data name="MsCmdTypeEnd" xml:space="preserve">
+    <data name="MsCmdTypeEnd" xml:space="preserve">
     <value>End</value>
   </data>
-  <data name="MsCmdTypeDelay" xml:space="preserve">
+    <data name="MsCmdTypeDelay" xml:space="preserve">
     <value>Delay</value>
   </data>
-  <data name="MsCmdTypePreset" xml:space="preserve">
+    <data name="MsCmdTypePreset" xml:space="preserve">
     <value>Select preset</value>
   </data>
-  <data name="MsCmdTypeLoosening" xml:space="preserve">
+    <data name="MsCmdTypeLoosening" xml:space="preserve">
     <value>Loosening</value>
   </data>
-  <data name="MsCmdTypeJump" xml:space="preserve">
+    <data name="MsCmdTypeJump" xml:space="preserve">
     <value>Jump</value>
   </data>
-  <data name="MsCmdTypeCount" xml:space="preserve">
+    <data name="MsCmdTypeCount" xml:space="preserve">
     <value>Count value = (A)</value>
   </data>
-  <data name="MsCmdTypeIf" xml:space="preserve">
+    <data name="MsCmdTypeIf" xml:space="preserve">
     <value>Sub if (A)</value>
   </data>
-  <data name="JobEventTypeStepInto" xml:space="preserve">
+    <data name="JobEventTypeStepInto" xml:space="preserve">
     <value>Step into</value>
   </data>
-  <data name="JobEventTypeFastenOk" xml:space="preserve">
+    <data name="JobEventTypeFastenOk" xml:space="preserve">
     <value>Fastening OK</value>
   </data>
-  <data name="JobEventTypeFastenNg" xml:space="preserve">
+    <data name="JobEventTypeFastenNg" xml:space="preserve">
     <value>Fastening NG</value>
   </data>
-  <data name="JobEventTypeStepOk" xml:space="preserve">
+    <data name="JobEventTypeStepOk" xml:space="preserve">
     <value>Step OK</value>
   </data>
-  <data name="JobEventTypeStepNg" xml:space="preserve">
+    <data name="JobEventTypeStepNg" xml:space="preserve">
     <value>Step NG</value>
   </data>
-  <data name="JobEventTypeJobOk" xml:space="preserve">
+    <data name="JobEventTypeJobOk" xml:space="preserve">
     <value>Job OK</value>
   </data>
-  <data name="JobEventTypeJobNg" xml:space="preserve">
+    <data name="JobEventTypeJobNg" xml:space="preserve">
     <value>Job NG</value>
   </data>
-  <data name="JobEventTypeJobAbort" xml:space="preserve">
+    <data name="JobEventTypeJobAbort" xml:space="preserve">
     <value>Job aborted</value>
   </data>
-  <data name="JobEventTypeSkip" xml:space="preserve">
+    <data name="JobEventTypeSkip" xml:space="preserve">
     <value>Skip</value>
   </data>
-  <data name="JobEventTypeBack" xml:space="preserve">
+    <data name="JobEventTypeBack" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="JobEventTypeResetStep" xml:space="preserve">
+    <data name="JobEventTypeResetStep" xml:space="preserve">
     <value>Reset step</value>
   </data>
-  <data name="JobEventTypeResetJob" xml:space="preserve">
+    <data name="JobEventTypeResetJob" xml:space="preserve">
     <value>Reset job</value>
   </data>
-  <data name="JobStepTypeFastening" xml:space="preserve">
+    <data name="JobStepTypeFastening" xml:space="preserve">
     <value>Fastening</value>
   </data>
-  <data name="JobStepTypeInput" xml:space="preserve">
+    <data name="JobStepTypeInput" xml:space="preserve">
     <value>Input</value>
   </data>
-  <data name="JobStepTypeOutput" xml:space="preserve">
+    <data name="JobStepTypeOutput" xml:space="preserve">
     <value>Output</value>
   </data>
-  <data name="JobStepTypeDelay" xml:space="preserve">
+    <data name="JobStepTypeDelay" xml:space="preserve">
     <value>Delay</value>
   </data>
-  <data name="JobStepTypeMessage" xml:space="preserve">
+    <data name="JobStepTypeMessage" xml:space="preserve">
     <value>Message</value>
   </data>
-  <data name="JobStepTypeId" xml:space="preserve">
+    <data name="JobStepTypeId" xml:space="preserve">
     <value>Id</value>
   </data>
-  <data name="LogTypeJobName" xml:space="preserve">
+    <data name="LogTypeJobName" xml:space="preserve">
     <value>Job name</value>
   </data>
-  <data name="LogTypeStepName" xml:space="preserve">
+    <data name="LogTypeStepName" xml:space="preserve">
     <value>Step name</value>
   </data>
-  <data name="LogTypeToolName" xml:space="preserve">
+    <data name="LogTypeToolName" xml:space="preserve">
     <value>Tool name</value>
   </data>
-  <data name="LogTypeBarcode" xml:space="preserve">
+    <data name="LogTypeBarcode" xml:space="preserve">
     <value>Barcode</value>
   </data>
-  <data name="LogTypeFastenTime" xml:space="preserve">
+    <data name="LogTypeFastenTime" xml:space="preserve">
     <value>Fasten time</value>
   </data>
-  <data name="LogTypePreset" xml:space="preserve">
+    <data name="LogTypePreset" xml:space="preserve">
     <value>Preset no.</value>
   </data>
-  <data name="LogTypeUnit" xml:space="preserve">
+    <data name="LogTypeUnit" xml:space="preserve">
     <value>Unit</value>
   </data>
-  <data name="LogTypeScrews" xml:space="preserve">
+    <data name="LogTypeScrews" xml:space="preserve">
     <value>Remain screw</value>
   </data>
-  <data name="LogTypeDir" xml:space="preserve">
+    <data name="LogTypeDir" xml:space="preserve">
     <value>Direction</value>
   </data>
-  <data name="LogTypeError" xml:space="preserve">
+    <data name="LogTypeError" xml:space="preserve">
     <value>Error</value>
   </data>
-  <data name="LogTypeStatus" xml:space="preserve">
+    <data name="LogTypeStatus" xml:space="preserve">
     <value>Status</value>
   </data>
-  <data name="LogTypeTargetTorque" xml:space="preserve">
+    <data name="LogTypeTargetTorque" xml:space="preserve">
     <value>Target torque</value>
   </data>
-  <data name="LogTypeTorque" xml:space="preserve">
+    <data name="LogTypeTorque" xml:space="preserve">
     <value>Converted torque</value>
   </data>
-  <data name="LogTypeSeatTorque" xml:space="preserve">
+    <data name="LogTypeSeatTorque" xml:space="preserve">
     <value>Seating torque</value>
   </data>
-  <data name="LogTypeClampTorque" xml:space="preserve">
+    <data name="LogTypeClampTorque" xml:space="preserve">
     <value>Clamp torque</value>
   </data>
-  <data name="LogTypePrevTorque" xml:space="preserve">
+    <data name="LogTypePrevTorque" xml:space="preserve">
     <value>Prevailing torque</value>
   </data>
-  <data name="LogTypeSnugTorque" xml:space="preserve">
+    <data name="LogTypeSnugTorque" xml:space="preserve">
     <value>Snug torque</value>
   </data>
-  <data name="LogTypeSpeed" xml:space="preserve">
+    <data name="LogTypeSpeed" xml:space="preserve">
     <value>Speed</value>
   </data>
-  <data name="LogTypeAngle1" xml:space="preserve">
+    <data name="LogTypeAngle1" xml:space="preserve">
     <value>Angle 1</value>
   </data>
-  <data name="LogTypeAngle2" xml:space="preserve">
+    <data name="LogTypeAngle2" xml:space="preserve">
     <value>Angle 2</value>
   </data>
-  <data name="LogTypeAngle3" xml:space="preserve">
+    <data name="LogTypeAngle3" xml:space="preserve">
     <value>Angle 3</value>
   </data>
-  <data name="LogTypeSnugAngle" xml:space="preserve">
+    <data name="LogTypeSnugAngle" xml:space="preserve">
     <value>Snug angle</value>
   </data>
-  <data name="LogTypeNgCause" xml:space="preserve">
+    <data name="LogTypeNgCause" xml:space="preserve">
     <value>NG cause</value>
   </data>
-  <data name="LogTypeId1Name" xml:space="preserve">
+    <data name="LogTypeId1Name" xml:space="preserve">
     <value>ID1 name</value>
   </data>
-  <data name="LogTypeId1" xml:space="preserve">
+    <data name="LogTypeId1" xml:space="preserve">
     <value>ID1</value>
   </data>
-  <data name="LogTypeId2" xml:space="preserve">
+    <data name="LogTypeId2" xml:space="preserve">
     <value>ID2</value>
   </data>
-  <data name="LogTypeId2Name" xml:space="preserve">
+    <data name="LogTypeId2Name" xml:space="preserve">
     <value>ID2 name</value>
   </data>
-  <data name="LogTypeId3" xml:space="preserve">
+    <data name="LogTypeId3" xml:space="preserve">
     <value>ID3</value>
   </data>
-  <data name="LogTypeId3Name" xml:space="preserve">
+    <data name="LogTypeId3Name" xml:space="preserve">
     <value>ID3 name</value>
   </data>
-  <data name="LogTypeId4" xml:space="preserve">
+    <data name="LogTypeId4" xml:space="preserve">
     <value>ID4</value>
   </data>
-  <data name="LogTypeId4Name" xml:space="preserve">
+    <data name="LogTypeId4Name" xml:space="preserve">
     <value>ID4 name</value>
   </data>
-  <data name="LogTypeId5" xml:space="preserve">
+    <data name="LogTypeId5" xml:space="preserve">
     <value>ID5</value>
   </data>
-  <data name="LogTypeId5Name" xml:space="preserve">
+    <data name="LogTypeId5Name" xml:space="preserve">
     <value>ID5 name</value>
   </data>
-  <data name="LogTypeId6" xml:space="preserve">
+    <data name="LogTypeId6" xml:space="preserve">
     <value>ID6</value>
   </data>
-  <data name="LogTypeId6Name" xml:space="preserve">
+    <data name="LogTypeId6Name" xml:space="preserve">
     <value>ID6 name</value>
   </data>
-  <data name="SetInTypeDisable" xml:space="preserve">
+    <data name="SetInTypeDisable" xml:space="preserve">
     <value>Disable</value>
   </data>
-  <data name="SetInTypeJob1" xml:space="preserve">
+    <data name="SetInTypeJob1" xml:space="preserve">
     <value>Job select 1</value>
   </data>
-  <data name="SetInTypeJob2" xml:space="preserve">
+    <data name="SetInTypeJob2" xml:space="preserve">
     <value>Job select 2</value>
   </data>
-  <data name="SetInTypeJob3" xml:space="preserve">
+    <data name="SetInTypeJob3" xml:space="preserve">
     <value>Job select 3</value>
   </data>
-  <data name="SetInTypeJob4" xml:space="preserve">
+    <data name="SetInTypeJob4" xml:space="preserve">
     <value>Job select 4</value>
   </data>
-  <data name="SetInTypeJob5" xml:space="preserve">
+    <data name="SetInTypeJob5" xml:space="preserve">
     <value>Job select 5</value>
   </data>
-  <data name="SetInTypeJob6" xml:space="preserve">
+    <data name="SetInTypeJob6" xml:space="preserve">
     <value>Job select 6</value>
   </data>
-  <data name="SetInTypeJob7" xml:space="preserve">
+    <data name="SetInTypeJob7" xml:space="preserve">
     <value>Job select 7</value>
   </data>
-  <data name="SetInTypeJob8" xml:space="preserve">
+    <data name="SetInTypeJob8" xml:space="preserve">
     <value>Job select 8</value>
   </data>
-  <data name="SetInTypeSkip" xml:space="preserve">
+    <data name="SetInTypeSkip" xml:space="preserve">
     <value>Skip</value>
   </data>
-  <data name="SetInTypeBack" xml:space="preserve">
+    <data name="SetInTypeBack" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="SetInTypeStepReset" xml:space="preserve">
+    <data name="SetInTypeStepReset" xml:space="preserve">
     <value>Reset step</value>
   </data>
-  <data name="SetInTypeJobReset" xml:space="preserve">
+    <data name="SetInTypeJobReset" xml:space="preserve">
     <value>Reset job</value>
   </data>
-  <data name="SetInTypeNextJob" xml:space="preserve">
+    <data name="SetInTypeNextJob" xml:space="preserve">
     <value>Next job</value>
   </data>
-  <data name="SetInTypePrevJob" xml:space="preserve">
+    <data name="SetInTypePrevJob" xml:space="preserve">
     <value>Previous job</value>
   </data>
-  <data name="SetInTypeAlarmReset" xml:space="preserve">
+    <data name="SetInTypeAlarmReset" xml:space="preserve">
     <value>Tool alarm reset</value>
   </data>
-  <data name="SetInTypeEmergency" xml:space="preserve">
+    <data name="SetInTypeEmergency" xml:space="preserve">
     <value>Emergency lock</value>
   </data>
-  <data name="SetOutTypeDisable" xml:space="preserve">
+    <data name="SetOutTypeDisable" xml:space="preserve">
     <value>Disable</value>
   </data>
-  <data name="SetOutTypeFastenOk" xml:space="preserve">
+    <data name="SetOutTypeFastenOk" xml:space="preserve">
     <value>Fastening OK</value>
   </data>
-  <data name="SetOutTypeFastenNg" xml:space="preserve">
+    <data name="SetOutTypeFastenNg" xml:space="preserve">
     <value>Fastening NG</value>
   </data>
-  <data name="SetOutTypeStepOk" xml:space="preserve">
+    <data name="SetOutTypeStepOk" xml:space="preserve">
     <value>Step OK</value>
   </data>
-  <data name="SetOutTypeStepNg" xml:space="preserve">
+    <data name="SetOutTypeStepNg" xml:space="preserve">
     <value>Step NG</value>
   </data>
-  <data name="SetOutTypeJobOk" xml:space="preserve">
+    <data name="SetOutTypeJobOk" xml:space="preserve">
     <value>Job OK</value>
   </data>
-  <data name="SetOutTypeJobNg" xml:space="preserve">
+    <data name="SetOutTypeJobNg" xml:space="preserve">
     <value>Job NG</value>
   </data>
-  <data name="SetOutTypeReady" xml:space="preserve">
+    <data name="SetOutTypeReady" xml:space="preserve">
     <value>Ready</value>
   </data>
-  <data name="SetOutTypeAlarm" xml:space="preserve">
+    <data name="SetOutTypeAlarm" xml:space="preserve">
     <value>Alarm</value>
   </data>
 </root>

@@ -82,10 +82,6 @@ public static class DeviceHelper {
         return [HeaderStx[0], HeaderStx[1], 0x00, 0x01, (byte)DeviceCommandTypes.ReqTorque];
     }
 
-    /// <summary>
-    ///     Create calibration data save packet from FormatCalData
-    /// </summary>
-    /// <param name="calData">calibration data object</param>
     /// <returns>packet</returns>
     /// <exception cref="ArgumentNullException">Thrown when calData is null</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

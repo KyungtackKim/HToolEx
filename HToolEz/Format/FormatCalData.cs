@@ -47,7 +47,7 @@ public sealed class FormatCalData {
         [CalPointTypes.Point80M]  = 3,
         [CalPointTypes.Point100M] = 4
     };
-    
+
     /// <summary>
     ///     Constructor
     /// </summary>

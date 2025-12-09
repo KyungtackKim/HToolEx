@@ -263,57 +263,20 @@ public class DeviceService : IDeviceService {
             return;
         // try catch
         try {
+            // get the length
+            var length = port.BytesToRead;
+            // check the length
+            if (length < 1)
+                return;
             // check the operation mode
             switch (Mode) {
                 case DeviceModeTypes.Operation:
-                    // split the data
-                    var values = port.ReadExisting().Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-                    // check the length
-                    if (values.Length < 1)
-                        return;
-                    // split the value
-                    var data = values[^1].Split(',');
-                    // check the length
-                    if (data.Length != 2)
-                        return;
-                    // convert to torque
-                    if (!float.TryParse(data[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var torque))
-                        return;
-                    // convert to unit
-                    var unit = Utils.ParseToUnit(data[1].Trim());
-                    // invoke the received torque
-                    ReceivedTorque?.Invoke(torque, unit);
-
+                    // process the operation mode
+                    ProcessOperationMode(port, length);
                     break;
                 case DeviceModeTypes.Calibration:
-                    // get the length
-                    var length = port.BytesToRead;
-                    // check the length
-                    if (length < 1)
-                        return;
-                    // rent the pool
-                    var chunk = ArrayPool<byte>.Shared.Rent(length);
-                    // try catch
-                    try {
-                        // read the data
-                        var read = port.Read(chunk, 0, length);
-                        // check the read length
-                        if (read < 1) {
-                            // return the pool
-                            ArrayPool<byte>.Shared.Return(chunk);
-                            // end of receive
-                            return;
-                        }
-
-                        // enqueue the data
-                        ReceiveBuf.Enqueue((read, chunk));
-                    } catch (Exception ex) {
-                        // return the pool
-                        ArrayPool<byte>.Shared.Return(chunk);
-                        // debug log
-                        Console.WriteLine($"Read the data error: {ex.Message}");
-                    }
-
+                    // process the calibration mode
+                    ProcessCalibrationMode(port, length);
                     break;
                 default:
                     // clear the buffer
@@ -323,6 +286,89 @@ public class DeviceService : IDeviceService {
         } catch (Exception ex) {
             // debug log
             Console.WriteLine($"Received data error : {ex.Message}");
+        }
+    }
+
+    private void ProcessOperationMode(SerialPort port, int length) {
+        // rent buffer from pool
+        var buffer = ArrayPool<byte>.Shared.Rent(length);
+        // try finally
+        try {
+            // read data as bytes
+            var read = port.Read(buffer, 0, length);
+            // check read length
+            if (read < 1)
+                // end of processing
+                return;
+
+            // check first byte to determine data type
+            if (buffer[0] >= 0x30 && buffer[0] <= 0x39)
+                // ASCII torque data (starts with digit 0-9)
+                ProcessAsciiTorque(buffer, read);
+            else if (read      >= 9    &&
+                     buffer[0] == 0x5A && buffer[1] == 0xA5 && buffer[2] == 0x05 &&
+                     buffer[3] == 0x00 && buffer[4] == 0x85)
+                // binary torque data (Header: 5A A5 05 00 85 + 4-byte float)
+                ProcessBinaryTorque(buffer);
+            // else: discard invalid data
+        } finally {
+            // return buffer to pool
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    private void ProcessAsciiTorque(byte[] buffer, int length) {
+        // convert bytes to string
+        var text = Encoding.ASCII.GetString(buffer, 0, length);
+        // split the data
+        var values = text.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+        // check the length
+        if (values.Length < 1)
+            return;
+        // split the value
+        var data = values[^1].Split(',');
+        // check the length
+        if (data.Length != 2)
+            return;
+        // convert to torque
+        if (!float.TryParse(data[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var torque))
+            return;
+        // convert to unit
+        var unit = Utils.ParseToUnit(data[1].Trim());
+        // invoke the received torque
+        ReceivedTorque?.Invoke(torque, unit);
+    }
+
+    private void ProcessBinaryTorque(byte[] buffer) {
+        // rent buffer for 9 bytes
+        var chunk = ArrayPool<byte>.Shared.Rent(9);
+        // copy 9 bytes to chunk
+        buffer.AsSpan(0, 9).CopyTo(chunk);
+        // enqueue for timer processing
+        ReceiveBuf.Enqueue((9, chunk));
+    }
+
+    private void ProcessCalibrationMode(SerialPort port, int length) {
+        // rent buffer from pool
+        var chunk = ArrayPool<byte>.Shared.Rent(length);
+        // try catch
+        try {
+            // read the data
+            var read = port.Read(chunk, 0, length);
+            // check the read length
+            if (read < 1) {
+                // return the pool
+                ArrayPool<byte>.Shared.Return(chunk);
+                // end of processing
+                return;
+            }
+            // enqueue for timer processing
+            ReceiveBuf.Enqueue((read, chunk));
+        } catch (Exception ex) {
+            // return the pool
+            ArrayPool<byte>.Shared.Return(chunk);
+            // debug log
+            Console.WriteLine($"Read the data error: {ex.Message}");
         }
     }
 
