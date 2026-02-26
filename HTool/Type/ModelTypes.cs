@@ -25,6 +25,10 @@ public enum ModelTypes {
     Mdt40 = 27,
     [Description("BMT40")]
     Bmt40 = 29,
+    [Description("ET")]
+    Et = 30,
+    [Description("BT")]
+    Bt = 32,
 
     // Mountz 모델 코드
     // Mountz model codes
@@ -39,5 +43,9 @@ public enum ModelTypes {
     [Description("ECT40")]
     Ect40 = 1027,
     [Description("EPT40")]
-    Ept40 = 1029
+    Ept40 = 1029,
+    [Description("ETM")]
+    Etm = 1030,
+    [Description("BTM")]
+    Btm = 1032
 }

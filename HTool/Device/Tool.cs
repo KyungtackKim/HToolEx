@@ -33,8 +33,8 @@ public abstract class Tool {
     /// </summary>
     /// <param name="v">확인할 MODBUS 함수 코드 바이트 값 / MODBUS function code byte value to check</param>
     /// <returns>
-    ///     지원하는 함수 코드이면 true (0x03, 0x04, 0x06, 0x10, 0x11, 0x64, 0x65)
-    ///     True if supported function code (0x03, 0x04, 0x06, 0x10, 0x11, 0x64, 0x65)
+    ///     지원하는 함수 코드이면 true (0x03, 0x04, 0x06, 0x10, 0x11, 0x64, 0x65, 0x66)
+    ///     True if supported function code (0x03, 0x04, 0x06, 0x10, 0x11, 0x64, 0x65, 0x66)
     /// </returns>
     /// <remarks>
     ///     AggressiveInlining 속성으로 메서드 호출 오버헤드를 제거하여 프레임 분석 성능을 향상시킵니다.
@@ -47,6 +47,6 @@ public abstract class Tool {
         return v is (byte)CodeTypes.ReadHoldingReg or (byte)CodeTypes.ReadInputReg
             or (byte)CodeTypes.ReadInfoReg or (byte)CodeTypes.WriteSingleReg
             or (byte)CodeTypes.WriteMultiReg or (byte)CodeTypes.Graph
-            or (byte)CodeTypes.GraphRes;
+            or (byte)CodeTypes.GraphRes or (byte)CodeTypes.HighResGraph;
     }
 }

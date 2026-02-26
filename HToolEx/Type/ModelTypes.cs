@@ -6,40 +6,50 @@ namespace HToolEx.Type;
 ///     Hantas tool model types
 /// </summary>
 public enum ModelTypes {
-    [Description("md")]
+    // Hantas model codes
+    [Description("MD")]
     Md = 1,
-    [Description("mdt")]
+    [Description("AD")]
+    Ad = 2,
+    [Description("MDT")]
     Mdt = 15,
-    [Description("bm")]
+    [Description("BM")]
     Bm = 10,
-    [Description("bmt")]
+    [Description("BMT")]
     Bmt = 19,
-    [Description("bpt")]
+    [Description("BPT")]
     Bpt = 20,
-    [Description("mdt40")]
+    [Description("MDT40")]
     Mdt40 = 27,
-    [Description("bmt40")]
+    [Description("BMT40")]
     Bmt40 = 29,
-    [Description("ept")]
-    Ept = 99
+    [Description("ET")]
+    Et = 30,
+    [Description("BT")]
+    Bt = 32,
 }
 
 /// <summary>
 ///     Mountz tool model types
 /// </summary>
 public enum ModelTypesMountz {
-    [Description("ec")]
-    Ec = 1,
-    [Description("ect")]
-    Ect = 15,
-    [Description("ep")]
-    Ep = 10,
-    [Description("ept")]
-    Ept = 19,
-    [Description("bpt")]
-    Bpt = 20,
-    [Description("ect40")]
-    Ect40 = 27,
-    [Description("ept40")]
-    Ept40 = 29
+    // Mountz model codes
+    [Description("EC")]
+    Ec = 1001,
+    [Description("AD")]
+    Ad = 1002,
+    [Description("ECT")]
+    Ect = 1015,
+    [Description("EP")]
+    Ep = 1010,
+    [Description("EPT")]
+    Ept = 1019,
+    [Description("ECT40")]
+    Ect40 = 1027,
+    [Description("EPT40")]
+    Ept40 = 1029,
+    [Description("ETM")]
+    Etm = 1030,
+    [Description("BTM")]
+    Btm = 1032
 }
