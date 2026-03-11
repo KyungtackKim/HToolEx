@@ -362,6 +362,7 @@ public class DeviceService : IDeviceService {
                 // end of processing
                 return;
             }
+
             // enqueue for timer processing
             ReceiveBuf.Enqueue((read, chunk));
         } catch (Exception ex) {

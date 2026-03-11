@@ -7,9 +7,32 @@
       "Bash(dotnet --version:*)",
       "Bash(dotnet restore:*)",
       "Bash(dotnet pack:*)",
-      "Bash(Remove-Item \"D:\\Dev\\Enterprise\\Windows\\HToolEx\\HTool\\Util\\BinaryReaderBigEndian.cs\" -Force)"
+      "Bash(Remove-Item \"D:\\Dev\\Enterprise\\Windows\\HToolEx\\HTool\\Util\\BinaryReaderBigEndian.cs\" -Force)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "WebSearch",
+      "Bash(where:*)",
+      "Bash(cmd.exe /c \"where /r C:\\\\ pdftoppm.exe 2>nul\")",
+      "Bash(choco search:*)",
+      "Bash(export PATH=\"C:/Users/김경택/Downloads/poppler-25.12.0/Library/bin:$PATH\")",
+      "Bash(pdftoppm:*)",
+      "Bash(\"C:/Users/김경택/Downloads/poppler-25.12.0/Library/bin/pdftoppm.exe\" -h)",
+      "Bash(~/.bashrc)",
+      "Bash(source:*)",
+      "Bash(echo:*)",
+      "Bash(tar -xz -C ~/.local/bin claudeline.exe)",
+      "Bash(curl -fsSL -o /tmp/claudeline.zip \"https://github.com/fredrikaverpil/claudeline/releases/latest/download/claudeline_windows_amd64.zip\")",
+      "Bash(unzip -o /tmp/claudeline.zip claudeline.exe -d ~/.local/bin)",
+      "Bash(~/.local/bin/claudeline.exe:*)",
+      "Bash(python:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
+  },
+  "enabledPlugins": {
+    "csharp-lsp@claude-plugins-official": true
   }
 }

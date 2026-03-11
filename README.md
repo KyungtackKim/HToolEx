@@ -96,8 +96,8 @@ HTool.sln
 ### Key Dependencies
 
 **HTool**:
-- SuperSimpleTcp (v3.0.17)
-- System.IO.Ports (v9.0.9)
+- FluentFTP (v53.0.2)
+- System.IO.Ports (v10.0.3)
 
 **HToolEx**:
 - FluentFTP (v49.0.1)
