@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using HToolEx.Localization;
 using HToolEx.Util;
 using JetBrains.Annotations;
 
@@ -14,39 +12,22 @@ public class FormatSetInOut {
     ///     Input function types
     /// </summary>
     public enum SetInputTypes {
-        [Display(Description = @"SetInTypeDisable", ResourceType = typeof(HToolExRes))]
         Disable,
-        [Display(Description = @"SetInTypeJob1", ResourceType = typeof(HToolExRes))]
         JobSelect1,
-        [Display(Description = @"SetInTypeJob2", ResourceType = typeof(HToolExRes))]
         JobSelect2,
-        [Display(Description = @"SetInTypeJob3", ResourceType = typeof(HToolExRes))]
         JobSelect3,
-        [Display(Description = @"SetInTypeJob4", ResourceType = typeof(HToolExRes))]
         JobSelect4,
-        [Display(Description = @"SetInTypeJob5", ResourceType = typeof(HToolExRes))]
         JobSelect5,
-        [Display(Description = @"SetInTypeJob6", ResourceType = typeof(HToolExRes))]
         JobSelect6,
-        [Display(Description = @"SetInTypeJob7", ResourceType = typeof(HToolExRes))]
         JobSelect7,
-        [Display(Description = @"SetInTypeJob8", ResourceType = typeof(HToolExRes))]
         JobSelect8,
-        [Display(Description = @"SetInTypeSkip", ResourceType = typeof(HToolExRes))]
         Skip,
-        [Display(Description = @"SetInTypeBack", ResourceType = typeof(HToolExRes))]
         Back,
-        [Display(Description = @"SetInTypeStepReset", ResourceType = typeof(HToolExRes))]
         StepReset,
-        [Display(Description = @"SetInTypeJobReset", ResourceType = typeof(HToolExRes))]
         JobReset,
-        [Display(Description = @"SetInTypeNextJob", ResourceType = typeof(HToolExRes))]
         NextJob,
-        [Display(Description = @"SetInTypePrevJob", ResourceType = typeof(HToolExRes))]
         PreviousJob,
-        [Display(Description = @"SetInTypeAlarmReset", ResourceType = typeof(HToolExRes))]
         AlarmReset,
-        [Display(Description = @"SetInTypeEmergency", ResourceType = typeof(HToolExRes))]
         EmergencyLock
     }
 
@@ -54,23 +35,14 @@ public class FormatSetInOut {
     ///     Output function types
     /// </summary>
     public enum SetOutputTypes {
-        [Display(Description = @"SetOutTypeDisable", ResourceType = typeof(HToolExRes))]
         Disable,
-        [Display(Description = @"SetOutTypeFastenOk", ResourceType = typeof(HToolExRes))]
         FastenOk,
-        [Display(Description = @"SetOutTypeFastenNg", ResourceType = typeof(HToolExRes))]
         FastenNg,
-        [Display(Description = @"SetOutTypeStepOk", ResourceType = typeof(HToolExRes))]
         StepOk,
-        [Display(Description = @"SetOutTypeStepNg", ResourceType = typeof(HToolExRes))]
         StepNg,
-        [Display(Description = @"SetOutTypeJobOk", ResourceType = typeof(HToolExRes))]
         JobOk,
-        [Display(Description = @"SetOutTypeJobNg", ResourceType = typeof(HToolExRes))]
         JobNg,
-        [Display(Description = @"SetOutTypeReady", ResourceType = typeof(HToolExRes))]
         SystemReady,
-        [Display(Description = @"SetOutTypeAlarm", ResourceType = typeof(HToolExRes))]
         Alarm
     }
 

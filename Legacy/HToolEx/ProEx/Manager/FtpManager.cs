@@ -137,7 +137,7 @@ public class FtpManager {
                 rules.Add(new FtpFolderNameRule(false, block));
             // download files
             var res = await Client.DownloadDirectory(local, remote, mode, FtpLocalExists.Overwrite,
-                FtpVerify.OnlyChecksum, rules, progress, Token);
+                FtpVerify.OnlyVerify, rules, progress, Token);
             // result
             return !res.Any(x => x.IsFailed);
         } catch (Exception e) {
@@ -173,7 +173,7 @@ public class FtpManager {
             // Callback method that accepts a FtpProgress object
             var progress = new Progress<FtpProgress>(x => { TransferStatus(x); });
             // upload files
-            var res = await Client.UploadDirectory(local, remote, mode, exists, FtpVerify.OnlyChecksum, null, progress,
+            var res = await Client.UploadDirectory(local, remote, mode, exists, FtpVerify.OnlyVerify, null, progress,
                 Token);
             // result
             return !res.Any(x => x.IsFailed);
@@ -208,7 +208,7 @@ public class FtpManager {
             // Callback method that accepts a FtpProgress object
             var progress = new Progress<FtpProgress>(x => { TransferStatus(x); });
             // upload file
-            var res = await Client.UploadFile(local, remote, exists, true, FtpVerify.OnlyChecksum, progress, Token);
+            var res = await Client.UploadFile(local, remote, exists, true, FtpVerify.OnlyVerify, progress, Token);
             // result
             return res != FtpStatus.Failed;
         } catch (Exception e) {

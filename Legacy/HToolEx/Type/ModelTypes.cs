@@ -44,6 +44,8 @@ public enum ModelTypesMountz {
     Ep = 1010,
     [Description("EPT")]
     Ept = 1019,
+    [Description("BPT")]
+    Bpt = 1020,
     [Description("ECT40")]
     Ect40 = 1027,
     [Description("EPT40")]
