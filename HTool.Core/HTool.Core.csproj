@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+        <PackageId>Hantas.HTool.Core</PackageId>
+        <Title>HTool.Core</Title>
+        <Version>1.0.0</Version>
+        <PackageVersion>1.0.0</PackageVersion>
+        <Company>HANTAS</Company>
+        <Authors>Eloiz</Authors>
+        <Description>Core utilities and domain types for HANTAS tool communication libraries.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="README.md">
+            <PackagePath>\</PackagePath>
+            <Pack>true</Pack>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.IO.Hashing" Version="9.0.4"/>
+    </ItemGroup>
+
+</Project>

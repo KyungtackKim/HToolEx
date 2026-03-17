@@ -1,0 +1,153 @@
+<UserControl x:Class="ToolSample.Views.ConnectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:ToolSample.Converters">
+    <UserControl.Resources>
+        <converters:ComTypeToVisibilityConverter x:Key="ComTypeToVisibility" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ComType 선택 -->
+        <GroupBox Grid.Row="0" Header="Communication Type" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="8">
+                <RadioButton Content="RTU" Margin="0,0,16,0"
+                             GroupName="ComType"
+                             Click="OnComTypeRadioClick" />
+                <RadioButton Content="TCP" Margin="0,0,16,0"
+                             IsChecked="True"
+                             GroupName="ComType"
+                             Click="OnComTypeRadioClick" />
+                <RadioButton Content="PRO X"
+                             GroupName="ComType"
+                             Click="OnComTypeRadioClick" />
+            </StackPanel>
+        </GroupBox>
+
+        <!-- RTU 파라미터 -->
+        <GroupBox Grid.Row="1" Header="RTU Parameters" Margin="0,0,0,12"
+                  Visibility="{Binding SelectedComType, Converter={StaticResource ComTypeToVisibility}, ConverterParameter=Rtu}">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="COM Port:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"
+                          ItemsSource="{Binding AvailableComPorts}"
+                          SelectedItem="{Binding SelectedComPort}" />
+                <Button Grid.Row="0" Grid.Column="2" Content="Refresh" Margin="8,0,0,8"
+                        Command="{Binding RefreshComPortsCommand}" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Baud Rate:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8"
+                          ItemsSource="{Binding BaudRates}"
+                          SelectedItem="{Binding SelectedBaudRate}" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Slave ID:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SlaveId}" Width="60" HorizontalAlignment="Left" />
+            </Grid>
+        </GroupBox>
+
+        <!-- TCP 파라미터 -->
+        <GroupBox Grid.Row="1" Header="TCP Parameters" Margin="0,0,0,12"
+                  Visibility="{Binding SelectedComType, Converter={StaticResource ComTypeToVisibility}, ConverterParameter=Tcp}">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="IP Address:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding IpAddress}" Margin="0,0,0,8" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Port}" Width="80" HorizontalAlignment="Left"
+                         Margin="0,0,0,8" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Slave ID:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SlaveId}" Width="60" HorizontalAlignment="Left" />
+            </Grid>
+        </GroupBox>
+
+        <!-- PRO X 파라미터 -->
+        <GroupBox Grid.Row="1" Header="PRO X Parameters" Margin="0,0,0,12"
+                  Visibility="{Binding SelectedComType, Converter={StaticResource ComTypeToVisibility}, ConverterParameter=Pro}">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="IP Address:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding IpAddress}" Margin="0,0,0,8" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,0,0,8" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Port}" Width="80" HorizontalAlignment="Left"
+                         Margin="0,0,0,8" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Slave ID:" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SlaveId}" Width="60" HorizontalAlignment="Left" />
+            </Grid>
+        </GroupBox>
+
+        <!-- 설정 -->
+        <GroupBox Grid.Row="2" Header="Settings" Margin="0,0,0,12">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Timeout (ms):" VerticalAlignment="Center"
+                           Margin="0,0,0,8" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding MessageTimeout}" Width="80"
+                         HorizontalAlignment="Left" Margin="0,0,0,8" />
+
+                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                          Content="Enable Keep-Alive"
+                          IsChecked="{Binding KeepAliveEnabled}" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Connect / Disconnect 버튼 -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button Content="Connect" Width="100" Height="32" Margin="0,0,12,0"
+                    Command="{Binding ConnectCommand}" />
+            <Button Content="Disconnect" Width="100" Height="32"
+                    Command="{Binding DisconnectCommand}" />
+            <TextBlock Margin="16,0,0,0" VerticalAlignment="Center"
+                       Visibility="{Binding IsConnecting, Converter={StaticResource BoolToVisibility}}"
+                       Text="Connecting..." Foreground="Orange" />
+        </StackPanel>
+    </Grid>
+</UserControl>

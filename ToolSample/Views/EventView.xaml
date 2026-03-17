@@ -1,0 +1,52 @@
+<UserControl x:Class="ToolSample.Views.EventView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 버튼 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Start" Width="80" Height="28" Margin="0,0,8,0"
+                    Command="{Binding StartMonitoringCommand}" />
+            <Button Content="Stop" Width="80" Height="28" Margin="0,0,8,0"
+                    Command="{Binding StopMonitoringCommand}" />
+            <Button Content="Clear" Width="80" Height="28" Margin="0,0,8,0"
+                    Command="{Binding ClearEventsCommand}" />
+            <Button Content="Export CSV" Width="100" Height="28"
+                    Command="{Binding ExportCsvCommand}" />
+            <TextBlock Margin="16,0,0,0" VerticalAlignment="Center"
+                       Text="{Binding Events.Count, StringFormat='Events: {0}'}"
+                       Foreground="Gray" />
+        </StackPanel>
+
+        <!-- 이벤트 DataGrid -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Events}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  EnableRowVirtualization="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  AlternatingRowBackground="#F8F8F8">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70" />
+                <DataGridTextColumn Header="DateTime" Binding="{Binding DateTime}" Width="150" />
+                <DataGridTextColumn Header="Preset" Binding="{Binding Preset}" Width="60" />
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80" />
+                <DataGridTextColumn Header="Dir" Binding="{Binding Direction}" Width="60" />
+                <DataGridTextColumn Header="Target" Binding="{Binding TargetTorque, StringFormat=F2}" Width="80" />
+                <DataGridTextColumn Header="Torque" Binding="{Binding Torque, StringFormat=F2}" Width="80" />
+                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60" />
+                <DataGridTextColumn Header="Angle" Binding="{Binding Angle}" Width="70" />
+                <DataGridTextColumn Header="Speed" Binding="{Binding Speed}" Width="70" />
+                <DataGridTextColumn Header="Barcode" Binding="{Binding Barcode}" Width="120" />
+                <DataGridTextColumn Header="Error" Binding="{Binding Error}" Width="60" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

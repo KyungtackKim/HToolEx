@@ -1,844 +1,1136 @@
-﻿using System.Timers;
-using HTool.Data;
+using System.Timers;
 using HTool.Device;
-using HTool.Format;
+using HTool.Device.Codec;
+using HTool.Device.Pro;
+using HTool.Device.Protocol;
+using HTool.Device.Transport;
+using HTool.Format.Device;
 using HTool.Type;
-using HTool.Util;
 using Timer = System.Timers.Timer;
 
 namespace HTool;
 
 /// <summary>
-///     HTool 라이브러리의 메인 클래스. HANTAS 토크 도구와의 MODBUS 통신을 관리하는 고수준 API를 제공합니다.
-///     Main class of HTool library. Provides high-level API for managing MODBUS communication with HANTAS torque tools.
+///     HANTAS 장비와의 MODBUS 통신을 위한 통합 라이브러리 진입점.
+///     직접 RTU/TCP 연결과 PRO X 게이트웨이 연결을 동일한 API로 제공한다.
+///     동일 인스턴스에서 ComType 전환이 가능하다.
+///     Unified library entry point for MODBUS communication with HANTAS devices.
+///     Provides direct RTU/TCP and PRO X gateway connections through the same API.
+///     Supports ComType switching on the same instance.
 /// </summary>
-/// <remarks>
-///     <para>주요 기능 / Key Features:</para>
-///     <list type="bullet">
-///         <item>MODBUS RTU/TCP 프로토콜 지원 / Supports MODBUS RTU/TCP protocols</item>
-///         <item>자동 메시지 큐 관리 및 중복 방지 / Automatic message queue management with duplicate prevention</item>
-///         <item>대용량 레지스터 읽기/쓰기 자동 분할 (125/123 레지스터) / Auto-splits large read/write operations (125/123 registers)</item>
-///         <item>타임아웃 및 자동 재시도 / Timeout and automatic retry</item>
-///         <item>Keep-Alive 메커니즘 (3초 주기, 10초 타임아웃) / Keep-Alive mechanism (3s period, 10s timeout)</item>
-///         <item>이벤트 기반 비동기 통신 / Event-driven asynchronous communication</item>
-///     </list>
-/// </remarks>
-public sealed class HTool {
-    /// <summary>
-    ///     연결 상태 변경 델리게이트
-    ///     Connection state changed delegate
-    /// </summary>
-    /// <param name="state">연결 상태 (true: 연결됨, false: 연결 해제) / connection state (true: connected, false: disconnected)</param>
-    public delegate void PerformChangedConnect(bool state);
+public sealed class HTool : IDisposable {
+    // MODBUS 읽기 최대 레지스터 수
+    // maximum register count per MODBUS read request
+    private const int MaxReadRegisters = 125;
+
+    // MODBUS 쓰기 최대 레지스터 수
+    // maximum register count per MODBUS write request
+    private const int MaxWriteRegisters = 123;
+
+    // 코덱 (직접 연결 전용, PRO X 모드에서는 null)
+    // codec (direct connection only, null in PRO X mode)
+    private IModbusCodec? _codec;
+
+    // ConnectionState backing field — Volatile.Read/Write로 스레드 안전 보장
+    // ConnectionState backing field — thread-safe via Volatile.Read/Write
+    private int _connectionState = (int)Connection.Closed;
+    // 해제 상태 플래그
+    // disposed state flag
+    private bool _disposed;
+    // Keep-Alive 타이머 (직접 연결 전용, PRO X 모드에서는 null)
+    // keep-alive timer (direct connection only, null in PRO X mode)
+    private Timer? _keepAliveTimer;
+    // Keep-Alive 마지막 활동 시각 — ticks 단위 (스레드 안전)
+    // keep-alive last activity time — in ticks (thread-safe)
+    private long _lastActivityTicks;
+    // 메시지 파이프라인 (직접 연결 전용, PRO X 모드에서는 null)
+    // message pipeline (direct connection only, null in PRO X mode)
+    private MessagePipeline? _pipeline;
+
+    // MODBUS 슬레이브 ID
+    // MODBUS slave ID
+    private byte _slaveId = 0x01;
+
+    // 연결 대상 (IP 주소 또는 COM 포트명)
+    // connection target (IP address or COM port name)
+    private string _target = string.Empty;
+    // TCP 트랜잭션 ID (자동 증가)
+    // TCP transaction ID (auto-increment)
+    private ushort _transactionId;
+
+    // 전송 계층 (Connect 시 생성, 타입 전환 시 재생성)
+    // transport layer (created on Connect, recreated on type switch)
+    private ITransport? _transport;
 
     /// <summary>
-    ///     원시 데이터 수신 델리게이트
-    ///     Raw data received delegate
-    /// </summary>
-    /// <param name="data">원시 패킷 데이터 / raw packet data</param>
-    public delegate void PerformRawData(byte[] data);
-
-    /// <summary>
-    ///     파싱된 데이터 수신 델리게이트
-    ///     Parsed data received delegate
-    /// </summary>
-    /// <param name="codeTypes">MODBUS 함수 코드 / MODBUS function code</param>
-    /// <param name="addr">레지스터 주소 / register address</param>
-    /// <param name="data">수신 데이터 / received data</param>
-    public delegate void PerformReceivedData(CodeTypes codeTypes, int addr, IReceivedData data);
-
-    /// <summary>
-    ///     기본 생성자
-    ///     Default constructor
+    ///     HTool 인스턴스를 생성한다. 컴포넌트는 Connect() 호출 시 지연 생성된다.
+    ///     Creates an HTool instance. Components are lazily created on Connect().
     /// </summary>
     public HTool() {
-        // 타이머 옵션 설정
-        // set timer option
-        ProcessTimer.Interval  =  Constants.ProcessPeriod;
-        ProcessTimer.AutoReset =  true;
-        ProcessTimer.Elapsed   += OnElapsed;
+        // 로거 인스턴스 생성
+        // create logger instance
+        Logger = new HToolLogger();
     }
 
     /// <summary>
-    ///     통신 타입을 지정하는 생성자
-    ///     Constructor with communication type
+    ///     HTool 인스턴스를 초기 통신 유형과 함께 생성한다.
+    ///     컴포넌트는 Connect() 호출 시 지연 생성된다.
+    ///     Creates an HTool instance with an initial communication type.
+    ///     Components are lazily created on Connect().
     /// </summary>
-    /// <param name="type">통신 타입 (RTU 또는 TCP) / communication type (RTU or TCP)</param>
-    public HTool(ComTypes type) : this() {
-        // 통신 타입 설정
-        // set the communication type
-        SetType(type);
+    /// <param name="type">통신 유형 (Rtu, Tcp, Pro) / communication type (Rtu, Tcp, Pro)</param>
+    public HTool(ComType type) : this() {
+        // 초기 통신 유형 설정
+        // set initial communication type
+        Type = type;
     }
 
     /// <summary>
-    ///     통신 도구 인스턴스
-    ///     Communication tool instance
+    ///     통신 유형. Connect(ComType, ...) 호출 시 변경된다.
+    ///     Communication type. Changed on Connect(ComType, ...) calls.
     /// </summary>
-    private ITool? Tool { get; set; }
+    public ComType Type { get; private set; }
 
     /// <summary>
-    ///     메시지 큐 처리 타이머. 20ms 주기로 큐에서 메시지를 추출하여 전송하고 타임아웃을 관리합니다.
-    ///     Message queue processing timer. Extracts and sends messages from queue every 20ms, manages timeouts.
+    ///     현재 연결 상태.
+    ///     Current connection state.
     /// </summary>
-    /// <remarks>
-    ///     ProcessTimer는 메시지 전송, 타임아웃 확인, 재시도, Keep-Alive 등의 핵심 기능을 담당합니다.
-    ///     ProcessTimer handles core functions: message transmission, timeout checking, retry, and keep-alive.
-    /// </remarks>
-    private Timer ProcessTimer { get; } = new();
-
-    /// <summary>
-    ///     메시지 전송 큐. 중복 방지 기능이 있는 KeyedQueue를 사용하여 동일 주소/함수 코드 메시지가 큐에 중복 추가되지 않도록 합니다.
-    ///     Message transmission queue. Uses KeyedQueue with duplicate prevention to avoid adding duplicate messages with same
-    ///     address/function code.
-    /// </summary>
-    /// <remarks>
-    ///     최대 64개 메시지 저장 가능. 메시지 키는 (FunctionCode, Address)로 구성되어 중복을 식별합니다.
-    ///     Capacity of 64 messages. Message key consists of (FunctionCode, Address) to identify duplicates.
-    /// </remarks>
-    private KeyedQueue<FormatMessage, FormatMessage.MessageKey> MessageQue { get; } =
-        KeyedQueue<FormatMessage, FormatMessage.MessageKey>.Create(static m => m.Key, capacity: 64);
-
-    /// <summary>
-    ///     연결 시작 시간
-    ///     Connection start time
-    /// </summary>
-    private DateTime ConnectionTime { get; set; }
-
-    /// <summary>
-    ///     마지막 Keep-Alive 요청 시간
-    ///     Last keep-alive request time
-    /// </summary>
-    private DateTime KeepAliveRequestTime { get; set; } = DateTime.Now;
-
-    /// <summary>
-    ///     마지막 Keep-Alive 응답 수신 시간
-    ///     Last keep-alive response received time
-    /// </summary>
-    private DateTime KeepAliveTime { get; set; } = DateTime.Now;
-
-    /// <summary>
-    ///     통신 타입 (RTU 또는 TCP)
-    ///     Communication type (RTU or TCP)
-    /// </summary>
-    public ComTypes Type { get; private set; }
-
-    /// <summary>
-    ///     연결 상태
-    ///     Connection state
-    /// </summary>
-    public ConnectionTypes ConnectionState { get; set; }
-
-    /// <summary>
-    ///     도구 프로토콜 세대 (Gen.1, Gen.2 등)
-    ///     Tool protocol generation (Gen.1, Gen.2, etc.)
-    /// </summary>
-    public GenerationTypes Gen { get; private set; } = GenerationTypes.GenRev2;
-
-    /// <summary>
-    ///     장치 기본 정보
-    ///     Device basic information
-    /// </summary>
-    public FormatSimpleInfo Info { get; private set; } = new();
-
-    /// <summary>
-    ///     Keep-Alive 기능 활성화 여부. 활성화 시 3초마다 장치 정보 요청을 보내 연결을 유지하고, 10초 응답 없으면 자동 종료합니다.
-    ///     Keep-Alive feature enabled flag. When enabled, sends device info request every 3s to maintain connection,
-    ///     auto-disconnects after 10s no response.
-    /// </summary>
-    /// <remarks>
-    ///     장기 연결 모니터링 애플리케이션에 권장. 짧은 작업에는 불필요한 트래픽을 유발할 수 있습니다.
-    ///     Recommended for long-running monitoring applications. May cause unnecessary traffic for short operations.
-    /// </remarks>
-    public bool EnableKeepAlive { get; set; }
-
-    /// <summary>
-    ///     한 번에 읽을 수 있는 최대 레지스터 수. MODBUS 프로토콜 제약사항으로 인한 제한값입니다.
-    ///     Maximum register count for single read operation. Limited by MODBUS protocol constraints.
-    /// </summary>
-    /// <remarks>
-    ///     이 값을 초과하는 읽기 요청은 자동으로 여러 메시지로 분할됩니다.
-    ///     Read requests exceeding this value are automatically split into multiple messages.
-    /// </remarks>
-    public static int ReadRegMaxSize => 125;
-
-    /// <summary>
-    ///     한 번에 쓸 수 있는 최대 레지스터 수. MODBUS 프로토콜 제약사항으로 인한 제한값입니다.
-    ///     Maximum register count for single write operation. Limited by MODBUS protocol constraints.
-    /// </summary>
-    /// <remarks>
-    ///     이 값을 초과하는 쓰기 요청은 자동으로 여러 메시지로 분할됩니다.
-    ///     Write requests exceeding this value are automatically split into multiple messages.
-    /// </remarks>
-    public static int WriteRegMaxSize => 123;
-
-    /// <summary>
-    ///     연결 상태 변경 이벤트
-    ///     Connection state changed event
-    /// </summary>
-    public event PerformChangedConnect? ChangedConnect;
-
-    /// <summary>
-    ///     파싱된 데이터 수신 이벤트
-    ///     Parsed data received event
-    /// </summary>
-    public event PerformReceivedData? ReceivedData;
-
-    /// <summary>
-    ///     수신 오류 이벤트
-    ///     Receive error event
-    /// </summary>
-    public event ITool.PerformReceiveError? ReceiveError;
-
-    /// <summary>
-    ///     원시 데이터 수신 이벤트
-    ///     Raw data received event
-    /// </summary>
-    public event PerformRawData? ReceivedRawData;
-
-    /// <summary>
-    ///     원시 데이터 전송 이벤트
-    ///     Raw data transmitted event
-    /// </summary>
-    public event PerformRawData? TransmitRawData;
-
-    /// <summary>
-    ///     통신 타입 설정
-    ///     Set the communication type
-    /// </summary>
-    /// <param name="type">통신 타입 (RTU 또는 TCP) / communication type (RTU or TCP)</param>
-    public void SetType(ComTypes type) {
-        // 기존 통신 도구 확인
-        // check existing communication tool
-        if (Tool != null) {
-            // 연결 중이면 변경 불가
-            // cannot change while connected
-            if (ConnectionState == ConnectionTypes.Connected)
-                return;
-            // 이벤트 해제
-            // unsubscribe events
-            Tool.ChangedConnect -= OnChangedConnect;
-            Tool.ReceivedData   -= OnReceivedData;
-            Tool.ReceivedRaw    -= OnReceivedRaw;
-            Tool.TransmitRaw    -= OnTransmitRaw;
-            // 도구 해제
-            // dispose tool
-            Tool = null;
-        }
-
-        try {
-            // 통신 타입 설정
-            // set communication type
-            Type = type;
-            // 통신 도구 생성
-            // create communication tool
-            Tool = Device.Tool.Create(type);
-            // 도구 생성 확인
-            // check tool creation
-            if (Tool == null)
-                throw new Exception("Unable to create a Tool communication object.");
-            // 이벤트 등록
-            // subscribe events
-            Tool.ChangedConnect += OnChangedConnect;
-        } catch (Exception e) {
-            Console.WriteLine(e.Message);
+    public Connection ConnectionState {
+        get => (Connection)Volatile.Read(ref _connectionState);
+        private set {
+            // 새 상태 저장
+            // store new state
+            Volatile.Write(ref _connectionState, (int)value);
+            // 4-state 이벤트 발행
+            // raise 4-state event
+            ConnectionStateChanged?.Invoke(value);
         }
     }
 
     /// <summary>
-    ///     장치에 연결
-    ///     Connect to the device
+    ///     장치 기본 정보. 연결 완료 후 설정된다. PRO X 모드에서는 사용하지 않는다.
+    ///     Device basic information. Set after connection is established. Not used in PRO X mode.
     /// </summary>
-    /// <param name="target">대상 (COM 포트 또는 IP 주소) / target (COM port or IP address)</param>
-    /// <param name="option">옵션 (보드레이트 또는 포트) / option (baud rate or port)</param>
-    /// <param name="id">장치 ID / device ID</param>
-    /// <returns>연결 성공 여부 / connection success result</returns>
-    public bool Connect(string target, int option, byte id = 0x01) {
-        try {
-            // 통신 도구 확인
-            // check communication tool
-            if (Tool == null)
-                return false;
-            // 연결 시도
-            // attempt connection
-            if (!Tool.Connect(target, option, id))
-                return false;
-            // 메시지 큐 초기화
-            // clear message queue
-            MessageQue.Clear();
-            // 연결 중 상태로 변경
-            // change to connecting state
-            ConnectionState = ConnectionTypes.Connecting;
-            // 연결 시작 시간 기록
-            // record connection start time
-            ConnectionTime = DateTime.Now;
-            // 이벤트 등록
-            // subscribe events
-            Tool.ReceivedData  += OnReceivedData;
-            Tool.ReceivedError += OnReceivedError;
-            Tool.ReceivedRaw   += OnReceivedRaw;
-            Tool.TransmitRaw   += OnTransmitRaw;
-            // 처리 타이머 시작
-            // start process timer
-            ProcessTimer.Start();
+    public SimpleInfo Info { get; private set; }
+
+    /// <summary>
+    ///     인스턴스별 설정. Connect() 호출 전에 설정한다.
+    ///     Per-instance settings. Configure before calling Connect().
+    /// </summary>
+    public HToolSettings Settings { get; } = new();
+
+    /// <summary>
+    ///     통합 로거 인스턴스.
+    ///     Integrated logger instance.
+    /// </summary>
+    public HToolLogger Logger { get; }
+
+    /// <summary>
+    ///     PRO X 서비스. 직접 연결 시 null. ComType 전환 시 재생성된다.
+    ///     PRO X service. null for direct connection. Recreated on ComType switch.
+    /// </summary>
+    public ProService? Pro { get; private set; }
+
+    /// <summary>
+    ///     PRO X 모드 여부.
+    ///     Whether this instance is in PRO X mode.
+    /// </summary>
+    private bool IsProMode => Type is ComType.Pro;
+
+    /// <inheritdoc />
+    public void Dispose() {
+        // 이중 해제 방지
+        // prevent double disposal
+        if (_disposed)
+            // 이미 해제됨 — 건너뜀
+            // already disposed — skip
+            return;
+        // 해제됨으로 표시
+        // mark as disposed
+        _disposed = true;
+
+        // 내부 컴포넌트 해제 (Transport, Pipeline, ProService, Timer)
+        // dispose internal components (Transport, Pipeline, ProService, Timer)
+        DisposeComponents();
+        // 로거 해제
+        // dispose logger
+        Logger.Dispose();
+        // Finalizer 큐 진입 방지
+        // suppress finalizer queue entry
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Dispose 누락 시 안전망.
+    ///     Safety net for missed Dispose calls.
+    /// </summary>
+    ~HTool() {
+        // Dispose 패턴 위임
+        // delegate to Dispose pattern
+        Dispose();
+    }
+
+    /// <summary>
+    ///     연결 상태 변경 이벤트. true = 연결됨, false = 해제됨.
+    ///     Connection state changed event. true = connected, false = disconnected.
+    /// </summary>
+    public event Action<bool>? ChangedConnect;
+
+    /// <summary>
+    ///     연결 상태 변경 이벤트 (4-state). Close / Closed / Connecting / Connected 상태를 전달한다.
+    ///     Connection state changed event (4-state). Delivers Close / Closed / Connecting / Connected states.
+    /// </summary>
+    public event Action<Connection>? ConnectionStateChanged;
+
+    /// <summary>
+    ///     MODBUS 응답 수신 이벤트.
+    ///     MODBUS response received event.
+    /// </summary>
+    public event Action<ModbusResponse>? ReceivedData;
+
+    /// <summary>
+    ///     통신 오류 이벤트.
+    ///     Communication error event.
+    /// </summary>
+    public event Action<ComError>? ReceiveError;
+
+    /// <summary>
+    ///     통신 유형을 지정하여 대상에 비동기로 연결한다. 유형이 변경되면 내부 컴포넌트를 재생성한다.
+    ///     Asynchronously connects to the target with a specified communication type.
+    ///     Rebuilds internal components when the type changes.
+    /// </summary>
+    /// <param name="type">통신 유형 (Rtu, Tcp, Pro) / communication type (Rtu, Tcp, Pro)</param>
+    /// <param name="target">
+    ///     연결 대상 (RTU: COM 포트명, TCP/Pro: IP 주소).
+    ///     Connection target (RTU: COM port name, TCP/Pro: IP address).
+    /// </param>
+    /// <param name="option">
+    ///     연결 옵션 (RTU: 보드레이트, TCP/Pro: 포트 번호).
+    ///     Connection option (RTU: baud rate, TCP/Pro: port number).
+    /// </param>
+    /// <param name="id">MODBUS 슬레이브 ID. 기본값 0x01 / MODBUS slave ID. Default 0x01</param>
+    /// <param name="ct">취소 토큰 / cancellation token</param>
+    /// <returns>연결 시도 성공 여부 / whether the connection attempt was initiated</returns>
+    public async Task<bool> ConnectAsync(
+        ComType           type,
+        string            target,
+        int               option,
+        byte              id = 0x01,
+        CancellationToken ct = default) {
+        // 이미 연결 중이거나 연결된 상태면 거부
+        // reject if already connecting or connected
+        if (ConnectionState is Connection.Connecting or Connection.Connected)
+            // 중복 연결 시도 거부
+            // reject duplicate connection attempt
+            return false;
+
+        // 타입 변경 또는 첫 연결 시 컴포넌트 재생성
+        // rebuild components on type change or first connection
+        if (type != Type || _transport is null)
+            // 새 통신 유형으로 컴포넌트 생성
+            // build components for new communication type
+            BuildComponents(type);
+
+        // 비동기 연결 위임
+        // delegate to async connection
+        return await ConnectInternalAsync(target, option, id, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     현재 설정된 통신 유형으로 대상에 비동기로 연결한다.
+    ///     Asynchronously connects to the target using the currently configured communication type.
+    /// </summary>
+    /// <param name="target">
+    ///     연결 대상 (RTU: COM 포트명, TCP/Pro: IP 주소).
+    ///     Connection target (RTU: COM port name, TCP/Pro: IP address).
+    /// </param>
+    /// <param name="option">
+    ///     연결 옵션 (RTU: 보드레이트, TCP/Pro: 포트 번호).
+    ///     Connection option (RTU: baud rate, TCP/Pro: port number).
+    /// </param>
+    /// <param name="id">MODBUS 슬레이브 ID. 기본값 0x01 / MODBUS slave ID. Default 0x01</param>
+    /// <param name="ct">취소 토큰 / cancellation token</param>
+    /// <returns>연결 시도 성공 여부 / whether the connection attempt was initiated</returns>
+    public async Task<bool> ConnectAsync(
+        string            target,
+        int               option,
+        byte              id = 0x01,
+        CancellationToken ct = default) {
+        // 이미 연결 중이거나 연결된 상태면 거부
+        // reject if already connecting or connected
+        if (ConnectionState is Connection.Connecting or Connection.Connected)
+            // 중복 연결 시도 거부
+            // reject duplicate connection attempt
+            return false;
+
+        // 첫 연결 시 컴포넌트 생성
+        // build components on first connection
+        if (_transport is null)
+            // 현재 통신 유형으로 컴포넌트 생성
+            // build components for current communication type
+            BuildComponents(Type);
+
+        // 비동기 연결 위임
+        // delegate to async connection
+        return await ConnectInternalAsync(target, option, id, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     연결을 해제한다. 컴포넌트는 정지만 하고 해제하지 않는다.
+    ///     Closes the connection. Components are stopped but not disposed.
+    /// </summary>
+    public void Close() {
+        // 이미 닫혀있는 상태면 무시
+        // ignore if already closed
+        if (ConnectionState is Connection.Closed or Connection.Close)
+            // 이미 닫힌 상태 — 반환
+            // already closed — return
+            return;
+
+        // 연결 해제 상태로 변경
+        // set state to closing
+        ConnectionState = Connection.Close;
+        // 연결 해제 로그 기록
+        // log disconnection
+        Logger.Log(LogCategories.Connection, LogLevel.Info, "Closing connection");
+
+        // PRO X 모드 정리
+        // PRO X mode cleanup
+        if (Pro is not null) {
+            // ProService 정지
+            // stop ProService
+            Pro.Stop();
+        } else {
+            // 직접 연결 모드 정리
+            // direct connection mode cleanup
+            // Keep-Alive 타이머 정지
+            // stop keep-alive timer
+            _keepAliveTimer?.Stop();
+            // 파이프라인 정지
+            // stop pipeline
+            _pipeline?.Stop();
+        }
+
+        // 전송 계층 닫기
+        // close transport
+        _transport?.Close();
+    }
+
+    /// <summary>
+    ///     보유 레지스터를 읽는다 (FC 0x03). 125개 초과 시 자동 분할.
+    ///     Reads holding registers (FC 0x03). Auto-splits if count exceeds 125.
+    /// </summary>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="count">레지스터 개수 / register count</param>
+    /// <returns>요청 인큐 성공 여부 / whether all requests were enqueued</returns>
+    public bool ReadHoldingReg(ushort addr, ushort count) {
+        // 자동 분할 읽기 위임
+        // delegate to auto-split read
+        return EnqueueReadRequests(FunctionCode.ReadHoldingReg, addr, count);
+    }
+
+    /// <summary>
+    ///     입력 레지스터를 읽는다 (FC 0x04). 125개 초과 시 자동 분할.
+    ///     Reads input registers (FC 0x04). Auto-splits if count exceeds 125.
+    /// </summary>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="count">레지스터 개수 / register count</param>
+    /// <returns>요청 인큐 성공 여부 / whether all requests were enqueued</returns>
+    public bool ReadInputReg(ushort addr, ushort count) {
+        // 자동 분할 읽기 위임
+        // delegate to auto-split read
+        return EnqueueReadRequests(FunctionCode.ReadInputReg, addr, count);
+    }
+
+    /// <summary>
+    ///     단일 레지스터에 값을 쓴다 (FC 0x06).
+    ///     Writes a value to a single register (FC 0x06).
+    /// </summary>
+    /// <param name="addr">레지스터 주소 / register address</param>
+    /// <param name="value">쓸 값 / value to write</param>
+    /// <returns>요청 인큐 성공 여부 / whether the request was enqueued</returns>
+    public bool WriteSingleReg(ushort addr, ushort value) {
+        // 연결 상태 확인
+        // check connection state
+        if (ConnectionState is not Connection.Connected)
+            // 미연결 — 거부
+            // not connected — reject
+            return false;
+
+        // PRO X 모드: MODBUS 패스스루
+        // PRO X mode: MODBUS passthrough
+        if (IsProMode)
+            // ProService를 통해 MODBUS 패스스루
+            // MODBUS passthrough via ProService
+            return EnqueueProModbusRequest(FunctionCode.WriteSingleReg, addr, value);
+
+        // 트랜잭션 ID 발급
+        // issue transaction ID
+        var tId = NextTransactionId();
+        // 패킷 생성
+        // build packet
+        var packet = _codec!.BuildWriteSingleReg(addr, value, _slaveId, tId);
+        // 요청 생성 및 인큐
+        // create request and enqueue
+        var request = new ModbusRequest(FunctionCode.WriteSingleReg, addr, packet);
+        // 마지막 활동 시각 갱신
+        // update last activity time
+        Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+        // 요청 인큐
+        // enqueue request
+        return _pipeline!.Enqueue(request);
+    }
+
+    /// <summary>
+    ///     다중 레지스터에 값을 쓴다 (FC 0x10).
+    ///     Writes values to multiple registers (FC 0x10).
+    /// </summary>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="values">쓸 값 배열 / values to write</param>
+    /// <returns>요청 인큐 성공 여부 / whether the request was enqueued</returns>
+    public bool WriteMultiReg(ushort addr, ushort[] values) {
+        // ReadOnlySpan 오버로드 위임
+        // delegate to ReadOnlySpan overload
+        return WriteMultiReg(addr, (ReadOnlySpan<ushort>)values);
+    }
+
+    /// <summary>
+    ///     다중 레지스터에 값을 쓴다 (FC 0x10, Span 오버로드).
+    ///     Writes values to multiple registers (FC 0x10, Span overload).
+    /// </summary>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="values">쓸 값 스팬 / values span to write</param>
+    /// <returns>요청 인큐 성공 여부 / whether the request was enqueued</returns>
+    public bool WriteMultiReg(ushort addr, ReadOnlySpan<ushort> values) {
+        // 연결 상태 확인
+        // check connection state
+        if (ConnectionState is not Connection.Connected)
+            // 미연결 — 거부
+            // not connected — reject
+            return false;
+
+        // 가드: 레지스터 개수 범위 확인
+        // guard: validate register count range
+        if (values.Length is 0 or > MaxWriteRegisters)
+            // 범위 초과 — 거부
+            // out of range — reject
+            return false;
+
+        // PRO X 모드: MODBUS 패스스루
+        // PRO X mode: MODBUS passthrough
+        if (IsProMode) {
+            // MODBUS TCP 코덱으로 패킷 생성
+            // build packet with MODBUS TCP codec
+            var proCodec = new ModbusTcpCodec();
+            // 패킷 생성
+            // build packet
+            var proPacket = proCodec.BuildWriteMultiReg(addr, values, _slaveId);
+            // ProService를 통해 MODBUS 패스스루
+            // MODBUS passthrough via ProService
+            return Pro!.EnqueueModbusRequest(proPacket);
+        }
+
+        // 트랜잭션 ID 발급
+        // issue transaction ID
+        var tId = NextTransactionId();
+        // 패킷 생성
+        // build packet
+        var packet = _codec!.BuildWriteMultiReg(addr, values, _slaveId, tId);
+        // 요청 생성 및 인큐
+        // create request and enqueue
+        var request = new ModbusRequest(FunctionCode.WriteMultiReg, addr, packet);
+        // 마지막 활동 시각 갱신
+        // update last activity time
+        Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+        // 요청 인큐
+        // enqueue request
+        return _pipeline!.Enqueue(request);
+    }
+
+    /// <summary>
+    ///     문자열을 레지스터에 쓴다 (FC 0x10, 문자열 인코딩).
+    ///     Writes a string to registers (FC 0x10, string encoding).
+    /// </summary>
+    /// <param name="addr">시작 주소 / start address</param>
+    /// <param name="str">쓸 문자열 / string to write</param>
+    /// <param name="length">고정 바이트 길이 (0이면 문자열 길이 사용) / fixed byte length (0 uses string length)</param>
+    /// <returns>요청 인큐 성공 여부 / whether the request was enqueued</returns>
+    public bool WriteStrReg(ushort addr, string str, int length = 0) {
+        // 연결 상태 확인
+        // check connection state
+        if (ConnectionState is not Connection.Connected)
+            // 미연결 — 거부
+            // not connected — reject
+            return false;
+
+        // PRO X 모드: MODBUS 패스스루
+        // PRO X mode: MODBUS passthrough
+        if (IsProMode) {
+            // MODBUS TCP 코덱으로 패킷 생성
+            // build packet with MODBUS TCP codec
+            var proCodec = new ModbusTcpCodec();
+            // 패킷 생성
+            // build packet
+            var proPacket = proCodec.BuildWriteStrReg(addr, str, length, _slaveId);
+            // ProService를 통해 MODBUS 패스스루
+            // MODBUS passthrough via ProService
+            return Pro!.EnqueueModbusRequest(proPacket);
+        }
+
+        // 트랜잭션 ID 발급
+        // issue transaction ID
+        var tId = NextTransactionId();
+        // 패킷 생성
+        // build packet
+        var packet = _codec!.BuildWriteStrReg(addr, str, length, _slaveId, tId);
+        // 요청 생성 및 인큐
+        // create request and enqueue
+        var request = new ModbusRequest(FunctionCode.WriteMultiReg, addr, packet);
+        // 마지막 활동 시각 갱신
+        // update last activity time
+        Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+        // 요청 인큐
+        // enqueue request
+        return _pipeline!.Enqueue(request);
+    }
+
+    /// <summary>
+    ///     장치 정보를 읽는다 (FC 0x11, HANTAS 전용). PRO X 모드에서는 사용하지 않는다.
+    ///     Reads device information (FC 0x11, HANTAS custom). Not used in PRO X mode.
+    /// </summary>
+    /// <returns>요청 인큐 성공 여부 / whether the request was enqueued</returns>
+    public bool ReadInfoReg() {
+        // PRO X 모드에서는 지원하지 않음
+        // not supported in PRO X mode
+        if (IsProMode)
+            // PRO X 모드 — 거부
+            // PRO X mode — reject
+            return false;
+
+        // 연결 해제 상태면 거부 (Connecting 상태에서도 허용)
+        // reject if closed (allowed during Connecting state)
+        if (ConnectionState is Connection.Closed or Connection.Close)
+            // 미연결 — 거부
+            // not connected — reject
+            return false;
+
+        // 트랜잭션 ID 발급
+        // issue transaction ID
+        var tId = NextTransactionId();
+        // 패킷 생성
+        // build packet
+        var packet = _codec!.BuildReadInfoReg(_slaveId, tId);
+        // 요청 생성 및 인큐
+        // create request and enqueue
+        var request = new ModbusRequest(FunctionCode.ReadInfoReg, 0, packet);
+        // 마지막 활동 시각 갱신
+        // update last activity time
+        Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+        // 요청 인큐
+        // enqueue request
+        return _pipeline!.Enqueue(request);
+    }
+
+    /// <summary>
+    ///     통신 유형에 따라 내부 컴포넌트를 생성한다.
+    ///     기존 컴포넌트가 있으면 먼저 해제한다.
+    ///     Builds internal components based on communication type.
+    ///     Disposes existing components first if present.
+    /// </summary>
+    /// <param name="type">통신 유형 / communication type</param>
+    private void BuildComponents(ComType type) {
+        // 기존 컴포넌트 해제
+        // dispose existing components
+        DisposeComponents();
+
+        // 통신 유형 설정
+        // set communication type
+        Type = type;
+
+        // 통신 유형에 따라 전송 계층과 코덱 생성
+        // create transport and codec based on communication type
+        switch (type) {
+            case ComType.Rtu:
+                // RTU 전송 계층 생성
+                // create RTU transport
+                _transport = new RtuTransport(Settings.Connection);
+                // RTU 코덱 생성
+                // create RTU codec
+                _codec = new ModbusRtuCodec();
+                // RTU 전송 계층 생성 완료
+                // RTU transport setup complete
+                break;
+            case ComType.Tcp:
+                // TCP 전송 계층 생성
+                // create TCP transport
+                _transport = new TcpTransport(Settings.Connection);
+                // TCP 코덱 생성
+                // create TCP codec
+                _codec = new ModbusTcpCodec();
+                // TCP 전송 계층 생성 완료
+                // TCP transport setup complete
+                break;
+            case ComType.Pro:
+                // PRO X는 TCP 전송 계층 사용
+                // PRO X uses TCP transport
+                _transport = new TcpTransport(Settings.Connection);
+                // PRO X 서비스 생성
+                // create PRO X service
+                Pro = new ProService(_transport, Logger, Settings);
+                // ProService 연결 상태 변경 이벤트 구독
+                // subscribe to ProService connection state change event
+                Pro.ConnectionChanged += OnProConnectionChanged;
+                // ProService MODBUS 응답 이벤트 구독
+                // subscribe to ProService MODBUS response event
+                Pro.ModbusResponseReceived += OnProModbusResponse;
+                // PRO X 서비스 생성 완료
+                // PRO X service setup complete
+                break;
+            default:
+                // 지원하지 않는 통신 유형 예외
+                // unsupported communication type
+                throw new ArgumentOutOfRangeException(nameof(type), type, "Unsupported communication type");
+        }
+
+        // 직접 연결 모드에서만 파이프라인과 Keep-Alive 타이머 생성
+        // create pipeline and Keep-Alive timer only in direct connection mode
+        if (type is not ComType.Pro) {
+            // 메시지 파이프라인 생성
+            // create message pipeline
+            _pipeline = new MessagePipeline(_transport, _codec!, Logger, Settings);
+            // 파이프라인 응답 이벤트 구독
+            // subscribe to pipeline response event
+            _pipeline.ResponseReceived += OnResponseReceived;
+            // 파이프라인 오류 이벤트 구독
+            // subscribe to pipeline error event
+            _pipeline.ErrorOccurred += OnErrorOccurred;
+
+            // Keep-Alive 타이머 생성 (Connect 시점에 Settings.KeepAlive.Period 반영)
+            // create keep-alive timer (Settings.KeepAlive.Period applied at Connect time)
+            _keepAliveTimer = new Timer(1000) {
+                // 반복 실행 활성화
+                // enable auto-reset
+                AutoReset = true
+            };
+            // Keep-Alive 타이머 이벤트 핸들러 등록
+            // register keep-alive timer event handler
+            _keepAliveTimer.Elapsed += OnKeepAliveElapsed;
+        }
+
+        // 전송 계층 연결 상태 변경 이벤트 구독
+        // subscribe to transport connection state change event
+        _transport.ConnectionChanged += OnConnectionChanged;
+    }
+
+    /// <summary>
+    ///     내부 컴포넌트를 해제한다. Logger와 Settings는 유지한다.
+    ///     Disposes internal components. Logger and Settings are preserved.
+    /// </summary>
+    private void DisposeComponents() {
+        // PRO X 모드 정리
+        // PRO X mode cleanup
+        if (Pro is not null) {
+            // ProService 이벤트 해제
+            // unsubscribe ProService events
+            Pro.ConnectionChanged -= OnProConnectionChanged;
+            // ProService MODBUS 응답 이벤트 해제
+            // unsubscribe ProService MODBUS response event
+            Pro.ModbusResponseReceived -= OnProModbusResponse;
+            // ProService 해제
+            // dispose ProService
+            Pro.Dispose();
+            // ProService 참조 제거
+            // clear ProService reference
+            Pro = null;
+        }
+
+        // 직접 연결 모드 정리
+        // direct connection mode cleanup
+        if (_keepAliveTimer is not null) {
+            // Keep-Alive 타이머 정지
+            // stop keep-alive timer
+            _keepAliveTimer.Stop();
+            // Keep-Alive 타이머 이벤트 핸들러 해제
+            // unsubscribe keep-alive timer event handler
+            _keepAliveTimer.Elapsed -= OnKeepAliveElapsed;
+            // Keep-Alive 타이머 해제
+            // dispose keep-alive timer
+            _keepAliveTimer.Dispose();
+            // Keep-Alive 타이머 참조 제거
+            // clear keep-alive timer reference
+            _keepAliveTimer = null;
+        }
+
+        // 파이프라인 해제 (Transport 구독 해제를 위해 Transport보다 먼저 해제)
+        // dispose pipeline (before Transport to unsubscribe from Transport.DataReceived)
+        if (_pipeline is not null) {
+            // 파이프라인 해제
+            // dispose pipeline
+            _pipeline.Dispose();
+            // 파이프라인 참조 제거
+            // clear pipeline reference
+            _pipeline = null;
+        }
+
+        // 전송 계층 해제
+        // dispose transport
+        if (_transport is not null) {
+            // 전송 계층 이벤트 해제
+            // unsubscribe transport events
+            _transport.ConnectionChanged -= OnConnectionChanged;
+            // 전송 계층 해제
+            // dispose transport
+            _transport.Dispose();
+            // 전송 계층 참조 제거
+            // clear transport reference
+            _transport = null;
+        }
+
+        // 코덱 참조 제거 (상태 없음, Dispose 불필요)
+        // clear codec reference (stateless, no Dispose needed)
+        _codec = null;
+
+        // 장치 정보 초기화 (stale 데이터 방지)
+        // reset device info (prevent stale data)
+        Info = default;
+    }
+
+    /// <summary>
+    ///     연결 공유 로직. 전송 계층 비동기 연결을 시도한다.
+    ///     Shared connection logic. Attempts async transport connection.
+    /// </summary>
+    /// <param name="target">
+    ///     연결 대상 (RTU: COM 포트명, TCP/Pro: IP 주소).
+    ///     Connection target (RTU: COM port name, TCP/Pro: IP address).
+    /// </param>
+    /// <param name="option">
+    ///     연결 옵션 (RTU: 보드레이트, TCP/Pro: 포트 번호).
+    ///     Connection option (RTU: baud rate, TCP/Pro: port number).
+    /// </param>
+    /// <param name="id">MODBUS 슬레이브 ID / MODBUS slave ID</param>
+    /// <param name="ct">취소 토큰 / cancellation token</param>
+    /// <returns>연결 시도 성공 여부 / whether the connection attempt was initiated</returns>
+    private async Task<bool> ConnectInternalAsync(
+        string            target,
+        int               option,
+        byte              id,
+        CancellationToken ct) {
+        // 연결 대상 저장 (FTP 서비스에서 사용)
+        // store connection target (used by FTP service)
+        _target = target;
+        // 슬레이브 ID 설정
+        // set slave ID
+        _slaveId = id;
+        // 트랜잭션 ID 초기화
+        // reset transaction ID
+        _transactionId = 0;
+        // 연결 상태를 연결 중으로 변경
+        // set connection state to connecting
+        ConnectionState = Connection.Connecting;
+        // 연결 로그 기록
+        // log connection attempt
+        Logger.Log(LogCategories.Connection, LogLevel.Info, $"Connecting: {target}:{option} SlaveId=0x{id:X2}");
+
+        // 전송 계층 비동기 연결 시도
+        // attempt async transport connection
+        if (await _transport!.ConnectAsync(target, option, ct).ConfigureAwait(false))
+            // 연결 성공 반환
+            // return connection success
             return true;
-        } catch (Exception ex) {
-            Console.WriteLine(ex.Message);
-        }
-
+        // 연결 실패 — 상태 복원
+        // connection failed — restore state
+        ConnectionState = Connection.Closed;
+        // 연결 실패 로그 기록
+        // log connection failure
+        Logger.Log(LogCategories.Connection, LogLevel.Error, "Connection failed");
+        // 연결 실패 반환
+        // return connection failure
         return false;
     }
 
     /// <summary>
-    ///     장치 연결 해제
-    ///     Close the device connection
+    ///     읽기 요청을 자동 분할하여 인큐한다 (125 레지스터 초과 시).
+    ///     Auto-splits and enqueues read requests (when exceeding 125 registers).
     /// </summary>
-    public void Close() {
-        // 타이머 정지
-        // stop timer
-        ProcessTimer.Stop();
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return;
-        // 장치 정보 초기화
-        // reset device information
-        Info = new FormatSimpleInfo();
-        // 이벤트 해제
-        // unsubscribe events
-        Tool.ReceivedData  -= OnReceivedData;
-        Tool.ReceivedError -= OnReceivedError;
-        Tool.ReceivedRaw   -= OnReceivedRaw;
-        Tool.TransmitRaw   -= OnTransmitRaw;
-        // 연결 종료
-        // close connection
-        Tool.Close();
-    }
-
-    /// <summary>
-    ///     메시지 큐에 단일 메시지 추가
-    ///     Insert single message to queue
-    /// </summary>
-    /// <param name="msg">메시지 / message</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>추가 성공 여부 / insert success result</returns>
-    private bool Insert(FormatMessage msg, bool check = true) {
-        // 중복 확인 모드 설정
-        // set duplicate check mode
-        var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
-        // 큐에 추가
-        // enqueue message
-        return MessageQue.TryEnqueue(msg, mode);
-    }
-
-    /// <summary>
-    ///     메시지 큐에 여러 메시지 추가
-    ///     Insert multiple messages to queue
-    /// </summary>
-    /// <param name="messages">메시지 목록 / message list</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>추가 성공 여부 / insert success result</returns>
-    private bool InsertRange(IReadOnlyList<FormatMessage> messages, bool check = true) {
-        // 중복 확인 모드 설정
-        // set duplicate check mode
-        var mode = check ? EnqueueMode.EnforceUnique : EnqueueMode.AllowDuplicate;
-        // 큐에 추가
-        // enqueue messages
-        return MessageQue.TryEnqueueRange(messages, mode).Accepted > 0;
-    }
-
-    /// <summary>
-    ///     홀딩 레지스터 읽기 (MODBUS 함수 코드 0x03)
-    ///     Read holding registers (MODBUS function code 0x03)
-    /// </summary>
+    /// <param name="code">함수 코드 (ReadHoldingReg 또는 ReadInputReg) / function code</param>
     /// <param name="addr">시작 주소 / start address</param>
-    /// <param name="count">읽을 레지스터 수 / register count to read</param>
-    /// <param name="split">분할 단위 (0=자동) / split size (0=auto)</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool ReadHoldingReg(ushort addr, ushort count, int split = 0, bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
+    /// <param name="count">총 레지스터 개수 / total register count</param>
+    /// <returns>모든 요청 인큐 성공 여부 / whether all requests were enqueued</returns>
+    private bool EnqueueReadRequests(FunctionCode code, ushort addr, ushort count) {
         // 연결 상태 확인
         // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
+        if (ConnectionState is not Connection.Connected)
+            // 미연결 — 거부
+            // not connected — reject
             return false;
-        // 개수 확인
-        // check count
-        if (count == 0)
-            return true;
 
-        var address = addr;
-        // 분할 단위 확인
-        // check split count
-        if (split <= 0)
-            split = ReadRegMaxSize;
-        // 블록 수 계산
-        // calculate block count
-        var block = (count + split - 1) / split;
-        // 메시지 목록 생성
-        // create message list
-        var messages = new List<FormatMessage>(block);
-        // 블록별 메시지 생성
-        // create message for each block
-        for (var i = 0; i < block; i++) {
-            // 남은 수량 계산
-            // calculate remaining count
-            var remaining = count - i * split;
-            // 요청 수량 결정
-            // determine request count
-            var request = (ushort)Math.Min(split, remaining);
-            // 메시지 추가
-            // add message
-            messages.Add(new FormatMessage(CodeTypes.ReadHoldingReg, address, Tool.GetReadHoldingRegPacket(address, request)));
-            // 주소 갱신
-            // update address
-            address += request;
+        // 가드: 레지스터 개수 유효성 확인
+        // guard: validate register count
+        if (count is 0)
+            // 개수 0 — 거부
+            // count is 0 — reject
+            return false;
+
+        // 남은 레지스터 수
+        // remaining register count
+        var remaining = (int)count;
+        // 현재 주소 오프셋
+        // current address offset
+        var offset = 0;
+        // 모든 요청 인큐 성공 여부
+        // all requests enqueued successfully
+        var success = true;
+
+        // 남은 레지스터가 있는 동안 분할 전송
+        // split and transmit while registers remain
+        while (remaining > 0) {
+            // 현재 청크 크기 (최대 125)
+            // current chunk size (max 125)
+            var chunk = (ushort)Math.Min(remaining, MaxReadRegisters);
+            // 현재 청크 시작 주소
+            // current chunk start address
+            var currentAddr = (ushort)(addr + offset);
+
+            // PRO X 모드: MODBUS 패스스루
+            // PRO X mode: MODBUS passthrough
+            if (IsProMode) {
+                // MODBUS 패스스루로 분할 읽기 인큐
+                // enqueue split read via MODBUS passthrough
+                if (!EnqueueProModbusRequest(code, currentAddr, chunk))
+                    // 인큐 실패 기록
+                    // record enqueue failure
+                    success = false;
+            } else {
+                // 트랜잭션 ID 발급
+                // issue transaction ID
+                var tId = NextTransactionId();
+
+                // 함수 코드에 따라 패킷 생성
+                // build packet based on function code
+                var packet = code is FunctionCode.ReadHoldingReg
+                    ? _codec!.BuildReadHoldingReg(currentAddr, chunk, _slaveId, tId)
+                    : _codec!.BuildReadInputReg(currentAddr, chunk, _slaveId, tId);
+
+                // 요청 생성 및 인큐
+                // create request and enqueue
+                var request = new ModbusRequest(code, currentAddr, packet);
+                // 인큐 실패 시 전체 실패 표시
+                // mark total failure if enqueue fails
+                if (!_pipeline!.Enqueue(request))
+                    // 인큐 실패 기록
+                    // record enqueue failure
+                    success = false;
+            }
+
+            // 남은 레지스터 수 감소
+            // decrement remaining register count
+            remaining -= chunk;
+            // 주소 오프셋 증가
+            // increment address offset
+            offset += chunk;
         }
 
-        // 메시지 삽입
-        // insert messages
-        return InsertRange(messages, check);
+        // 마지막 활동 시각 갱신 (직접 모드)
+        // update last activity time (direct mode)
+        if (!IsProMode)
+            // 마지막 활동 시각 갱신
+            // update last activity time
+            Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+        // 전체 성공 여부 반환
+        // return overall success
+        return success;
     }
 
     /// <summary>
-    ///     입력 레지스터 읽기 (MODBUS 함수 코드 0x04)
-    ///     Read input registers (MODBUS function code 0x04)
+    ///     PRO X MODBUS 패스스루 요청을 인큐한다.
+    ///     Enqueues a PRO X MODBUS passthrough request.
     /// </summary>
+    /// <param name="code">함수 코드 / function code</param>
     /// <param name="addr">시작 주소 / start address</param>
-    /// <param name="count">읽을 레지스터 수 / register count to read</param>
-    /// <param name="split">분할 단위 (0=자동) / split size (0=auto)</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool ReadInputReg(ushort addr, ushort count, int split = 0, bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
-        // 연결 상태 확인
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-        // 개수 확인
-        // check count
-        if (count == 0)
-            return true;
+    /// <param name="value">값 또는 카운트 / value or count</param>
+    /// <returns>인큐 성공 여부 / whether the request was enqueued</returns>
+    private bool EnqueueProModbusRequest(FunctionCode code, ushort addr, ushort value) {
+        // MODBUS TCP 코덱으로 패킷 생성
+        // build packet with MODBUS TCP codec
+        var codec = new ModbusTcpCodec();
 
-        var address = addr;
-        // 분할 단위 확인
-        // check split count
-        if (split <= 0)
-            split = ReadRegMaxSize;
-        // 블록 수 계산
-        // calculate block count
-        var block = (count + split - 1) / split;
-        // 메시지 목록 생성
-        // create message list
-        var messages = new List<FormatMessage>(block);
-        // 블록별 메시지 생성
-        // create message for each block
-        for (var i = 0; i < block; i++) {
-            // 남은 수량 계산
-            // calculate remaining count
-            var remaining = count - i * split;
-            // 요청 수량 결정
-            // determine request count
-            var request = (ushort)Math.Min(split, remaining);
-            // 메시지 추가
-            // add message
-            messages.Add(new FormatMessage(CodeTypes.ReadInputReg, address, Tool.GetReadInputRegPacket(address, request)));
-            // 주소 갱신
-            // update address
-            address += request;
-        }
+        // 함수 코드에 따라 MODBUS 패킷 생성
+        // build MODBUS packet based on function code
+        var modbusPacket = code switch {
+            // 보유 레지스터 읽기
+            // read holding registers
+            FunctionCode.ReadHoldingReg => codec.BuildReadHoldingReg(addr, value, _slaveId),
+            // 입력 레지스터 읽기
+            // read input registers
+            FunctionCode.ReadInputReg => codec.BuildReadInputReg(addr, value, _slaveId),
+            // 단일 레지스터 쓰기
+            // write single register
+            FunctionCode.WriteSingleReg => codec.BuildWriteSingleReg(addr, value, _slaveId),
+            // 그 외 — 빈 패킷
+            // otherwise — empty packet
+            _ => []
+        };
 
-        // 메시지 삽입
-        // insert messages
-        return InsertRange(messages, check);
+        // 빈 패킷이면 거부
+        // reject if empty packet
+        if (modbusPacket.Length is 0)
+            // 미지원 함수 코드 — 거부
+            // unsupported function code — reject
+            return false;
+
+        // ProService를 통해 MODBUS 패스스루 인큐
+        // enqueue MODBUS passthrough via ProService
+        return Pro!.EnqueueModbusRequest(modbusPacket);
     }
 
     /// <summary>
-    ///     단일 레지스터 쓰기 (MODBUS 함수 코드 0x06)
-    ///     Write single register (MODBUS function code 0x06)
+    ///     전송 계층 연결 상태 변경 핸들러.
+    ///     Transport connection state change handler.
     /// </summary>
-    /// <param name="addr">레지스터 주소 / register address</param>
-    /// <param name="value">쓸 값 / value to write</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool WriteSingleReg(ushort addr, ushort value, bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
-        // 연결 상태 확인
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-
-        // 메시지 생성
-        // create message
-        var msg = new FormatMessage(CodeTypes.WriteSingleReg, addr, Tool.SetSingleRegPacket(addr, value));
-        // 메시지 삽입
-        // insert message
-        return Insert(msg, check);
-    }
-
-    /// <summary>
-    ///     다중 레지스터 쓰기 (MODBUS 함수 코드 0x10)
-    ///     Write multiple registers (MODBUS function code 0x10)
-    /// </summary>
-    /// <param name="addr">시작 주소 / start address</param>
-    /// <param name="values">쓸 값 배열 / values array to write</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool WriteMultiReg(ushort addr, ushort[] values, bool check = true) {
-        return WriteMultiReg(addr, values.AsSpan(), check);
-    }
-
-    /// <summary>
-    ///     다중 레지스터 쓰기 (MODBUS 함수 코드 0x10)
-    ///     Write multiple registers (MODBUS function code 0x10)
-    /// </summary>
-    /// <param name="addr">시작 주소 / start address</param>
-    /// <param name="values">쓸 값 스팬 / values span to write</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool WriteMultiReg(ushort addr, ReadOnlySpan<ushort> values, bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
-        // 연결 상태 확인
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-        // 값 배열 확인
-        // check values array
-        if (values.Length == 0)
-            return true;
-
-        var offset   = 0;
-        var total    = values.Length;
-        var blocks   = (total + WriteRegMaxSize - 1) / WriteRegMaxSize;
-        var messages = new List<FormatMessage>(blocks);
-        // 오프셋별 메시지 생성
-        // create message for each offset
-        while (offset < total) {
-            // 길이 계산
-            // calculate length
-            var len = Math.Min(total - offset, WriteRegMaxSize);
-            // 주소 계산
-            // calculate address
-            var address = (ushort)(addr + offset);
-            // 버퍼 생성
-            // create buffer
-            var buf = GC.AllocateUninitializedArray<ushort>(len);
-            // 버퍼에 복사
-            // copy to buffer
-            values.Slice(offset, len).CopyTo(buf);
-            // 패킷 생성
-            // create packet
-            var packet = Tool.SetMultiRegPacket(address, buf);
-            // 메시지 추가
-            // add message
-            messages.Add(new FormatMessage(CodeTypes.WriteMultiReg, address, packet));
-
-            // 오프셋 갱신
-            // update offset
-            offset += len;
-        }
-
-        // 메시지 삽입
-        // insert messages
-        return InsertRange(messages, check);
-    }
-
-    /// <summary>
-    ///     문자열 레지스터 쓰기
-    ///     Write string to registers
-    /// </summary>
-    /// <param name="addr">시작 주소 / start address</param>
-    /// <param name="str">문자열 값 / string value</param>
-    /// <param name="length">문자열 길이 (0=자동) / string length (0=auto)</param>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool WriteStrReg(ushort addr, string str, int length = 0, bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
-        // 연결 상태 확인
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-
-        // 길이 검증 및 조정
-        // validate and adjust length
-        if (length < str.Length)
-            length = str.Length;
-        // 메시지 생성
-        // create message
-        var msg = new FormatMessage(CodeTypes.WriteMultiReg, addr, Tool.SetMultiRegStrPacket(addr, str, length));
-        // 메시지 삽입
-        // insert message
-        return Insert(msg, check);
-    }
-
-    /// <summary>
-    ///     장치 정보 레지스터 읽기 (MODBUS 함수 코드 0x11)
-    ///     Read device information register (MODBUS function code 0x11)
-    /// </summary>
-    /// <param name="check">중복 확인 여부 / check duplicate flag</param>
-    /// <returns>요청 성공 여부 / request success result</returns>
-    public bool ReadInfoReg(bool check = true) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return false;
-        // 연결 상태 확인
-        // check connection state
-        if (ConnectionState != ConnectionTypes.Connected)
-            return false;
-
-        // 메시지 생성
-        // create message
-        var msg = new FormatMessage(CodeTypes.ReadInfoReg, FormatMessage.EmptyAddr, Tool.GetInfoRegPacket());
-        // 메시지 삽입
-        // insert message
-        return Insert(msg, check);
-    }
-
-    /// <summary>
-    ///     메시지 처리 타이머 이벤트 핸들러
-    ///     Message processing timer event handler
-    /// </summary>
-    /// <param name="sender">이벤트 발생 객체 / event sender</param>
-    /// <param name="e">타이머 이벤트 인자 / timer event args</param>
-    private void OnElapsed(object? sender, ElapsedEventArgs e) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return;
-        // 상태별 처리
-        // process by state
-        switch (ConnectionState) {
-            case ConnectionTypes.Connecting
-                when (DateTime.Now - ConnectionTime).TotalSeconds < Constants.ConnectTimeout:
-                // 정보 요청
-                // request information
-                Insert(new FormatMessage(CodeTypes.ReadInfoReg, FormatMessage.EmptyAddr, Tool.GetInfoRegPacket()));
-                break;
-            case ConnectionTypes.Connecting:
-                // 연결 종료
-                // close connection
-                Close();
-                break;
-            case ConnectionTypes.Close:
-            case ConnectionTypes.Connected:
-                // Keep-Alive 활성화 확인
-                // check keep-alive enabled
-                if (EnableKeepAlive) {
-                    // Keep-Alive 요청 시간 확인
-                    // check keep-alive request time
-                    if ((DateTime.Now - KeepAliveRequestTime).TotalMilliseconds >= Constants.KeepAlivePeriod)
-                        // 큐 비어있는지 확인
-                        // check queue empty
-                        if (MessageQue.IsEmpty)
-                            // Keep-Alive 메시지 삽입
-                            // insert keep-alive message
-                            if (ReadInfoReg())
-                                // Keep-Alive 시간 갱신
-                                // update keep-alive time
-                                KeepAliveRequestTime = DateTime.Now;
-                    // Keep-Alive 타임아웃 확인
-                    // check keep-alive timeout
-                    if ((DateTime.Now - KeepAliveTime).TotalSeconds >= Constants.KeepAliveTimeout)
-                        // 연결 종료
-                        // close connection
-                        Close();
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(string.Empty);
-        }
-
-        // 큐 비어있는지 확인
-        // check queue empty
-        if (MessageQue.IsEmpty)
-            return;
-        // 메시지 조회
-        // peek message
-        if (!MessageQue.TryPeek(out var msg))
-            return;
-        // 활성화 상태 확인
-        // check activation state
-        if (!msg.Activated) {
-            // 패킷 데이터 가져오기
-            // get packet data
-            var packet = msg.Packet.ToArray();
-            // 패킷 전송
-            // send packet
-            if (!Tool.Write(packet, packet.Length))
+    /// <param name="connected">연결 상태 / connection state</param>
+    private void OnConnectionChanged(bool connected) {
+        // 연결됨 처리
+        // handle connected
+        if (connected) {
+            // PRO X 모드: ProService 시작
+            // PRO X mode: start ProService
+            if (IsProMode) {
+                // ProService 시작 (멤버 툴 요청 자동 발행)
+                // start ProService (auto-issues member tool request)
+                Pro!.Start(_target);
+                // 연결 로그 기록
+                // log connection
+                Logger.Log(LogCategories.Connection, LogLevel.Info, "Transport connected, requesting member tools");
+                // 반환
+                // return
                 return;
-            // 메시지 활성화
-            // activate message
-            msg.Activate();
-            // 응답 확인 안 함이면 종료
-            // exit if no check required
-            if (!msg.NotCheck)
-                return;
+            }
+
+            // 직접 연결 모드: 파이프라인 시작 + 장치 정보 읽기
+            // direct mode: start pipeline + read device info
+            // 파이프라인 시작
+            // start pipeline
+            _pipeline!.Start();
+            // 마지막 활동 시각 초기화
+            // initialize last activity time
+            Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+            // 장치 정보 읽기 (연결 확인용)
+            // read device info (for connection confirmation)
+            ReadInfoReg();
+            // 연결 로그 기록
+            // log connection
+            Logger.Log(LogCategories.Connection, LogLevel.Info, "Transport connected, reading device info");
+            // 반환
+            // return
+            return;
+        }
+
+        // 연결 해제 처리
+        // handle disconnected
+        if (IsProMode) {
+            // ProService 정지
+            // stop ProService
+            Pro!.Stop();
         } else {
-            // 타임아웃 확인
-            // check timeout
-            if ((DateTime.Now - msg.ActiveTime).TotalMilliseconds < Constants.MessageTimeout)
-                return;
-            // 메시지 비활성화 (재시도 가능)
-            // deactivate message (allows retry)
-            if (msg.Deactivate() > 0)
-                return;
+            // Keep-Alive 타이머 정지
+            // stop keep-alive timer
+            _keepAliveTimer?.Stop();
+            // 파이프라인 정지
+            // stop pipeline
+            _pipeline?.Stop();
         }
 
-        // 메시지 제거
-        // remove message
-        MessageQue.TryDequeue(out _);
-    }
-
-    /// <summary>
-    ///     연결 상태 변경 이벤트 핸들러
-    ///     Connection state changed event handler
-    /// </summary>
-    /// <param name="state">연결 상태 / connection state</param>
-    private void OnChangedConnect(bool state) {
-        // Keep-Alive 시간 갱신
-        // update keep-alive time
-        KeepAliveRequestTime = DateTime.Now;
-        KeepAliveTime        = DateTime.Now;
-        // 연결 상태 확인
-        // check connection state
-        if (state)
-            return;
-        // 상태 변경
-        // change state
-        ConnectionState = ConnectionTypes.Close;
+        // 연결 상태를 Closed로 변경
+        // set connection state to Closed
+        ConnectionState = Connection.Closed;
+        // 연결 해제 로그 기록
+        // log disconnection
+        Logger.Log(LogCategories.Connection, LogLevel.Info, "Disconnected");
         // 연결 상태 변경 이벤트 발생
-        // raise connection state changed event
+        // raise connection state change event
         ChangedConnect?.Invoke(false);
     }
 
     /// <summary>
-    ///     데이터 수신 이벤트 핸들러
-    ///     Data received event handler
+    ///     ProService 연결 상태 변경 핸들러 (PRO X 레벨).
+    ///     ProService connection state change handler (PRO X level).
     /// </summary>
-    /// <param name="code">함수 코드 / function code</param>
-    /// <param name="packet">패킷 데이터 / packet data</param>
-    private void OnReceivedData(CodeTypes code, byte[] packet) {
-        // 통신 도구 확인
-        // check communication tool
-        if (Tool == null)
-            return;
+    /// <param name="connected">연결 상태 / connection state</param>
+    private void OnProConnectionChanged(bool connected) {
+        // 연결 상태에 따라 처리 분기
+        // branch on connection state
+        switch (connected) {
+            // 연결 완료 처리 (멤버 툴 수신 후)
+            // handle connection complete (after member tools received)
+            case true when ConnectionState is Connection.Connecting:
+                // 연결 완료 상태로 전환
+                // transition to connected state
+                ConnectionState = Connection.Connected;
+                // 연결 완료 로그 기록
+                // log connection complete
+                Logger.Log(LogCategories.Connection, LogLevel.Info, $"Connected via PRO X: {Pro!.Tools.MemberTools.Count} member tools");
+                // 연결 상태 변경 이벤트 발생
+                // raise connection state change event
+                ChangedConnect?.Invoke(true);
+                // 연결 완료 케이스 종료
+                // end of connection complete case
+                break;
+            // Keep-Alive 타임아웃으로 인한 연결 해제
+            // disconnection due to Keep-Alive timeout
+            case false:
+                // 연결 해제 로그
+                // log disconnection
+                Logger.Log(LogCategories.Connection, LogLevel.Warning, "PRO X Keep-Alive timeout, closing connection");
+                // 연결 해제
+                // close connection
+                Close();
+                // 연결 해제 케이스 종료
+                // end of disconnection case
+                break;
+        }
+    }
 
-        var addr = FormatMessage.EmptyAddr;
-        // 메시지 조회
-        // peek message
-        if (MessageQue.TryPeek(out var msg))
-            // 활성화된 메시지 확인
-            // check activated message
-            if (msg is { Activated: true })
-                // 코드 일치 확인
-                // check code match
-                if (code == msg.Code || code == CodeTypes.Error) {
-                    // 주소 설정
-                    // set address
-                    addr = msg.Address;
-                    // 메시지 제거
-                    // remove message
-                    MessageQue.TryDequeue(out _);
+    /// <summary>
+    ///     ProService MODBUS 응답 수신 핸들러 (MID 111 언래핑).
+    ///     ProService MODBUS response received handler (MID 111 unwrapped).
+    /// </summary>
+    /// <param name="response">MODBUS 응답 / MODBUS response</param>
+    private void OnProModbusResponse(ModbusResponse response) {
+        // 구독자에게 응답 전달
+        // deliver response to subscribers
+        ReceivedData?.Invoke(response);
+    }
+
+    /// <summary>
+    ///     파이프라인 응답 수신 핸들러 (직접 연결 전용).
+    ///     Pipeline response received handler (direct connection only).
+    /// </summary>
+    /// <param name="response">수신된 응답 / received response</param>
+    private void OnResponseReceived(ModbusResponse response) {
+        // 마지막 활동 시각 갱신
+        // update last activity time
+        Volatile.Write(ref _lastActivityTicks, DateTime.UtcNow.Ticks);
+
+        // 장치 정보 응답 처리 (FC 0x11)
+        // handle device info response (FC 0x11)
+        if (response.Code is FunctionCode.ReadInfoReg && response.Payload.Length >= SimpleInfo.Size) {
+            // 장치 정보 파싱
+            // parse device info
+            if (SimpleInfo.TryParse(response.Payload.Span, out var info))
+                // 파싱 성공 — 장치 정보 설정
+                // parse success — set device info
+                Info = info;
+
+            // Connecting 상태에서 장치 정보 수신 시 Connected로 전환
+            // transition to Connected when device info received during Connecting
+            if (ConnectionState is Connection.Connecting) {
+                // 연결 완료 상태로 전환
+                // transition to connected state
+                ConnectionState = Connection.Connected;
+                // Keep-Alive가 활성화되어 있으면 타이머 시작 (사용자 설정 반영)
+                // start keep-alive timer if enabled (apply user settings)
+                if (Settings.KeepAlive.Enabled) {
+                    // 타이머 주기를 사용자 설정값으로 적용
+                    // apply timer interval from user settings
+                    _keepAliveTimer!.Interval = Settings.KeepAlive.Period;
+                    // Keep-Alive 타이머 시작
+                    // start keep-alive timer
+                    _keepAliveTimer.Start();
                 }
 
-        // 수신 데이터 생성
-        // create received data
-        IReceivedData? data = Type switch {
-            ComTypes.Rtu => new HcRtuData(packet),
-            ComTypes.Tcp => new HcTcpData(packet),
-            _            => null
-        };
-
-        // 장치 정보 읽기 응답 처리
-        // process device info read response
-        if (code == CodeTypes.ReadInfoReg && data != null) {
-            // 장치 정보 설정
-            // set device information
-            Info = new FormatSimpleInfo(data.Data);
-            // 연결 중 상태인 경우
-            // if connecting state
-            if (ConnectionState == ConnectionTypes.Connecting) {
-                // 프로토콜 세대 설정
-                // set protocol revision
-                Tool.Revision = Info.Firmware switch {
-                    > (int)GenerationTypes.GenRev2                                  => GenerationTypes.GenRev2,
-                    > (int)GenerationTypes.GenRev1Plus                              => GenerationTypes.GenRev1Plus,
-                    > (int)GenerationTypes.GenRev1 when Info.Model == ModelTypes.Ad => GenerationTypes.GenRev1Ad,
-                    _                                                               => GenerationTypes.GenRev1
-                };
-                Gen = Tool.Revision;
-                // 상태 변경
-                // change state
-                ConnectionState = ConnectionTypes.Connected;
+                // 연결 완료 로그 기록
+                // log connection complete
+                Logger.Log(LogCategories.Connection, LogLevel.Info, $"Connected: Model={Info.Controller} FW={Info.Firmware} SN={Info.Serial}");
                 // 연결 상태 변경 이벤트 발생
-                // raise connection state changed event
+                // raise connection state change event
                 ChangedConnect?.Invoke(true);
             }
         }
 
-        // 수신 데이터 확인
-        // check received data
-        if (data == null)
+        // 구독자에게 응답 전달
+        // deliver response to subscribers
+        ReceivedData?.Invoke(response);
+    }
+
+    /// <summary>
+    ///     파이프라인 오류 발생 핸들러 (직접 연결 전용).
+    ///     Pipeline error occurred handler (direct connection only).
+    /// </summary>
+    /// <param name="error">통신 오류 / communication error</param>
+    private void OnErrorOccurred(ComError error) {
+        // 오류 로그 기록
+        // log error
+        Logger.Log(LogCategories.Error, LogLevel.Error, $"{error.Reason}: {error.Detail}");
+        // 구독자에게 오류 전달
+        // deliver error to subscribers
+        ReceiveError?.Invoke(error);
+    }
+
+    /// <summary>
+    ///     Keep-Alive 타이머 이벤트 핸들러 (직접 연결 전용).
+    ///     Keep-Alive timer handler (direct connection only).
+    /// </summary>
+    private void OnKeepAliveElapsed(object? sender, ElapsedEventArgs e) {
+        // 연결 상태 확인
+        // check connection state
+        if (ConnectionState is not Connection.Connected)
+            // 미연결 — 반환
+            // not connected — return
             return;
-        // 수신 이벤트 발생
-        // raise receive event
-        ReceivedData?.Invoke(code, addr, data);
-        // Keep-Alive 활성화 확인
-        // check keep-alive enabled
-        if (!EnableKeepAlive)
+
+        // Keep-Alive 비활성화 확인
+        // check if keep-alive is disabled
+        if (!Settings.KeepAlive.Enabled) {
+            // 타이머 정지
+            // stop timer
+            _keepAliveTimer?.Stop();
+            // 비활성화 — 반환
+            // disabled — return
             return;
-        // Keep-Alive 시간 갱신
-        // update keep-alive time
-        KeepAliveTime = DateTime.Now;
+        }
+
+        // 마지막 활동 이후 경과 시간 계산
+        // calculate elapsed time since last activity
+        var elapsed = new TimeSpan(DateTime.UtcNow.Ticks - Volatile.Read(ref _lastActivityTicks)).TotalMilliseconds;
+
+        // 경과 시간에 따라 Keep-Alive 동작 분기
+        // branch keep-alive action based on elapsed time
+        switch (elapsed) {
+            // Keep-Alive 타임아웃 확인
+            // check keep-alive timeout
+            case var _ when elapsed > Settings.KeepAlive.Timeout:
+                // 타임아웃 — 연결 해제
+                // timeout — disconnect
+                Logger.Log(LogCategories.KeepAlive, LogLevel.Warning, "Keep-Alive timeout, disconnecting");
+                // 연결 해제
+                // close connection
+                Close();
+                // 케이스 종료
+                // end case
+                break;
+            // 유휴 상태이면 장치 정보 읽기
+            // read device info if idle
+            case var _ when elapsed >= Settings.KeepAlive.Period:
+                // Keep-Alive 장치 정보 읽기
+                // keep-alive device info read
+                Logger.Log(LogCategories.KeepAlive, LogLevel.Debug, "Keep-Alive ping");
+                // 장치 정보 읽기
+                // read device info
+                ReadInfoReg();
+                // 케이스 종료
+                // end case
+                break;
+        }
     }
 
     /// <summary>
-    ///     수신 오류 이벤트 핸들러
-    ///     Receive error event handler
+    ///     다음 TCP 트랜잭션 ID를 발급한다.
+    ///     Issues the next TCP transaction ID.
     /// </summary>
-    /// <param name="reason">오류 사유 / error reason</param>
-    /// <param name="param">추가 파라미터 / additional parameter</param>
-    private void OnReceivedError(ComErrorTypes reason, object? param) {
-        // 오류 이벤트 발생
-        // raise error event
-        ReceiveError?.Invoke(reason, param);
-    }
-
-    /// <summary>
-    ///     원시 데이터 수신 이벤트 핸들러
-    ///     Raw data received event handler
-    /// </summary>
-    /// <param name="packet">패킷 데이터 / packet data</param>
-    private void OnReceivedRaw(byte[] packet) {
-        // 수신 이벤트 발생
-        // raise receive event
-        ReceivedRawData?.Invoke(packet);
-    }
-
-    /// <summary>
-    ///     원시 데이터 전송 이벤트 핸들러
-    ///     Raw data transmit event handler
-    /// </summary>
-    /// <param name="packet">패킷 데이터 / packet data</param>
-    private void OnTransmitRaw(byte[] packet) {
-        // 전송 이벤트 발생
-        // raise transmit event
-        TransmitRawData?.Invoke(packet);
+    /// <returns>트랜잭션 ID / transaction ID</returns>
+    private ushort NextTransactionId() {
+        // 트랜잭션 ID 증가 후 반환
+        // increment and return transaction ID
+        return _transactionId++;
     }
 }
