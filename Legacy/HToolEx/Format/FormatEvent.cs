@@ -170,23 +170,25 @@ public partial class FormatEvent {
             // check status
             if (!status.res)
                 throw new Exception("Invalid value : Status");
+            // culture information for parsing
+            var info = CultureInfo.InvariantCulture;
             // try parse target torque
-            if (!float.TryParse(data[pos++], out var target))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var target))
                 throw new Exception("Invalid value : Target torque");
             // try parse torque
-            if (!float.TryParse(data[pos++], out var torque))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var torque))
                 throw new Exception("Invalid value : Torque");
             // try parse seating torque
-            if (!float.TryParse(data[pos++], out var seating))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var seating))
                 throw new Exception("Invalid value : Seating torque");
             // try parse clamp torque
-            if (!float.TryParse(data[pos++], out var clamp))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var clamp))
                 throw new Exception("Invalid value : Clamp torque");
             // try parse prevailing torque
-            if (!float.TryParse(data[pos++], out var prevailing))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var prevailing))
                 throw new Exception("Invalid value : Prevailing torque");
             // try parse snug torque
-            if (!float.TryParse(data[pos++], out var snugTorque))
+            if (!float.TryParse(data[pos++], NumberStyles.Float, info, out var snugTorque))
                 throw new Exception("Invalid value : Snug torque");
             // try parse speed
             if (!int.TryParse(data[pos++], out var speed))

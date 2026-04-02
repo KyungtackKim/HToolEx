@@ -26,7 +26,10 @@ public enum ModelTypes {
     [Description("ET")]
     Et = 30,
     [Description("BT")]
-    Bt = 32
+    Bt = 32,
+    // neXus (QSC)
+    [Description("EPT")]
+    Ept = 99
 }
 
 /// <summary>
@@ -53,5 +56,8 @@ public enum ModelTypesMountz {
     [Description("ETM")]
     Etm = 1030,
     [Description("BTM")]
-    Btm = 1032
+    Btm = 1032,
+    // neXus (QSC)
+    [Description("EPT")]
+    Eptm = 1099
 }
