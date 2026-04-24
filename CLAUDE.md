@@ -21,7 +21,7 @@ dotnet build HTool.sln
 dotnet build HTool.Core/HTool.Core.csproj -c Release
 dotnet build HTool.Format/HTool.Format.csproj -c Release
 dotnet build HTool/HTool.csproj -c Release
-dotnet build HToolEx/HToolEx.csproj -c Release
+dotnet build Legacy/HToolEx/HToolEx.csproj -c Release
 dotnet build HToolEz/HToolEz.csproj -c Release
 
 # Create NuGet packages (GeneratePackageOnBuild is enabled)
@@ -29,12 +29,18 @@ dotnet pack HTool.Core/HTool.Core.csproj -c Release
 dotnet pack HTool.Format/HTool.Format.csproj -c Release
 dotnet pack HTool/HTool.csproj -c Release
 
+# Run all tests
+dotnet test Tester/Tester.csproj
+
+# Run a single test class
+dotnet test Tester/Tester.csproj --filter "FullyQualifiedName~KeyedQueueTests"
+
 # Clean and restore
 dotnet clean HTool.sln
 dotnet restore HTool.sln
 ```
 
-No unit test infrastructure exists. The `Tester/` directory is currently empty.
+Tests use **xUnit** with **NSubstitute** for mocking. Test files mirror the source structure under `Tester/` (e.g., `Tester/Core/Util/`, `Tester/Device/Codec/`, `Tester/Format/`). Helper types are in `Tester/TestHelpers/` (`ByteBuilder`, `FakeTransport`, `TestData`).
 
 ## High-Level Architecture
 
@@ -42,21 +48,24 @@ No unit test infrastructure exists. The `Tester/` directory is currently empty.
 
 ```
 HTool.sln
-├── HTool.Core/         # 공유 유틸리티 및 도메인 타입 (v1.0.0, .NET 8.0)
-├── HTool.Format/       # 데이터 파싱 라이브러리 (v1.0.0, .NET 8.0)
-├── HTool/              # 통합 MODBUS 통신 라이브러리 — 직접 RTU/TCP + PRO X (v2.0.0)
-├── HToolEx/            # PRO X 장비 지원, ParaMon 4에서 사용 중 (v1.1.18, 레거시 전환 예정)
-├── HToolEz/            # 한타스 토크미터 지원 (v0.0.20, x64 only)
-├── HToolLegacy/        # HTool v1 아카이브 (v1.1.24, 신규 개발 금지)
-├── HComm/              # 구버전 한타스 툴 지원 (.NET Standard 2.0, legacy)
-└── HCommEz/            # 구버전 한타스 토크미터 지원 (.NET Standard 2.0, legacy)
+├── HTool.Core/               # 공유 유틸리티 및 도메인 타입 (v1.0.0, .NET 8.0)
+├── HTool.Format/             # 데이터 파싱 라이브러리 (v1.0.0, .NET 8.0)
+├── HTool/                    # 통합 MODBUS 통신 라이브러리 — 직접 RTU/TCP + PRO X (v2.0.0)
+├── HToolEz/                  # 한타스 토크미터 지원 (v0.0.20, win-x64 only)
+├── Tester/                   # xUnit 테스트 프로젝트 (HTool.Core, HTool.Format, HTool 대상)
+├── ToolSample/               # WPF 데모 앱 (.NET 10.0, CommunityToolkit.Mvvm + LiveChartsCore)
+└── Legacy/
+    ├── HToolEx/              # PRO X 장비 지원, ParaMon 4에서 사용 중 (v1.1.18, 레거시 전환 예정)
+    ├── HToolLegacy/          # HTool v1 아카이브 (신규 개발 금지)
+    ├── HComm/                # 구버전 한타스 툴 지원 (.NET Standard 2.0, legacy)
+    └── HCommEz/              # 구버전 한타스 토크미터 지원 (.NET Standard 2.0, legacy)
 ```
 
 **Platform**: HTool, HTool.Core, HTool.Format target AnyCPU (.NET 8.0). HToolEz targets **win-x64** only.
 
 **주력 개발 대상**: HTool (v2), HTool.Core, HTool.Format, HToolEz
-**유지보수 중**: HToolEx (ParaMon 4에서 사용 중이므로 지원 계속)
-**레거시**: HToolLegacy, HComm, HCommEz (신규 기능 추가 금지)
+**유지보수 중**: Legacy/HToolEx (ParaMon 4에서 사용 중이므로 지원 계속)
+**레거시**: Legacy/HToolLegacy, Legacy/HComm, Legacy/HCommEz (신규 기능 추가 금지)
 
 **Migration 상태**: HTool v2가 HToolEx의 PRO X 기능(ProService, ToolService, FtpService)을 통합 완료. HToolEx는 ParaMon 4 마이그레이션 후 레거시로 전환 예정.
 
@@ -90,6 +99,7 @@ MODBUS 응답 페이로드를 강타입 `readonly struct`로 파싱하는 라이
 **Key namespaces**:
 - `HTool.Format.Device`: SimpleInfo (13B, FC 0x11), Info (200B, FC 0x04), Status
 - `HTool.Format.Process`: Event, Graph, Barcode
+- `HTool.Format.Param`: Preset (4B), AdvPreset, Control (register mapping)
 - `HTool.Format.Ez`: CalibrationData, CalibrationSettings, DeviceSettings
 - `HTool.Format.Pro`: ToolInfo, SystemInfo, JobEvent, NgCause, RecipeVersion
 - `HTool.Format.Pro.Setting`: Operation, Network, Barcode, Log, Sound, Share, InOut, Encoder, IoToolName
@@ -349,8 +359,8 @@ tool.Pro.ErrorReceived += (mid, code) => Console.WriteLine($"PRO X Error: MID={m
 - `HTool/Device/Pro/FtpService.cs` — FTP operations
 
 **Legacy**:
-- `HToolEx/ProEx/HCommProEx.cs` — ProX controller interface (HToolEx)
-- `HToolEx/CommunicationFactory.cs` — Factory pattern (HToolEx)
+- `Legacy/HToolEx/ProEx/HCommProEx.cs` — ProX controller interface (HToolEx)
+- `Legacy/HToolEx/CommunicationFactory.cs` — Factory pattern (HToolEx)
 - `HToolEz/HToolEz.cs` — Main EZTorQ-III entry point
 - `HToolEz/Device/DeviceService.cs` — ASCII+binary torque data handling
 
@@ -359,7 +369,8 @@ tool.Pro.ErrorReceived += (mid, code) => Console.WriteLine($"PRO X Error: MID={m
 - Nullable enabled, implicit usings enabled across all .NET 8 projects
 - HTool.Core, HTool.Format: pure .NET 8.0 (no Windows dependency)
 - HTool: Windows Forms dependency (`UseWindowsForms=true`) for serial port
-- HToolEx suppresses warning CS0618 (obsolete member usage) via `<NoWarn>`
-- Localization via .resx files with `PublicResXFileCodeGenerator` (HToolEx only)
-- HToolLegacy, HComm, HCommEz: 신규 기능 추가 금지
-- HToolEx: ParaMon 4 지원을 위해 유지보수 중, HTool v2 마이그레이션 후 레거시 전환
+- Legacy/HToolEx suppresses warning CS0618 (obsolete member usage) via `<NoWarn>`
+- Localization via .resx files with `PublicResXFileCodeGenerator` (Legacy/HToolEx only)
+- Legacy/HToolLegacy, Legacy/HComm, Legacy/HCommEz: 신규 기능 추가 금지
+- Legacy/HToolEx: ParaMon 4 지원을 위해 유지보수 중, HTool v2 마이그레이션 후 레거시 전환
+- ToolSample: WPF 데모 앱 (.NET 10.0), 신규 API 검증용. `CommunityToolkit.Mvvm` + `LiveChartsCore` 사용
