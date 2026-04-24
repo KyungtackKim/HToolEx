@@ -42,8 +42,8 @@ public enum ModelTypes {
     Ept = 1019,
     [Description("ECT40")]
     Ect40 = 1027,
-    [Description("EPT40")]
-    Ept40 = 1029,
+    [Description("EPT60")]
+    Ept60 = 1029,
     [Description("ETM")]
     Etm = 1030,
     [Description("BTM")]
