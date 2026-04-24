@@ -45,7 +45,7 @@ public readonly struct DeviceSettings {
         TargetEnable = EnumUtil.IsDefined<TargetEnable>(data[0]) ? (TargetEnable)data[0] : TargetEnable.Disable;
         // 목표 토크 읽기 (float, LE)
         // read target torque (float, LE)
-        TargetTorque = Utils.ReadFloat(data[1..5], isBigEndian: false);
+        TargetTorque = ByteOrder.ReadFloat(data[1..5], isBigEndian: false);
 
         /*      operation settings (5-10) / 운전 설정 (5-10)      */
 
@@ -182,7 +182,7 @@ public readonly struct DeviceSettings {
         bytes[0] = (byte)TargetEnable;
         // 목표 토크 기록 (빅엔디안)
         // write target torque (big-endian)
-        Utils.WriteFloat(s[1..], TargetTorque);
+        ByteOrder.WriteFloat(s[1..], TargetTorque);
 
         // 운전 설정 직렬화 (5-10)
         // serialize operation settings (5-10)

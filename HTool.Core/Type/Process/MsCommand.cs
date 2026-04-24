@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     다중 시퀀스 명령 열거형
 ///     multi-sequence command enumeration
 /// </summary>
+/// <remarks>
+///     다중 시퀀스(MS) 기능을 가진 모델의 명령 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다.
+///     definition of commands for models with multi-sequence (MS) capability; currently unreferenced within this library.
+/// </remarks>
 public enum MsCommand {
     /// <summary>
     ///     없음

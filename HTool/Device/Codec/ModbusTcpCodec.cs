@@ -44,10 +44,10 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         p[7] = (byte)FunctionCode.ReadHoldingReg;
         // 시작 주소 기록 (Big-Endian)
         // write start address (Big-Endian)
-        Utils.WriteUInt16(s[8..], addr);
+        ByteOrder.WriteUInt16(s[8..], addr);
         // 레지스터 개수 기록 (Big-Endian)
         // write register count (Big-Endian)
-        Utils.WriteUInt16(s[10..], count);
+        ByteOrder.WriteUInt16(s[10..], count);
         // 완성된 보유 레지스터 읽기 패킷 반환
         // return the constructed read holding register packet
         return p;
@@ -69,10 +69,10 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         p[7] = (byte)FunctionCode.ReadInputReg;
         // 시작 주소 기록 (Big-Endian)
         // write start address (Big-Endian)
-        Utils.WriteUInt16(s[8..], addr);
+        ByteOrder.WriteUInt16(s[8..], addr);
         // 레지스터 개수 기록 (Big-Endian)
         // write register count (Big-Endian)
-        Utils.WriteUInt16(s[10..], count);
+        ByteOrder.WriteUInt16(s[10..], count);
         // 완성된 입력 레지스터 읽기 패킷 반환
         // return the constructed read input register packet
         return p;
@@ -94,10 +94,10 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         p[7] = (byte)FunctionCode.WriteSingleReg;
         // 레지스터 주소 기록 (Big-Endian)
         // write register address (Big-Endian)
-        Utils.WriteUInt16(s[8..], addr);
+        ByteOrder.WriteUInt16(s[8..], addr);
         // 레지스터 값 기록 (Big-Endian)
         // write register value (Big-Endian)
-        Utils.WriteUInt16(s[10..], value);
+        ByteOrder.WriteUInt16(s[10..], value);
         // 완성된 단일 레지스터 쓰기 패킷 반환
         // return the constructed write single register packet
         return p;
@@ -128,10 +128,10 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         p[7] = (byte)FunctionCode.WriteMultiReg;
         // 시작 주소 기록 (Big-Endian)
         // write start address (Big-Endian)
-        Utils.WriteUInt16(s[8..], addr);
+        ByteOrder.WriteUInt16(s[8..], addr);
         // 레지스터 개수 기록 (Big-Endian)
         // write register count (Big-Endian)
-        Utils.WriteUInt16(s[10..], (ushort)count);
+        ByteOrder.WriteUInt16(s[10..], (ushort)count);
         // 바이트 수 기록
         // write byte count
         p[12] = (byte)byteCount;
@@ -140,7 +140,7 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         for (var i = 0; i < count; i++)
             // 각 레지스터 값을 Big-Endian으로 기록
             // write each register value (Big-Endian)
-            Utils.WriteUInt16(s[(13 + i * 2)..], values[i]);
+            ByteOrder.WriteUInt16(s[(13 + i * 2)..], values[i]);
         // 완성된 다중 레지스터 쓰기 패킷 반환
         // return the constructed write multiple register packet
         return p;
@@ -183,10 +183,10 @@ public sealed class ModbusTcpCodec : IModbusCodec {
         p[7] = (byte)FunctionCode.WriteMultiReg;
         // 시작 주소 기록 (Big-Endian)
         // write start address (Big-Endian)
-        Utils.WriteUInt16(s[8..], addr);
+        ByteOrder.WriteUInt16(s[8..], addr);
         // 레지스터 개수 기록 (Big-Endian)
         // write register count (Big-Endian)
-        Utils.WriteUInt16(s[10..], (ushort)regCount);
+        ByteOrder.WriteUInt16(s[10..], (ushort)regCount);
         // 바이트 수 기록
         // write byte count
         p[12] = (byte)byteLen;
@@ -304,13 +304,13 @@ public sealed class ModbusTcpCodec : IModbusCodec {
     private static void WriteMbapHeader(Span<byte> s, ushort transactionId, int pduLen, byte deviceId) {
         // 트랜잭션 ID (Big-Endian)
         // transaction ID (Big-Endian)
-        Utils.WriteUInt16(s, transactionId);
+        ByteOrder.WriteUInt16(s, transactionId);
         // 프로토콜 ID (MODBUS는 항상 0x0000)
         // protocol ID (always 0x0000 for MODBUS)
-        Utils.WriteUInt16(s[2..], 0x0000);
+        ByteOrder.WriteUInt16(s[2..], 0x0000);
         // PDU 길이 (Big-Endian)
         // PDU length (Big-Endian)
-        Utils.WriteUInt16(s[4..], (ushort)pduLen);
+        ByteOrder.WriteUInt16(s[4..], (ushort)pduLen);
         // 유닛 ID (슬레이브 장치 ID)
         // unit ID (slave device ID)
         s[6] = deviceId;

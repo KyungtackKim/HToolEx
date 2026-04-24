@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     그래프 채널 열거형
 ///     graph channel enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Process.Event"/>.
+///     used by: <see cref="HTool.Format.Process.Event"/>.
+/// </remarks>
 public enum GraphChannel {
     /// <summary>
     ///     없음

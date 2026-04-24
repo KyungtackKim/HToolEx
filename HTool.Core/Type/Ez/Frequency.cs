@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     주파수 열거형
 ///     frequency enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+///     used by: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+/// </remarks>
 public enum Frequency : byte {
 	/// <summary>
 	///     100 Hz

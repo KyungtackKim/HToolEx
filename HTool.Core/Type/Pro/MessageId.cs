@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Remote-Pro X 메시지 ID
 ///     message ID for Remote-Pro X communication
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Device.Codec.ProCodec"/>, <see cref="HTool.Device.Protocol.ProRequest"/>, <see cref="HTool.Device.Protocol.ProMessage"/>, <see cref="HTool.Device.Pro.ProService"/>.
+///     used by: <see cref="HTool.Device.Codec.ProCodec"/>, <see cref="HTool.Device.Protocol.ProRequest"/>, <see cref="HTool.Device.Protocol.ProMessage"/>, <see cref="HTool.Device.Pro.ProService"/>.
+/// </remarks>
 public enum MessageId {
     #region General
 

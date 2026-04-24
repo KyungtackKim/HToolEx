@@ -1,9 +1,15 @@
+using HTool.Device.Protocol;
+
 namespace HTool.Type;
 
 /// <summary>
 ///     MODBUS 프로토콜 예외 코드를 정의한다.
 ///     Defines MODBUS protocol exception codes.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="ModbusResponse"/>.
+///     used by: <see cref="ModbusResponse"/>.
+/// </remarks>
 public enum ModbusExceptionCode : byte {
 	/// <summary>
 	///     잘못된 함수 코드.

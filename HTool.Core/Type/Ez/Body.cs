@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     본체 형태 열거형
 ///     body type enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.CalibrationData"/>, <see cref="HTool.Format.Ez.CalibrationSettings"/>.
+///     used by: <see cref="HTool.Format.Ez.CalibrationData"/>, <see cref="HTool.Format.Ez.CalibrationSettings"/>.
+/// </remarks>
 public enum Body : byte {
 	/// <summary>
 	///     일체형

@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 메시지 스텝의 동작 유형
 ///     action type for Pro X message step
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+///     used by: <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+/// </remarks>
 public enum StepMessage {
 	/// <summary>
 	///     입력 검증 대기

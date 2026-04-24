@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     체결 작업 이벤트 종류 열거형. FormatEvent에서 발생한 이벤트 유형(OK, NG, 오류 등)을 나타냅니다.
 ///     fastening operation event type enumeration. Represents event type (OK, NG, error, etc.) from FormatEvent.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Process.Event"/>.
+///     used by: <see cref="HTool.Format.Process.Event"/>.
+/// </remarks>
 public enum Event {
     /// <summary>
     ///     기타

@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 입력 신호 유형
 ///     input signal type for Pro X
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.Job.InputBody"/>.
+///     used by: <see cref="HTool.Format.Pro.Job.InputBody"/>.
+/// </remarks>
 public enum InputSignal {
 	/// <summary>
 	///     HIGH 활성 트리거

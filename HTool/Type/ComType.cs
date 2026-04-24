@@ -1,9 +1,15 @@
+using HTool.Device;
+
 namespace HTool.Type;
 
 /// <summary>
 ///     통신 유형을 정의한다.
 ///     Defines the communication type.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
+///     used by: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
+/// </remarks>
 public enum ComType {
 	/// <summary>
 	///     MODBUS RTU 시리얼 통신.

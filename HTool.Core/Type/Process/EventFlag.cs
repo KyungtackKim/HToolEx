@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     이벤트 상태 플래그 열거형
 ///     event status flag enumeration
 /// </summary>
+/// <remarks>
+///     체결 이벤트의 상태 플래그 비트 레이아웃 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다.
+///     definition of the bit-layout for fastening event status flags; currently unreferenced within this library.
+/// </remarks>
 [Flags]
 public enum EventFlag {
     /// <summary>

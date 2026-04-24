@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     토크 방향 열거형
 ///     torque direction enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+///     used by: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+/// </remarks>
 public enum Direction : byte {
 	/// <summary>
 	///     시계 방향

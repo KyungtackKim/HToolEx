@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     토크 단위 열거형
 ///     torque unit enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Core.Util.TorqueUnit"/>, <see cref="HTool.Format.Ez.CalibrationData"/>.
+///     used by: <see cref="HTool.Core.Util.TorqueUnit"/>, <see cref="HTool.Format.Ez.CalibrationData"/>.
+/// </remarks>
 public enum Unit {
     /// <summary>
     ///     kgf.cm

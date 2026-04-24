@@ -33,7 +33,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(0x04, frame[1]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     #endregion
@@ -64,7 +64,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(0xD2, frame[5]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     #endregion
@@ -96,7 +96,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(4, frame[6]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     #endregion
@@ -130,7 +130,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(0, frame[9]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     #endregion
@@ -158,7 +158,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(0x11, frame[1]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     #endregion
@@ -220,7 +220,7 @@ public sealed class ModbusRtuCodecTests {
         Assert.Equal(0x03, frame[1]);
         // CRC 유효성 확인
         // verify CRC validity
-        Assert.True(Utils.ValidateCrc(frame));
+        Assert.True(Checksum.Validate(frame));
     }
 
     /// <summary>

@@ -43,7 +43,11 @@ HTool.Core/
     ├── BinarySpanReader.cs # Big-Endian binary reader (ReadOnlySpan-based) / 빅 엔디언 이진 리더
     ├── DataHash.cs         # XxHash3-based change detection / XxHash3 기반 변경 감지
     ├── EnumUtil.cs         # Enum parsing utilities / 열거형 파싱 유틸리티
-    └── Utils.cs            # CRC, endianness, packing helpers / CRC, 엔디언 변환, 값 패킹 도우미
+    ├── Checksum.cs         # MODBUS CRC-16 calculation / MODBUS CRC-16 계산
+    ├── ByteOrder.cs        # Endian/word-order byte read/write / 엔디언·워드 순서 바이트 읽기·쓰기
+    ├── Packing.cs          # Value → ushort[] register packing / 값을 ushort[] 레지스터로 패킹
+    ├── TorqueUnit.cs       # Torque unit conversion/format/parse / 토크 단위 변환·포맷·파싱
+    └── TextFormat.cs       # Hex dump / ASCII decoding / 16진수 덤프·ASCII 디코딩
 ```
 
 ### Type Namespaces / 타입 네임스페이스
@@ -63,7 +67,11 @@ HTool.Core/
 | `RingBuffer`          | Fixed-size circular buffer for streaming data / 스트리밍 데이터용 고정 크기 순환 버퍼          |
 | `BinarySpanReader`    | Zero-allocation Big-Endian reader using `BinaryPrimitives` / 할당 없는 빅 엔디언 이진 리더 |
 | `DataHash`            | XxHash3-based hash for efficient change detection / 효율적인 변경 감지를 위한 XxHash3 해시  |
-| `Utils`               | CRC-16 (MODBUS), endianness conversion, value packing / CRC-16, 엔디언 변환, 값 패킹   |
+| `Checksum`            | MODBUS CRC-16 calculation and validation / MODBUS CRC-16 계산 및 검증                  |
+| `ByteOrder`           | Endian/word-order byte read/write helpers / 엔디언·워드 순서 바이트 읽기·쓰기 도우미             |
+| `Packing`             | Value → ushort[] MODBUS register packing / 값을 ushort[] MODBUS 레지스터로 패킹          |
+| `TorqueUnit`          | Torque unit conversion, format, and parse / 토크 단위 변환·포맷·파싱                       |
+| `TextFormat`          | Hex dump formatting and ASCII decoding / 16진수 덤프 포맷과 ASCII 디코딩                  |
 
 ---
 
