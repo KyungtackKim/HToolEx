@@ -50,7 +50,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
         ByteOrder.WriteUInt16(s[4..], count);
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..6], s[6..]);
+        Checksum.CalculateTo(s[..6], s[6..]);
         // 완성된 보유 레지스터 읽기 패킷 반환
         // return the constructed read holding register packet
         return p;
@@ -78,7 +78,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
         ByteOrder.WriteUInt16(s[4..], count);
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..6], s[6..]);
+        Checksum.CalculateTo(s[..6], s[6..]);
         // 완성된 입력 레지스터 읽기 패킷 반환
         // return the constructed read input register packet
         return p;
@@ -106,7 +106,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
         ByteOrder.WriteUInt16(s[4..], value);
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..6], s[6..]);
+        Checksum.CalculateTo(s[..6], s[6..]);
         // 완성된 단일 레지스터 쓰기 패킷 반환
         // return the constructed write single register packet
         return p;
@@ -150,7 +150,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
 
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..^2], s[^2..]);
+        Checksum.CalculateTo(s[..^2], s[^2..]);
         // 완성된 다중 레지스터 쓰기 패킷 반환
         // return the constructed write multiple register packet
         return p;
@@ -202,7 +202,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
         Array.Copy(strBytes, 0, p, 7, Math.Min(strBytes.Length, byteLen));
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..^2], s[^2..]);
+        Checksum.CalculateTo(s[..^2], s[^2..]);
         // 완성된 문자열 레지스터 쓰기 패킷 반환
         // return the constructed write string register packet
         return p;
@@ -224,7 +224,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
         p[1] = (byte)FunctionCode.ReadInfoReg;
         // CRC-16 계산 및 추가
         // calculate and append CRC-16
-        Crc16.CalculateTo(s[..2], s[2..]);
+        Checksum.CalculateTo(s[..2], s[2..]);
         // 완성된 장치 정보 읽기 패킷 반환
         // return the constructed read info register packet
         return p;
@@ -300,7 +300,7 @@ public sealed class ModbusRtuCodec : IModbusCodec {
     public bool ValidateFrame(ReadOnlySpan<byte> frame) {
         // 기존 유틸리티로 CRC-16 검증 위임
         // delegate CRC-16 validation to existing utility
-        return Crc16.Validate(frame);
+        return Checksum.Validate(frame);
     }
 
     /// <summary>

@@ -3,10 +3,10 @@ using HTool.Core.Util;
 namespace Tester.Core.Util;
 
 /// <summary>
-///     Utils 클래스의 CRC-16/MODBUS 계산 및 검증 메서드 테스트
-///     tests for CRC-16/MODBUS calculation and validation methods in Utils class
+///     Checksum 클래스의 CRC-16/MODBUS 계산 및 검증 테스트.
+///     tests for CRC-16/MODBUS calculation and validation in Checksum class.
 /// </summary>
-public class UtilsCrcTests {
+public class ChecksumTests {
     /// <summary>
     ///     알려진 MODBUS CRC 벡터로 CalculateCrc의 정확성을 검증합니다.
     ///     verifies CalculateCrc correctness with a known MODBUS CRC vector.
@@ -19,7 +19,7 @@ public class UtilsCrcTests {
 
         // CRC 계산 실행
         // execute CRC calculation
-        var (low, high) = Crc16.Calculate(packet);
+        var (low, high) = Checksum.Calculate(packet);
 
         // 하위 바이트가 0x84인지 확인
         // verify low byte is 0x84
@@ -41,7 +41,7 @@ public class UtilsCrcTests {
 
         // 빈 패킷의 CRC 계산
         // calculate CRC on empty packet
-        var (low, high) = Crc16.Calculate(packet);
+        var (low, high) = Checksum.Calculate(packet);
 
         // 초기값 0xFFFF의 하위 바이트 (0xFF) 확인
         // verify low byte of initial value 0xFFFF (0xFF)
@@ -63,11 +63,11 @@ public class UtilsCrcTests {
 
         // CRC 계산 실행
         // execute CRC calculation
-        var (low, high) = Crc16.Calculate(packet);
+        var (low, high) = Checksum.Calculate(packet);
 
         // CRC 결과가 결정적임을 확인 (재계산 시 동일)
         // verify CRC result is deterministic (same on recalculation)
-        var (low2, high2) = Crc16.Calculate(packet);
+        var (low2, high2) = Checksum.Calculate(packet);
         // 하위 바이트 일관성 확인
         // verify low byte consistency
         Assert.Equal(low, low2);
@@ -91,7 +91,7 @@ public class UtilsCrcTests {
 
         // 버퍼에 CRC 기록
         // write CRC to buffer
-        Crc16.CalculateTo(packet, buffer);
+        Checksum.CalculateTo(packet, buffer);
 
         // 버퍼의 하위 CRC 바이트 확인
         // verify low CRC byte in buffer
@@ -116,7 +116,7 @@ public class UtilsCrcTests {
 
         // 크기 부족 시 ArgumentException 발생 확인
         // verify ArgumentException is thrown for insufficient size
-        Assert.Throws<ArgumentException>(() => Crc16.CalculateTo(packet, buffer));
+        Assert.Throws<ArgumentException>(() => Checksum.CalculateTo(packet, buffer));
     }
 
     /// <summary>
@@ -134,10 +134,10 @@ public class UtilsCrcTests {
 
         // 튜플 반환 방식으로 CRC 계산
         // calculate CRC via tuple return
-        var (low, high) = Crc16.Calculate(packet);
+        var (low, high) = Checksum.Calculate(packet);
         // 버퍼 기록 방식으로 CRC 계산
         // calculate CRC via buffer write
-        Crc16.CalculateTo(packet, buffer);
+        Checksum.CalculateTo(packet, buffer);
 
         // 하위 바이트 일치 확인
         // verify low byte matches
@@ -159,7 +159,7 @@ public class UtilsCrcTests {
 
         // CRC 검증 실행
         // execute CRC validation
-        var result = Crc16.Validate(packet);
+        var result = Checksum.Validate(packet);
 
         // 유효한 CRC에 대해 true 반환 확인
         // verify true is returned for valid CRC
@@ -178,7 +178,7 @@ public class UtilsCrcTests {
 
         // CRC 검증 실행
         // execute CRC validation
-        var result = Crc16.Validate(packet);
+        var result = Checksum.Validate(packet);
 
         // 잘못된 CRC에 대해 false 반환 확인
         // verify false is returned for invalid CRC
@@ -197,7 +197,7 @@ public class UtilsCrcTests {
 
         // CRC 검증 실행
         // execute CRC validation
-        var result = Crc16.Validate(packet);
+        var result = Checksum.Validate(packet);
 
         // 너무 짧은 패킷에 대해 false 반환 확인
         // verify false is returned for too-short packet
@@ -219,7 +219,7 @@ public class UtilsCrcTests {
 
         // CRC 검증 실행
         // execute CRC validation
-        var result = Crc16.Validate(packet);
+        var result = Checksum.Validate(packet);
 
         // 변조된 데이터에 대해 false 반환 확인
         // verify false is returned for tampered data
@@ -237,14 +237,14 @@ public class UtilsCrcTests {
         byte[] data = [0x01];
         // CRC 값 계산
         // compute CRC value
-        var (low, high) = Crc16.Calculate(data);
+        var (low, high) = Checksum.Calculate(data);
         // CRC 포함 3바이트 패킷 구성
         // construct 3-byte packet with CRC
         byte[] packet = [0x01, low, high];
 
         // CRC 검증 실행
         // execute CRC validation
-        var result = Crc16.Validate(packet);
+        var result = Checksum.Validate(packet);
 
         // 최소 유효 길이 패킷에 대해 true 반환 확인
         // verify true is returned for minimum valid length packet

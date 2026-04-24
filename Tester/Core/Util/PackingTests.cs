@@ -4,10 +4,10 @@ using HTool.Core.Util;
 namespace Tester.Core.Util;
 
 /// <summary>
-///     Utils 클래스의 Pack 메서드 (값 → ushort[]) 테스트
-///     tests for Pack methods (value to ushort[]) in Utils class
+///     Packing 클래스의 MODBUS 레지스터 패킹 (값 → ushort[]) 테스트.
+///     tests for MODBUS register packing methods (value to ushort[]) in Packing class.
 /// </summary>
-public class UtilsPackTests {
+public class PackingTests {
     #region PackInt32
 
     /// <summary>

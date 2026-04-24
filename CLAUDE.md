@@ -84,7 +84,7 @@ HTool (communication — depends on HTool.Core + HTool.Format + FluentFTP + Syst
 유틸리티와 도메인 타입을 제공하는 공유 기반 라이브러리. Windows 종속성 없음.
 
 **Key namespaces**:
-- `HTool.Core.Util`: KeyedQueue, RingBuffer, BinarySpanReader, DataHash, Utils, EnumUtil
+- `HTool.Core.Util`: KeyedQueue, RingBuffer, BinarySpanReader, DataHash, Checksum, ByteOrder, Packing, TorqueUnit, TextFormat, EnumUtil
 - `HTool.Core.Type.Device`: Model, Manufacturer, ModelNames
 - `HTool.Core.Type.Process`: Event, Direction, Unit, GraphStep, GraphChannel, etc.
 - `HTool.Core.Type.Pro`: MessageId, JobStep, JobEvent, LogField, etc.

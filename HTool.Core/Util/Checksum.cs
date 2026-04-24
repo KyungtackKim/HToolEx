@@ -3,14 +3,16 @@ using System.Runtime.CompilerServices;
 namespace HTool.Core.Util;
 
 /// <summary>
-///     MODBUS-RTU CRC-16 계산 유틸리티. 룩업 테이블 기반 고속 CRC 계산을 제공합니다.
-///     MODBUS-RTU CRC-16 calculation utility. Provides high-speed lookup table-based CRC calculation.
+///     프레임 무결성 검사용 체크섬 계산 유틸리티. 현재 MODBUS-RTU CRC-16을 구현합니다.
+///     checksum utility for frame integrity validation. currently implements MODBUS-RTU CRC-16.
 /// </summary>
 /// <remarks>
-///     CRC-16/MODBUS 알고리즘 (Polynomial: 0xA001)을 사용합니다. RTU 프로토콜의 프레임 검증에 필수적입니다.
-///     uses CRC-16/MODBUS algorithm (Polynomial: 0xA001). Essential for RTU protocol frame validation.
+///     CRC-16/MODBUS 알고리즘 (Polynomial: 0xA001)을 룩업 테이블 기반으로 고속 계산합니다. RTU 프로토콜의 프레임 검증에 필수적입니다.
+///     다른 체크섬(CRC32, Fletcher 등)이 필요할 때 이 클래스에 메서드를 추가하십시오.
+///     uses CRC-16/MODBUS algorithm (Polynomial: 0xA001) with lookup table for high-speed calculation. Essential for RTU
+///     protocol frame validation. Add methods here when additional checksums (CRC32, Fletcher, etc.) are needed.
 /// </remarks>
-public static class Crc16 {
+public static class Checksum {
     /// <summary>
     ///     MODBUS-RTU CRC-16 룩업 테이블 (256개 항목).
     ///     MODBUS-RTU CRC-16 lookup table (256 entries).
