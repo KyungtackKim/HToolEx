@@ -102,7 +102,7 @@ MODBUS 응답 페이로드를 강타입 `readonly struct`로 파싱하는 라이
 - `HTool.Format.Param`: Preset (4B), AdvPreset, Control (register mapping)
 - `HTool.Format.Ez`: CalibrationData, CalibrationSettings, DeviceSettings
 - `HTool.Format.Pro`: ToolInfo, SystemInfo, JobEvent, NgCause, RecipeVersion
-- `HTool.Format.Pro.Setting`: Operation, Network, Barcode, Log, Sound, Share, InOut, Encoder, IoToolName
+- `HTool.Format.Pro.Setting`: Operation, Network, Barcode, LogSettings, Sound, Share, InOut, Encoder, IoToolName
 - `HTool.Format.Pro.Job`: Job, Step, StepHeader, JobHeader, FastenBody, DelayBody, InputBody, OutputBody, MessageBody
 
 **Dependencies**: HTool.Core

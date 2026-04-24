@@ -12,12 +12,12 @@ namespace HTool.Format.Pro.Setting;
 ///     contains logging settings such as storage, data fields, graph, sample time. modified in UI and serialized via
 ///     GetValues.
 /// </remarks>
-public sealed class Log {
+public sealed class LogSettings {
     /// <summary>
     ///     기본 생성자. 데이터 필드 배열과 문자열 속성을 초기화합니다.
     ///     default constructor. initializes data field array and string properties.
     /// </summary>
-    public Log() {
+    public LogSettings() {
         // 데이터 필드 배열 초기화
         // initialize data field array
         DataField = [];
@@ -33,7 +33,7 @@ public sealed class Log {
     /// <param name="data">원시 패킷 데이터 / raw packet data</param>
     /// <param name="revision">리비전 번호 / revision number</param>
     /// <exception cref="FormatException">데이터 길이가 부족할 때 / when data length is insufficient</exception>
-    public Log(ReadOnlySpan<byte> data, int revision = 0) : this() {
+    public LogSettings(ReadOnlySpan<byte> data, int revision = 0) : this() {
         // 리비전 범위 보정
         // clamp revision to valid range
         if (revision < 0 || revision >= Sizes.Length)
@@ -188,7 +188,7 @@ public sealed class Log {
     /// <param name="revision">리비전 번호 / revision number</param>
     /// <param name="result">파싱 결과 / parsed result</param>
     /// <returns>파싱 성공 여부 / true if parsing succeeded</returns>
-    public static bool TryParse(ReadOnlySpan<byte> data, int revision, out Log? result) {
+    public static bool TryParse(ReadOnlySpan<byte> data, int revision, out LogSettings? result) {
         // 리비전 범위 보정
         // clamp revision to valid range
         if (revision < 0 || revision >= Sizes.Length)
@@ -211,7 +211,7 @@ public sealed class Log {
         try {
             // 데이터 파싱
             // parse data
-            result = new Log(data, revision);
+            result = new LogSettings(data, revision);
             // 파싱 성공 반환
             // indicate parsing success
             return true;
