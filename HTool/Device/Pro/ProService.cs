@@ -339,7 +339,7 @@ public sealed class ProService : IDisposable {
         var payload = new byte[4];
         // 이벤트 ID 기록
         // write event ID
-        Utils.WriteInt32(payload, eventId);
+        ByteOrder.WriteInt32(payload, eventId);
         // MID 105 전송
         // send MID 105
         return Request(MessageId.OldEventRequest, 0, payload);
@@ -719,7 +719,7 @@ public sealed class ProService : IDisposable {
                 if (payload.Length >= 4) {
                     // 이벤트 ID 읽기
                     // read event ID
-                    var eventId = Utils.ReadInt32(payload);
+                    var eventId = ByteOrder.ReadInt32(payload);
                     // 이벤트 ID 알림
                     // notify event ID
                     LastEventIdReceived?.Invoke(eventId);
@@ -1089,7 +1089,7 @@ public sealed class ProService : IDisposable {
         var payload = new byte[4];
         // 이벤트 ID 기록
         // write event ID
-        Utils.WriteInt32(payload, (int)eventId);
+        ByteOrder.WriteInt32(payload, (int)eventId);
         // MID 103 프레임 생성
         // build MID 103 frame
         var packet = ProCodec.BuildMessage(MessageId.LastEventAcknowledge, 0, payload);

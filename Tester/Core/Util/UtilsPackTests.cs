@@ -22,7 +22,7 @@ public class UtilsPackTests {
 
         // HighLow 워드 순서로 패킹 실행
         // execute packing with HighLow word order
-        var result = Utils.PackInt32(value);
+        var result = Packing.PackInt32(value);
 
         // 결과 배열 길이가 2인지 확인
         // verify result array length is 2
@@ -47,7 +47,7 @@ public class UtilsPackTests {
 
         // LowHigh 워드 순서로 패킹 실행
         // execute packing with LowHigh word order
-        var result = Utils.PackInt32(value, WordOrder.LowHigh);
+        var result = Packing.PackInt32(value, WordOrder.LowHigh);
 
         // 결과 배열 길이가 2인지 확인
         // verify result array length is 2
@@ -76,7 +76,7 @@ public class UtilsPackTests {
 
         // HighLow 워드 순서로 패킹 실행
         // execute packing with HighLow word order
-        var result = Utils.PackFloat(value);
+        var result = Packing.PackFloat(value);
 
         // 결과 배열 길이가 2인지 확인
         // verify result array length is 2
@@ -101,7 +101,7 @@ public class UtilsPackTests {
 
         // LowHigh 워드 순서로 패킹 실행
         // execute packing with LowHigh word order
-        var result = Utils.PackFloat(value, WordOrder.LowHigh);
+        var result = Packing.PackFloat(value, WordOrder.LowHigh);
 
         // 첫 번째 요소가 하위 워드 (0x0000)인지 확인
         // verify first element is low word (0x0000)
@@ -127,7 +127,7 @@ public class UtilsPackTests {
 
         // 문자열 패킹 실행
         // execute string packing
-        var result = Utils.PackString(text);
+        var result = Packing.PackString(text);
 
         // 결과 배열 길이가 2인지 확인 (4문자 / 2 = 2워드)
         // verify result array length is 2 (4 chars / 2 = 2 words)
@@ -152,7 +152,7 @@ public class UtilsPackTests {
 
         // 문자열 패킹 실행
         // execute string packing
-        var result = Utils.PackString(text);
+        var result = Packing.PackString(text);
 
         // 결과 배열 길이가 2인지 확인 (1쌍 + 1나머지)
         // verify result array length is 2 (1 pair + 1 remainder)
@@ -175,7 +175,7 @@ public class UtilsPackTests {
     public void PackString_NullOrEmpty_ReturnsEmptyArray(string? text) {
         // null 또는 빈 문자열의 패킹 실행
         // execute packing of null or empty string
-        var result = Utils.PackString(text!);
+        var result = Packing.PackString(text!);
 
         // 빈 배열이 반환되는지 확인
         // verify empty array is returned
@@ -198,7 +198,7 @@ public class UtilsPackTests {
 
         // 숫자쌍 패킹 실행
         // execute digit pair packing
-        var result = Utils.PackDigitPairs(text);
+        var result = Packing.PackDigitPairs(text);
 
         // 결과 배열 길이가 2인지 확인
         // verify result array length is 2
@@ -219,7 +219,7 @@ public class UtilsPackTests {
     public void PackDigitPairs_EmptyString_ReturnsEmptyArray() {
         // 빈 문자열의 패킹 실행
         // execute packing of empty string
-        var result = Utils.PackDigitPairs("");
+        var result = Packing.PackDigitPairs("");
 
         // 빈 배열이 반환되는지 확인
         // verify empty array is returned
@@ -242,7 +242,7 @@ public class UtilsPackTests {
 
         // IP 주소 패킹 실행
         // execute IP address packing
-        var result = Utils.PackAddress(addr);
+        var result = Packing.PackAddress(addr);
 
         // 결과 배열 길이가 4인지 확인
         // verify result array length is 4
@@ -273,7 +273,7 @@ public class UtilsPackTests {
 
         // 서브넷 마스크 패킹 실행
         // execute subnet mask packing
-        var result = Utils.PackAddress(addr);
+        var result = Packing.PackAddress(addr);
 
         // 첫 번째 옥텟이 255인지 확인
         // verify first octet is 255

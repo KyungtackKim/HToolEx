@@ -60,11 +60,11 @@ public readonly struct CalibrationSettings {
         if (body is Body.Separated)
             // 분리형: int32 (4바이트, LE) 읽기
             // separated: read int32 (4 bytes, LE)
-            Value = Utils.ReadInt32(data[2..], isBigEndian: false);
+            Value = ByteOrder.ReadInt32(data[2..], isBigEndian: false);
         else
             // 일체형: ushort (2바이트, LE) 읽기
             // integrated: read ushort (2 bytes, LE)
-            Value = Utils.ReadUInt16(data[2..], false);
+            Value = ByteOrder.ReadUInt16(data[2..], false);
 
         // 해시 계산
         // compute hash
@@ -136,7 +136,7 @@ public readonly struct CalibrationSettings {
             case Body.Separated:
                 // 분리형: int32 (4바이트, BE) 기록
                 // separated: write int32 (4 bytes, BE)
-                Utils.WriteInt32(bytes.AsSpan(2), Value);
+                ByteOrder.WriteInt32(bytes.AsSpan(2), Value);
                 // switch 종료
                 // exit switch
                 break;
@@ -145,7 +145,7 @@ public readonly struct CalibrationSettings {
             default:
                 // 일체형: ushort (2바이트, BE) 기록
                 // integrated: write ushort (2 bytes, BE)
-                Utils.WriteUInt16(bytes.AsSpan(2), (ushort)Value);
+                ByteOrder.WriteUInt16(bytes.AsSpan(2), (ushort)Value);
                 // switch 종료
                 // exit switch
                 break;

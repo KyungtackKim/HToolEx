@@ -43,13 +43,13 @@ internal static class ProCodec {
 
         // 전체 길이 기록 (Big-Endian)
         // write total length (Big-Endian)
-        Utils.WriteUInt16(s, (ushort)totalLength);
+        ByteOrder.WriteUInt16(s, (ushort)totalLength);
         // MID 기록 (Big-Endian)
         // write MID (Big-Endian)
-        Utils.WriteUInt16(s[2..], (ushort)mid);
+        ByteOrder.WriteUInt16(s[2..], (ushort)mid);
         // 리비전 기록 (Big-Endian)
         // write revision (Big-Endian)
-        Utils.WriteUInt16(s[4..], (ushort)revision);
+        ByteOrder.WriteUInt16(s[4..], (ushort)revision);
         // 예약 영역 0으로 초기화
         // initialize reserved area to zero
         s[6..HeaderSize].Clear();
@@ -130,7 +130,7 @@ internal static class ProCodec {
     internal static MessageId ExtractMid(ReadOnlySpan<byte> frame) {
         // 바이트 2~3에서 MID 읽기 (Big-Endian)
         // read MID from bytes 2-3 (Big-Endian)
-        return (MessageId)Utils.ReadUInt16(frame[2..]);
+        return (MessageId)ByteOrder.ReadUInt16(frame[2..]);
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ internal static class ProCodec {
     internal static int ExtractRevision(ReadOnlySpan<byte> frame) {
         // 바이트 4~5에서 리비전 읽기 (Big-Endian)
         // read revision from bytes 4-5 (Big-Endian)
-        return Utils.ReadUInt16(frame[4..]);
+        return ByteOrder.ReadUInt16(frame[4..]);
     }
 
     /// <summary>

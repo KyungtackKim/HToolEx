@@ -143,7 +143,7 @@ public class UtilsConvertTests {
 
         // 빅엔디안 HighLow 방식으로 float 읽기
         // read float in big-endian HighLow mode
-        var result = Utils.ReadFloat(bytes);
+        var result = ByteOrder.ReadFloat(bytes);
 
         // 결과가 1.0f인지 확인
         // verify result is 1.0f
@@ -162,7 +162,7 @@ public class UtilsConvertTests {
 
         // 빅엔디안 LowHigh 방식으로 float 읽기
         // read float in big-endian LowHigh mode
-        var result = Utils.ReadFloat(bytes, WordOrder.LowHigh);
+        var result = ByteOrder.ReadFloat(bytes, WordOrder.LowHigh);
 
         // 결과가 1.0f인지 확인
         // verify result is 1.0f
@@ -181,7 +181,7 @@ public class UtilsConvertTests {
 
         // 부족한 바이트로 float 읽기 실행
         // execute float read with insufficient bytes
-        var result = Utils.ReadFloat(bytes);
+        var result = ByteOrder.ReadFloat(bytes);
 
         // 0이 반환되는지 확인
         // verify zero is returned
@@ -200,7 +200,7 @@ public class UtilsConvertTests {
 
         // 리틀엔디안 HighLow 방식으로 float 읽기
         // read float in little-endian HighLow mode
-        var result = Utils.ReadFloat(bytes, WordOrder.HighLow, false);
+        var result = ByteOrder.ReadFloat(bytes, WordOrder.HighLow, false);
 
         // 결과가 1.0f인지 확인
         // verify result is 1.0f
@@ -223,7 +223,7 @@ public class UtilsConvertTests {
 
         // 빅엔디안 방식으로 ushort 읽기
         // read ushort in big-endian mode
-        var result = Utils.ReadUInt16(bytes);
+        var result = ByteOrder.ReadUInt16(bytes);
 
         // 결과가 0x0102 (258)인지 확인
         // verify result is 0x0102 (258)
@@ -242,7 +242,7 @@ public class UtilsConvertTests {
 
         // 리틀엔디안 방식으로 ushort 읽기
         // read ushort in little-endian mode
-        var result = Utils.ReadUInt16(bytes, false);
+        var result = ByteOrder.ReadUInt16(bytes, false);
 
         // 결과가 0x0201 (513)인지 확인
         // verify result is 0x0201 (513)
@@ -261,7 +261,7 @@ public class UtilsConvertTests {
 
         // 부족한 바이트로 ushort 읽기 실행
         // execute ushort read with insufficient bytes
-        var result = Utils.ReadUInt16(bytes);
+        var result = ByteOrder.ReadUInt16(bytes);
 
         // 0이 반환되는지 확인
         // verify zero is returned
@@ -284,7 +284,7 @@ public class UtilsConvertTests {
 
         // 빅엔디안 HighLow 방식으로 int32 읽기
         // read int32 in big-endian HighLow mode
-        var result = Utils.ReadInt32(bytes);
+        var result = ByteOrder.ReadInt32(bytes);
 
         // 결과가 0x12345678인지 확인
         // verify result is 0x12345678
@@ -303,7 +303,7 @@ public class UtilsConvertTests {
 
         // 부족한 바이트로 int32 읽기 실행
         // execute int32 read with insufficient bytes
-        var result = Utils.ReadInt32(bytes);
+        var result = ByteOrder.ReadInt32(bytes);
 
         // 0이 반환되는지 확인
         // verify zero is returned
@@ -329,10 +329,10 @@ public class UtilsConvertTests {
 
         // 빅엔디안으로 int32 쓰기
         // write int32 in big-endian
-        Utils.WriteInt32(buffer, value);
+        ByteOrder.WriteInt32(buffer, value);
         // 빅엔디안으로 int32 읽기
         // read int32 in big-endian
-        var result = Utils.ReadInt32(buffer);
+        var result = ByteOrder.ReadInt32(buffer);
 
         // 왕복 결과가 원본과 일치하는지 확인
         // verify round-trip result matches original
@@ -354,10 +354,10 @@ public class UtilsConvertTests {
 
         // 빅엔디안으로 ushort 쓰기
         // write ushort in big-endian
-        Utils.WriteUInt16(buffer, value);
+        ByteOrder.WriteUInt16(buffer, value);
         // 빅엔디안으로 ushort 읽기
         // read ushort in big-endian
-        var result = Utils.ReadUInt16(buffer);
+        var result = ByteOrder.ReadUInt16(buffer);
 
         // 왕복 결과가 원본과 일치하는지 확인
         // verify round-trip result matches original
@@ -379,10 +379,10 @@ public class UtilsConvertTests {
 
         // 빅엔디안으로 float 쓰기
         // write float in big-endian
-        Utils.WriteFloat(buffer, value);
+        ByteOrder.WriteFloat(buffer, value);
         // 빅엔디안으로 float 읽기
         // read float in big-endian
-        var result = Utils.ReadFloat(buffer);
+        var result = ByteOrder.ReadFloat(buffer);
 
         // 왕복 결과가 원본과 일치하는지 확인 (float 정밀도 허용)
         // verify round-trip result matches original (float precision tolerance)

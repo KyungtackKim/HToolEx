@@ -87,16 +87,16 @@ public readonly struct CalibrationData {
         Body = EnumUtil.IsDefined<Body>(data[0]) ? (Body)data[0] : Body.Integrated;
         // 모델 번호 읽기 (int32, LE)
         // read model number (int32, LE)
-        Model = (uint)Utils.ReadInt32(data[1..5], isBigEndian: false);
+        Model = (uint)ByteOrder.ReadInt32(data[1..5], isBigEndian: false);
         // 100.0f, LE) / 최대 토크 읽기 (int32 / 100.0f, LE)
         // read max torque (int32
-        MaxTorque = Utils.ReadInt32(data[5..9], isBigEndian: false) / 100.0f;
+        MaxTorque = ByteOrder.ReadInt32(data[5..9], isBigEndian: false) / 100.0f;
         // 본체 시리얼 번호 읽기 (int32, LE)
         // read body serial number (int32, LE)
-        BodySerial = (uint)Utils.ReadInt32(data[9..13], isBigEndian: false);
+        BodySerial = (uint)ByteOrder.ReadInt32(data[9..13], isBigEndian: false);
         // 센서 시리얼 번호 읽기 (int32, LE)
         // read sensor serial number (int32, LE)
-        SensorSerial = (uint)Utils.ReadInt32(data[13..17], isBigEndian: false);
+        SensorSerial = (uint)ByteOrder.ReadInt32(data[13..17], isBigEndian: false);
         // 단위 읽기
         // read unit
         Unit = EnumUtil.IsDefined<Unit>(data[17]) ? (Unit)data[17] : Unit.KgfCm;
@@ -122,40 +122,40 @@ public readonly struct CalibrationData {
             case Body.Separated: {
                 // 분리형: int32 (4바이트) 단위로 읽기
                 // separated: read as int32 (4 bytes each)
-                Offset = Utils.ReadInt32(data[19..23], isBigEndian: false);
+                Offset = ByteOrder.ReadInt32(data[19..23], isBigEndian: false);
                 // 양방향 포인트 1 읽기
                 // read positive point 1
-                var p1 = Utils.ReadInt32(data[23..27], isBigEndian: false);
+                var p1 = ByteOrder.ReadInt32(data[23..27], isBigEndian: false);
                 // 양방향 포인트 2 읽기
                 // read positive point 2
-                var p2 = Utils.ReadInt32(data[27..31], isBigEndian: false);
+                var p2 = ByteOrder.ReadInt32(data[27..31], isBigEndian: false);
                 // 양방향 포인트 3 읽기
                 // read positive point 3
-                var p3 = Utils.ReadInt32(data[31..35], isBigEndian: false);
+                var p3 = ByteOrder.ReadInt32(data[31..35], isBigEndian: false);
                 // 양방향 포인트 4 읽기
                 // read positive point 4
-                var p4 = Utils.ReadInt32(data[35..39], isBigEndian: false);
+                var p4 = ByteOrder.ReadInt32(data[35..39], isBigEndian: false);
                 // 양방향 포인트 5 읽기
                 // read positive point 5
-                var p5 = Utils.ReadInt32(data[39..43], isBigEndian: false);
+                var p5 = ByteOrder.ReadInt32(data[39..43], isBigEndian: false);
                 // 양방향 배열 설정
                 // set positive array
                 Positives = [p1, p2, p3, p4, p5];
                 // 음방향 포인트 1 읽기
                 // read negative point 1
-                var n1 = Utils.ReadInt32(data[43..47], isBigEndian: false);
+                var n1 = ByteOrder.ReadInt32(data[43..47], isBigEndian: false);
                 // 음방향 포인트 2 읽기
                 // read negative point 2
-                var n2 = Utils.ReadInt32(data[47..51], isBigEndian: false);
+                var n2 = ByteOrder.ReadInt32(data[47..51], isBigEndian: false);
                 // 음방향 포인트 3 읽기
                 // read negative point 3
-                var n3 = Utils.ReadInt32(data[51..55], isBigEndian: false);
+                var n3 = ByteOrder.ReadInt32(data[51..55], isBigEndian: false);
                 // 음방향 포인트 4 읽기
                 // read negative point 4
-                var n4 = Utils.ReadInt32(data[55..59], isBigEndian: false);
+                var n4 = ByteOrder.ReadInt32(data[55..59], isBigEndian: false);
                 // 음방향 포인트 5 읽기
                 // read negative point 5
-                var n5 = Utils.ReadInt32(data[59..63], isBigEndian: false);
+                var n5 = ByteOrder.ReadInt32(data[59..63], isBigEndian: false);
                 // 음방향 배열 설정
                 // set negative array
                 Negatives = [n1, n2, n3, n4, n5];
@@ -167,40 +167,40 @@ public readonly struct CalibrationData {
             default: {
                 // 일체형: ushort (2바이트) 단위로 읽기
                 // integrated: read as ushort (2 bytes each)
-                Offset = Utils.ReadUInt16(data[19..21], false);
+                Offset = ByteOrder.ReadUInt16(data[19..21], false);
                 // 양방향 포인트 1 읽기
                 // read positive point 1
-                var p1 = Utils.ReadUInt16(data[21..23], false);
+                var p1 = ByteOrder.ReadUInt16(data[21..23], false);
                 // 양방향 포인트 2 읽기
                 // read positive point 2
-                var p2 = Utils.ReadUInt16(data[23..25], false);
+                var p2 = ByteOrder.ReadUInt16(data[23..25], false);
                 // 양방향 포인트 3 읽기
                 // read positive point 3
-                var p3 = Utils.ReadUInt16(data[25..27], false);
+                var p3 = ByteOrder.ReadUInt16(data[25..27], false);
                 // 양방향 포인트 4 읽기
                 // read positive point 4
-                var p4 = Utils.ReadUInt16(data[27..29], false);
+                var p4 = ByteOrder.ReadUInt16(data[27..29], false);
                 // 양방향 포인트 5 읽기
                 // read positive point 5
-                var p5 = Utils.ReadUInt16(data[29..31], false);
+                var p5 = ByteOrder.ReadUInt16(data[29..31], false);
                 // 양방향 배열 설정
                 // set positive array
                 Positives = [p1, p2, p3, p4, p5];
                 // 음방향 포인트 1 읽기
                 // read negative point 1
-                var n1 = Utils.ReadUInt16(data[31..33], false);
+                var n1 = ByteOrder.ReadUInt16(data[31..33], false);
                 // 음방향 포인트 2 읽기
                 // read negative point 2
-                var n2 = Utils.ReadUInt16(data[33..35], false);
+                var n2 = ByteOrder.ReadUInt16(data[33..35], false);
                 // 음방향 포인트 3 읽기
                 // read negative point 3
-                var n3 = Utils.ReadUInt16(data[35..37], false);
+                var n3 = ByteOrder.ReadUInt16(data[35..37], false);
                 // 음방향 포인트 4 읽기
                 // read negative point 4
-                var n4 = Utils.ReadUInt16(data[37..39], false);
+                var n4 = ByteOrder.ReadUInt16(data[37..39], false);
                 // 음방향 포인트 5 읽기
                 // read negative point 5
-                var n5 = Utils.ReadUInt16(data[39..41], false);
+                var n5 = ByteOrder.ReadUInt16(data[39..41], false);
                 // 음방향 배열 설정
                 // set negative array
                 Negatives = [n1, n2, n3, n4, n5];
@@ -383,16 +383,16 @@ public readonly struct CalibrationData {
         bytes[0] = (byte)Body;
         // 모델 번호 기록
         // write model number
-        Utils.WriteInt32(s[1..], (int)Model, false);
+        ByteOrder.WriteInt32(s[1..], (int)Model, false);
         // 최대 토크 기록 (float -> int * 100)
         // write max torque (float -> int * 100)
-        Utils.WriteInt32(s[5..], (int)(MaxTorque * 100.0f), false);
+        ByteOrder.WriteInt32(s[5..], (int)(MaxTorque * 100.0f), false);
         // 본체 시리얼 기록
         // write body serial
-        Utils.WriteInt32(s[9..], (int)BodySerial, false);
+        ByteOrder.WriteInt32(s[9..], (int)BodySerial, false);
         // 센서 시리얼 기록
         // write sensor serial
-        Utils.WriteInt32(s[13..], (int)SensorSerial, false);
+        ByteOrder.WriteInt32(s[13..], (int)SensorSerial, false);
         // 단위 기록
         // write unit
         bytes[17] = (byte)Unit;
@@ -406,19 +406,19 @@ public readonly struct CalibrationData {
             case Body.Separated:
                 // 분리형: int32 (4바이트) 단위로 기록
                 // separated: write as int32 (4 bytes each)
-                Utils.WriteInt32(s[19..], Offset, false);
+                ByteOrder.WriteInt32(s[19..], Offset, false);
                 // 양방향 값 기록
                 // write positive values
                 for (var i = 0; i < 5; i++)
                     // 계산된 오프셋에 양방향 값 기록
                     // write positive value at calculated offset
-                    Utils.WriteInt32(s[(23 + i * 4)..], Positives[i], false);
+                    ByteOrder.WriteInt32(s[(23 + i * 4)..], Positives[i], false);
                 // 음방향 값 기록
                 // write negative values
                 for (var i = 0; i < 5; i++)
                     // 계산된 오프셋에 음방향 값 기록
                     // write negative value at calculated offset
-                    Utils.WriteInt32(s[(43 + i * 4)..], Negatives[i], false);
+                    ByteOrder.WriteInt32(s[(43 + i * 4)..], Negatives[i], false);
                 // switch 종료
                 // exit switch
                 break;
@@ -427,19 +427,19 @@ public readonly struct CalibrationData {
             default:
                 // 일체형: ushort (2바이트) 단위로 기록
                 // integrated: write as ushort (2 bytes each)
-                Utils.WriteUInt16(s[19..], (ushort)Offset, false);
+                ByteOrder.WriteUInt16(s[19..], (ushort)Offset, false);
                 // 양방향 값 기록
                 // write positive values
                 for (var i = 0; i < 5; i++)
                     // 계산된 오프셋에 양방향 값 기록
                     // write positive value at calculated offset
-                    Utils.WriteUInt16(s[(21 + i * 2)..], (ushort)Positives[i], false);
+                    ByteOrder.WriteUInt16(s[(21 + i * 2)..], (ushort)Positives[i], false);
                 // 음방향 값 기록
                 // write negative values
                 for (var i = 0; i < 5; i++)
                     // 계산된 오프셋에 음방향 값 기록
                     // write negative value at calculated offset
-                    Utils.WriteUInt16(s[(31 + i * 2)..], (ushort)Negatives[i], false);
+                    ByteOrder.WriteUInt16(s[(31 + i * 2)..], (ushort)Negatives[i], false);
                 // switch 종료
                 // exit switch
                 break;
