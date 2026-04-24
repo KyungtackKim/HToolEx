@@ -1,9 +1,15 @@
+using HTool.Device;
+
 namespace HTool.Type;
 
 /// <summary>
 ///     로그 수준을 정의한다.
 ///     Defines log severity levels.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HToolLogger"/>, <see cref="MessagePipeline"/>.
+///     used by: <see cref="HToolLogger"/>, <see cref="MessagePipeline"/>.
+/// </remarks>
 public enum LogLevel {
 	/// <summary>
 	///     디버깅 정보.

@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     그래프 스텝 열거형
 ///     graph step enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Process.Event"/>.
+///     used by: <see cref="HTool.Format.Process.Event"/>.
+/// </remarks>
 public enum GraphStep {
     /// <summary>
     ///     없음

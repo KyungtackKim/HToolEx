@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     32비트 MODBUS 레지스터 값의 워드 순서
 ///     word order for 32-bit MODBUS register values
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Core.Util.ByteOrder"/>, <see cref="HTool.Core.Util.Packing"/>.
+///     used by: <see cref="HTool.Core.Util.ByteOrder"/>, <see cref="HTool.Core.Util.Packing"/>.
+/// </remarks>
 public enum WordOrder {
 	/// <summary>
 	///     상위 워드 먼저 (ABCD) — 가장 일반적

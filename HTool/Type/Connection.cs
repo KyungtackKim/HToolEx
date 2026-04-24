@@ -1,9 +1,15 @@
+using HTool.Device;
+
 namespace HTool.Type;
 
 /// <summary>
 ///     연결 상태를 정의한다.
 ///     Defines the connection state.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
+///     used by: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
+/// </remarks>
 public enum Connection {
 	/// <summary>
 	///     연결 해제 요청됨 (Close() 호출 직후).

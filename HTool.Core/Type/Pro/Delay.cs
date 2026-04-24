@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 지연 스텝의 모드
 ///     delay step mode for Pro X job
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.Job.DelayBody"/>.
+///     used by: <see cref="HTool.Format.Pro.Job.DelayBody"/>.
+/// </remarks>
 public enum Delay {
 	/// <summary>
 	///     시간 지연

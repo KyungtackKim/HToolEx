@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 출력 신호 유형
 ///     output signal type for Pro X
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.Job.OutputBody"/>.
+///     used by: <see cref="HTool.Format.Pro.Job.OutputBody"/>.
+/// </remarks>
 public enum OutputSignal {
 	/// <summary>
 	///     임펄스 출력

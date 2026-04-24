@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 작업 이벤트 상태
 ///     job event status for Pro X operation
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.JobEvent"/>, <see cref="HTool.Device.Pro.ProService"/>.
+///     used by: <see cref="HTool.Format.Pro.JobEvent"/>, <see cref="HTool.Device.Pro.ProService"/>.
+/// </remarks>
 public enum JobEvent {
 	/// <summary>
 	///     스텝 진입

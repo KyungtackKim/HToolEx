@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     자동 클리어 시간 열거형
 ///     auto clear time enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+///     used by: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+/// </remarks>
 public enum AutoClearTime : byte {
 	/// <summary>
 	///     비활성화

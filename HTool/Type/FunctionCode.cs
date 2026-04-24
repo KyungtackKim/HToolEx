@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using HTool.Device.Codec;
+using HTool.Device.Protocol;
 
 namespace HTool.Type;
 
@@ -6,6 +8,10 @@ namespace HTool.Type;
 ///     MODBUS 함수 코드를 정의한다.
 ///     Defines MODBUS function codes.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="ModbusRtuCodec"/>, <see cref="ModbusTcpCodec"/>, <see cref="ModbusRequest"/>, <see cref="ModbusResponse"/>.
+///     used by: <see cref="ModbusRtuCodec"/>, <see cref="ModbusTcpCodec"/>, <see cref="ModbusRequest"/>, <see cref="ModbusResponse"/>.
+/// </remarks>
 public enum FunctionCode : byte {
 	/// <summary>
 	///     보유 레지스터 읽기 (FC 0x03).

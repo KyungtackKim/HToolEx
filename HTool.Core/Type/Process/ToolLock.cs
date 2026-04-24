@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     공구 잠금 상태 열거형
 ///     tool lock state enumeration
 /// </summary>
+/// <remarks>
+///     공구 잠금(락/언락) 제어 명령 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다.
+///     definition of tool lock/unlock control commands; currently unreferenced within this library.
+/// </remarks>
 public enum ToolLock {
     /// <summary>
     ///     잠금 해제

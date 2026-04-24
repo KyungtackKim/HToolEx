@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     운전 모드 열거형
 ///     operation mode enumeration
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+///     used by: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+/// </remarks>
 public enum OperationMode : byte {
 	/// <summary>
 	///     피크 모드

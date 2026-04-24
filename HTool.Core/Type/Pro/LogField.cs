@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 로그 필드 유형
 ///     log field type for Pro X
 /// </summary>
+/// <remarks>
+///     Pro X 로그 설정(LogSettings)의 선택 항목을 식별하는 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다.
+///     definition identifying selectable entries of Pro X log settings (LogSettings); currently unreferenced within this library.
+/// </remarks>
 public enum LogField {
     #region Rev.0
 

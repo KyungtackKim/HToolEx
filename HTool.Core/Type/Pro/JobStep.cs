@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Pro;
 ///     Pro X 작업의 스텝 유형
 ///     step type within a Pro X job sequence
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Pro.Job.StepHeader"/>, <see cref="HTool.Format.Pro.Job.FastenBody"/>, <see cref="HTool.Format.Pro.Job.DelayBody"/>, <see cref="HTool.Format.Pro.Job.InputBody"/>, <see cref="HTool.Format.Pro.Job.OutputBody"/>, <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+///     used by: <see cref="HTool.Format.Pro.Job.StepHeader"/>, <see cref="HTool.Format.Pro.Job.FastenBody"/>, <see cref="HTool.Format.Pro.Job.DelayBody"/>, <see cref="HTool.Format.Pro.Job.InputBody"/>, <see cref="HTool.Format.Pro.Job.OutputBody"/>, <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+/// </remarks>
 public enum JobStep {
 	/// <summary>
 	///     체결 스텝

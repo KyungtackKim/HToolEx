@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Ez;
 ///     캘리브레이션 포인트 열거형. 정격 용량 대비 백분율을 나타냅니다.
 ///     calibration point enumeration. Represents percentage of rated capacity.
 /// </summary>
+/// <remarks>
+///     사용처: <see cref="HTool.Format.Ez.CalibrationData"/>.
+///     used by: <see cref="HTool.Format.Ez.CalibrationData"/>.
+/// </remarks>
 public enum CalPoint {
 	/// <summary>
 	///     영점 (0%)

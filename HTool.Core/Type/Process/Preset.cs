@@ -6,6 +6,10 @@ namespace HTool.Core.Type.Process;
 ///     프리셋 플래그 열거형. P1~P31 및 Ma(다축) 플래그를 포함합니다.
 ///     preset flag enumeration. Includes P1 through P31 and the Ma (multi-axis) flag.
 /// </summary>
+/// <remarks>
+///     프리셋 선택 비트 마스크 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다(호출자가 플래그 마스크로 사용).
+///     definition of preset selection bit masks; currently unreferenced within this library (callers use it as a flag mask).
+/// </remarks>
 [Flags]
 public enum Preset : ulong {
     /// <summary>
