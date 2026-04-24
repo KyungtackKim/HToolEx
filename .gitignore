@@ -427,3 +427,10 @@ fabric.properties
 # User-defined folders
 [Bb]ackup/
 [Tt]estor/
+
+# graphify outputs and interpreter path cache
+graphify-out/
+.graphify_python
+
+# temporary task files (see global CLAUDE.md)
+.temp/

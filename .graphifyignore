@@ -1,0 +1,22 @@
+# .NET build artifacts
+obj
+bin
+
+# generated source files
+*.AssemblyInfo.cs
+*.GlobalUsings.g.cs
+*.FileListAbsolute.txt
+
+# project-local temp and analysis outputs
+.temp
+graphify-out
+
+# scope: HTool v2 trio only — exclude legacy, test, and non-v2 projects
+Legacy
+HToolEz
+Tester
+ToolSample
+
+# root-level docs (scope consistency with original run that scanned only project dirs)
+/CLAUDE.md
+/README.md
