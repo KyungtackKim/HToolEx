@@ -511,12 +511,12 @@ public partial class FormatEvent {
         sb.Append(Direction.GetDesc()).Append(',');
         sb.Append(Error).Append(',');
         sb.Append(Event.GetDesc()).Append(',');
-        sb.Append(TargetTorque.ToString(info)).Append(',');
-        sb.Append(Torque.ToString(info)).Append(',');
-        sb.Append(SeatingTorque.ToString(info)).Append(',');
-        sb.Append(ClampTorque.ToString(info)).Append(',');
-        sb.Append(PrevailingTorque.ToString(info)).Append(',');
-        sb.Append(SnugTorque.ToString(info)).Append(',');
+        sb.Append(TargetTorque.ToString("F3", info)).Append(',');
+        sb.Append(Torque.ToString("F3", info)).Append(',');
+        sb.Append(SeatingTorque.ToString("F3", info)).Append(',');
+        sb.Append(ClampTorque.ToString("F3", info)).Append(',');
+        sb.Append(PrevailingTorque.ToString("F3", info)).Append(',');
+        sb.Append(SnugTorque.ToString("F3", info)).Append(',');
         sb.Append(Speed).Append(',');
         sb.Append(Angle1).Append(',');
         sb.Append(Angle2).Append(',');
