@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Pro;
 ///     action type for Pro X message step
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Pro.Job.MessageBody"/>.
-///     used by: <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+///     사용처: <c>HTool.Format.Pro.Job.MessageBody</c>.
+///     used by: <c>HTool.Format.Pro.Job.MessageBody</c>.
 /// </remarks>
 public enum StepMessage {
 	/// <summary>

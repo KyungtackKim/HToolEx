@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Process;
 ///     motor rotation direction enumeration
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Device.Status"/>.
-///     used by: <see cref="HTool.Format.Device.Status"/>.
+///     사용처: <c>HTool.Format.Device.Status</c>.
+///     used by: <c>HTool.Format.Device.Status</c>.
 /// </remarks>
 public enum Direction {
     /// <summary>

@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Ez;
 ///     torque direction enumeration
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Ez.DeviceSettings"/>.
-///     used by: <see cref="HTool.Format.Ez.DeviceSettings"/>.
+///     사용처: <c>HTool.Format.Ez.DeviceSettings</c>.
+///     used by: <c>HTool.Format.Ez.DeviceSettings</c>.
 /// </remarks>
 public enum Direction : byte {
 	/// <summary>

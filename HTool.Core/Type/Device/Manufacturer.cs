@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Device;
 ///     manufacturer enumeration. Distinguishes device manufacturers.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="ModelNames"/>, <see cref="HTool.Format.Device.Info"/>.
-///     used by: <see cref="ModelNames"/>, <see cref="HTool.Format.Device.Info"/>.
+///     사용처: <see cref="ModelNames"/>, <c>HTool.Format.Device.Info</c>.
+///     used by: <see cref="ModelNames"/>, <c>HTool.Format.Device.Info</c>.
 /// </remarks>
 public enum Manufacturer {
 	/// <summary>

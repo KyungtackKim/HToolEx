@@ -70,9 +70,11 @@ public sealed class Operation {
         // 원격 바코드 모드 읽기
         // read remote barcode mode
         RemoteBarcodeMode = BinarySpanReader.ReadByte(data, ref pos);
-        // Job 실행 중 바코드 스캔 읽기
-        // read scan barcode while job running
+        // Job 실행 중 바코드 스캔 읽기 (Rev.0 호환을 위해 의도적으로 obsolete 멤버 접근)
+        // read scan barcode while job running (intentional obsolete access for Rev.0 compatibility)
+#pragma warning disable CS0618
         ScanBarcodeWhileRun = BinarySpanReader.ReadByte(data, ref pos);
+#pragma warning restore CS0618
         // 재체결 실패 시 나사 건너뛰기 읽기
         // read skip screw on re-tight fail
         SkipScrewForReTightFail = BinarySpanReader.ReadByte(data, ref pos);
@@ -376,9 +378,11 @@ public sealed class Operation {
         // 원격 바코드 모드 추가
         // add remote barcode mode
         values.Add(Convert.ToByte(RemoteBarcodeMode));
-        // Job 실행 중 바코드 스캔 추가
-        // add scan barcode while run
+        // Job 실행 중 바코드 스캔 추가 (Rev.0 호환을 위해 의도적으로 obsolete 멤버 접근)
+        // add scan barcode while run (intentional obsolete access for Rev.0 compatibility)
+#pragma warning disable CS0618
         values.Add(Convert.ToByte(ScanBarcodeWhileRun));
+#pragma warning restore CS0618
         // 재체결 실패 시 나사 건너뛰기 추가
         // add skip screw on re-tight fail
         values.Add(Convert.ToByte(SkipScrewForReTightFail));
