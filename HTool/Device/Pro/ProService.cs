@@ -5,10 +5,10 @@ using HTool.Device.Codec;
 using HTool.Device.Protocol;
 using HTool.Device.Transport;
 using HTool.Format.Pro;
+using HTool.Format.Process;
 using HTool.Type;
 using JobEvent = HTool.Format.Pro.JobEvent;
 using Timer = System.Timers.Timer;
-using ToolEvent = HTool.Format.Process.Event;
 
 namespace HTool.Device.Pro;
 
@@ -194,7 +194,7 @@ public sealed class ProService : IDisposable {
     ///     툴 이벤트 데이터 수신 (MID 102/106). 자동 Ack 처리.
     ///     Tool event data received (MID 102/106). Auto-Ack handled.
     /// </summary>
-    public event Action<ToolEvent>? EventDataReceived;
+    public event Action<IFastenEvent>? EventDataReceived;
 
     /// <summary>
     ///     작업 이벤트 수신 (MID 88). 자동 Ack 처리.
@@ -999,11 +999,11 @@ public sealed class ProService : IDisposable {
             // activate subscription state
             IsToolEventSubscribed = true;
 
-        // 이벤트 데이터 파싱
-        // parse event data
-        if (!ToolEvent.TryParse(payload, out var eventData, revision) || eventData is null)
-            // 파싱 실패 또는 null — 반환
-            // parse failed or null — return
+        // PRO X 고해상도 이벤트 데이터 파싱
+        // parse PRO X high-res event data
+        if (!ProHighResGraph.TryParse(payload, out var eventData, revision))
+            // 파싱 실패 — 반환
+            // parse failed — return
             return;
         // 이벤트 로그
         // log event
@@ -1050,9 +1050,9 @@ public sealed class ProService : IDisposable {
             ? modbusPayload[1..]
             : ReadOnlyMemory<byte>.Empty;
 
-        // MODBUS 응답 생성
-        // create MODBUS response
-        var response = new ModbusResponse(code, 0, responsePayload);
+        // MODBUS 응답 생성 — 그래프 계열 FC는 LEN 필드를 분리해 노출
+        // create MODBUS response — graph-family FCs have their LEN field split into a dedicated property
+        var response = ModbusResponse.Decode(code, 0, responsePayload);
         // MODBUS 응답 로그
         // log MODBUS response
         _logger.Log(LogCategories.Pro, LogLevel.Debug, $"MODBUS reply: FC=0x{rawFc:X2} Len={responsePayload.Length}");

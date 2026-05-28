@@ -372,12 +372,16 @@ internal sealed class MessagePipeline : IDisposable {
                     _queue.TryDequeue(out _);
                 }
 
+        // 그래프 계열 FC는 LEN 필드를 분리해 별도 필드로 노출하고 페이로드는 순수 데이터만 남긴다
+        // graph-family FCs surface the LEN field as a dedicated property and leave only the actual data in payload
+        var response = ModbusResponse.Decode(code, addr, payload);
+
         // 응답 로그 기록
         // log response
-        _logger.Log(LogCategories.Pipeline, LogLevel.Debug, $"Response: FC=0x{(byte)code:X2} Addr={addr} Len={payload.Length}");
+        _logger.Log(LogCategories.Pipeline, LogLevel.Debug, $"Response: FC=0x{(byte)code:X2} Addr={addr} Length={response.Length} PayloadLen={response.Payload.Length}");
         // 응답 이벤트 발생
         // raise response event
-        ResponseReceived?.Invoke(new ModbusResponse(code, addr, payload));
+        ResponseReceived?.Invoke(response);
     }
 
     /// <summary>

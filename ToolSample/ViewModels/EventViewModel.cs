@@ -237,9 +237,9 @@ public sealed partial class EventViewModel(
             // not an event response — return
             return;
 
-        // 이벤트 파싱 시도
-        // attempt event parsing
-        if (!Event.TryParse(response.Payload.Span, out var ev) || ev is null)
+        // 이벤트 파싱 시도 (Event는 struct이므로 null 체크 불필요)
+        // attempt event parsing (Event is a struct, no null check needed)
+        if (!EventFrame.TryParse(response.Payload.Span, out var ev))
             // 파싱 실패 — 반환
             // parse failed — return
             return;
@@ -250,59 +250,65 @@ public sealed partial class EventViewModel(
     }
 
     /// <summary>
-    ///     PRO X 툴 이벤트 핸들러.
-    ///     PRO X tool event handler.
+    ///     PRO X 툴 이벤트 핸들러. 직접/PRO X 공통 인터페이스로 수신한다.
+    ///     PRO X tool event handler. receives both direct and PRO X events via the common interface.
     /// </summary>
-    private void OnToolEventReceived(Event ev) {
+    private void OnToolEventReceived(IFastenEvent ev) {
         // 이벤트 레코드로 변환 및 추가
         // convert to event record and add
         AddEventRecord(ev);
     }
 
     /// <summary>
-    ///     Event를 EventRecord로 변환하여 목록에 추가한다.
-    ///     Converts Event to EventRecord and adds to list.
+    ///     IFastenEvent를 EventRecord로 변환하여 목록에 추가한다. 분석 필드는 <see cref="IFastenEvent.Analysis" />에서 가져온다.
+    ///     Converts an IFastenEvent to an EventRecord and adds to the list. Analysis fields come from <see cref="IFastenEvent.Analysis" />.
     /// </summary>
-    private void AddEventRecord(Event ev) {
+    private void AddEventRecord(IFastenEvent ev) {
+        // 분석 블록 참조
+        // analysis block reference
+        var a = ev.Analysis;
+        // 기본 바코드/ID 값 (목록 첫 항목 또는 빈 문자열)
+        // primary barcode/ID value (first list item or empty)
+        var primaryId = ev.Ids.Count > 0 ? ev.Ids[0] : string.Empty;
         // EventRecord 생성
         // create EventRecord
         var record = new EventRecord {
             // 이벤트 ID 설정
             // set event ID
             Id = ev.Id,
-            // 날짜 시간 포맷
-            // format date time
-            DateTime = $"{ev.Date:yyyy-MM-dd} {ev.Time:HH:mm:ss}",
+            // 날짜 시간 포맷 (Time 단일 소스)
+            // format date time (single source: Time)
+            DateTime = $"{ev.Time:yyyy-MM-dd} {ev.Time:HH:mm:ss}",
             // 프리셋 번호 설정
             // set preset number
-            Preset = ev.Preset,
+            Preset = a.Preset,
             // 이벤트 상태 설정
             // set event status
-            Status = ev.EventStatus.ToString(),
+            Status = a.EventStatus.ToString(),
             // 회전 방향 설정
             // set rotation direction
-            Direction = ev.Direction.ToString(),
+            Direction = a.Direction.ToString(),
             // 목표 토크 설정
             // set target torque
-            TargetTorque = ev.TargetTorque,
+            TargetTorque = a.TargetTorque,
             // 실측 토크 설정
             // set actual torque
-            Torque = ev.Torque,
+            Torque = a.Torque,
             // 토크 단위 설정
             // set torque unit
-            Unit = ev.TorqueUnit.ToString(),
+            Unit = a.TorqueUnit.ToString(),
             // 총 각도 설정
             // set total angle
-            Angle = ev.Angle,
+            Angle = a.Angle,
             // 모터 속도 설정
             // set motor speed
-            Speed = ev.Speed,
-            // 바코드 설정
-            // set barcode
-            Barcode = ev.Barcode,
+            Speed = a.Speed,
+            // 바코드 설정 (Ids[0])
+            // set barcode (Ids[0])
+            Barcode = primaryId,
             // 오류 코드 설정
             // set error code
-            Error = ev.Error
+            Error = a.Error
         };
 
         // UI 스레드에서 추가
