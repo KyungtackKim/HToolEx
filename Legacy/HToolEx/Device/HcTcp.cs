@@ -187,7 +187,7 @@ public class HcTcp : IHComm {
             0x00,
             0x06,
             /*UID   */
-            0x00,
+            DeviceId,
             /*FC    */
             (byte)CodeTypes.ReadHoldingReg,
             /*ADDR  */
@@ -221,7 +221,7 @@ public class HcTcp : IHComm {
             0x00,
             0x06,
             /*UID   */
-            0x00,
+            DeviceId,
             /*FC    */
             (byte)CodeTypes.ReadInputReg,
             /*ADDR  */
@@ -255,7 +255,7 @@ public class HcTcp : IHComm {
             0x00,
             0x06,
             /*UID   */
-            0x00,
+            DeviceId,
             /*FC    */
             (byte)CodeTypes.WriteSingleReg,
             /*ADDR  */
@@ -291,7 +291,7 @@ public class HcTcp : IHComm {
             0x00,
             0x00,
             /*UID   */
-            0x00,
+            DeviceId,
             /*FC    */
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
@@ -346,7 +346,7 @@ public class HcTcp : IHComm {
             0x00,
             0x06,
             /*UID   */
-            0x00,
+            DeviceId,
             /*FC    */
             (byte)CodeTypes.WriteMultiReg,
             /*ADDR  */
@@ -455,7 +455,7 @@ public class HcTcp : IHComm {
                 // error invoke
                 ReceivedMsg?.Invoke(CodeTypes.Error, new byte[] {
                     // (byte)((TransactionId >> 8) & 0xFF), (byte)(TransactionId & 0xFF),   // NOT USE
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, (byte)cmd, 0x00, code, 0x00, 0x00
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x06, DeviceId, (byte)cmd, 0x00, code, 0x00, 0x00
                 });
                 // clear buffer
                 AnalyzeBuf.Clear();
