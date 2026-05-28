@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Process;
 ///     fastening operation event type enumeration. Represents event type (OK, NG, error, etc.) from FormatEvent.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Process.Event"/>.
-///     used by: <see cref="HTool.Format.Process.Event"/>.
+///     사용처: <c>HTool.Format.Process.Event</c>.
+///     used by: <c>HTool.Format.Process.Event</c>.
 /// </remarks>
 public enum Event {
     /// <summary>

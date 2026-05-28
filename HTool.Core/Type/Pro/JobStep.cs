@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Pro;
 ///     step type within a Pro X job sequence
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Pro.Job.StepHeader"/>, <see cref="HTool.Format.Pro.Job.FastenBody"/>, <see cref="HTool.Format.Pro.Job.DelayBody"/>, <see cref="HTool.Format.Pro.Job.InputBody"/>, <see cref="HTool.Format.Pro.Job.OutputBody"/>, <see cref="HTool.Format.Pro.Job.MessageBody"/>.
-///     used by: <see cref="HTool.Format.Pro.Job.StepHeader"/>, <see cref="HTool.Format.Pro.Job.FastenBody"/>, <see cref="HTool.Format.Pro.Job.DelayBody"/>, <see cref="HTool.Format.Pro.Job.InputBody"/>, <see cref="HTool.Format.Pro.Job.OutputBody"/>, <see cref="HTool.Format.Pro.Job.MessageBody"/>.
+///     사용처: <c>HTool.Format.Pro.Job.StepHeader</c>, <c>HTool.Format.Pro.Job.FastenBody</c>, <c>HTool.Format.Pro.Job.DelayBody</c>, <c>HTool.Format.Pro.Job.InputBody</c>, <c>HTool.Format.Pro.Job.OutputBody</c>, <c>HTool.Format.Pro.Job.MessageBody</c>.
+///     used by: <c>HTool.Format.Pro.Job.StepHeader</c>, <c>HTool.Format.Pro.Job.FastenBody</c>, <c>HTool.Format.Pro.Job.DelayBody</c>, <c>HTool.Format.Pro.Job.InputBody</c>, <c>HTool.Format.Pro.Job.OutputBody</c>, <c>HTool.Format.Pro.Job.MessageBody</c>.
 /// </remarks>
 public enum JobStep {
 	/// <summary>

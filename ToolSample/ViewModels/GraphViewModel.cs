@@ -170,7 +170,7 @@ public sealed partial class GraphViewModel(
 
         // 그래프 파싱 시도
         // attempt graph parsing
-        if (!Graph.TryParse(response.Payload.Span, out var graph))
+        if (!GraphFrame.TryParse(response.Payload.Span, out var graph))
             // 파싱 실패 — 반환
             // parse failed — return
             return;
@@ -202,10 +202,10 @@ public sealed partial class GraphViewModel(
     ///     PRO X 이벤트 수신 핸들러 (이벤트에 포함된 그래프 개수 표시).
     ///     PRO X event received handler (shows graph point count from event).
     /// </summary>
-    private void OnToolEventReceived(Event ev) {
-        // 그래프 데이터가 없으면 무시
-        // ignore if no graph data
-        if (ev.CountOfChannel1 is 0 && ev.CountOfChannel2 is 0)
+    private void OnToolEventReceived(IFastenEvent ev) {
+        // 그래프 데이터가 없으면 무시 (메타에서 카운트 확인)
+        // ignore if no graph data (counts from metadata)
+        if (ev.Meta.CountOfChannel1 is 0 && ev.Meta.CountOfChannel2 is 0)
             // 그래프 데이터 없음 — 반환
             // no graph data — return
             return;

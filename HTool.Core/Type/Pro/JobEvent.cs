@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Pro;
 ///     job event status for Pro X operation
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Pro.JobEvent"/>, <see cref="HTool.Device.Pro.ProService"/>.
-///     used by: <see cref="HTool.Format.Pro.JobEvent"/>, <see cref="HTool.Device.Pro.ProService"/>.
+///     사용처: <c>HTool.Format.Pro.JobEvent</c>, <c>HTool.Device.Pro.ProService</c>.
+///     used by: <c>HTool.Format.Pro.JobEvent</c>, <c>HTool.Device.Pro.ProService</c>.
 /// </remarks>
 public enum JobEvent {
 	/// <summary>

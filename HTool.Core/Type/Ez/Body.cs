@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Ez;
 ///     body type enumeration
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Ez.CalibrationData"/>, <see cref="HTool.Format.Ez.CalibrationSettings"/>.
-///     used by: <see cref="HTool.Format.Ez.CalibrationData"/>, <see cref="HTool.Format.Ez.CalibrationSettings"/>.
+///     사용처: <c>HTool.Format.Ez.CalibrationData</c>, <c>HTool.Format.Ez.CalibrationSettings</c>.
+///     used by: <c>HTool.Format.Ez.CalibrationData</c>, <c>HTool.Format.Ez.CalibrationSettings</c>.
 /// </remarks>
 public enum Body : byte {
 	/// <summary>

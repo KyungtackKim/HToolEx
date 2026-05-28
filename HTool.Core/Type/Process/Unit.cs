@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Process;
 ///     torque unit enumeration
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Core.Util.TorqueUnit"/>, <see cref="HTool.Format.Ez.CalibrationData"/>.
-///     used by: <see cref="HTool.Core.Util.TorqueUnit"/>, <see cref="HTool.Format.Ez.CalibrationData"/>.
+///     사용처: <see cref="HTool.Core.Util.TorqueUnit"/>, <c>HTool.Format.Ez.CalibrationData</c>.
+///     used by: <see cref="HTool.Core.Util.TorqueUnit"/>, <c>HTool.Format.Ez.CalibrationData</c>.
 /// </remarks>
 public enum Unit {
     /// <summary>

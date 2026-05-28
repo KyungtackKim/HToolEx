@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Pro;
 ///     output signal type for Pro X
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Pro.Job.OutputBody"/>.
-///     used by: <see cref="HTool.Format.Pro.Job.OutputBody"/>.
+///     사용처: <c>HTool.Format.Pro.Job.OutputBody</c>.
+///     used by: <c>HTool.Format.Pro.Job.OutputBody</c>.
 /// </remarks>
 public enum OutputSignal {
 	/// <summary>

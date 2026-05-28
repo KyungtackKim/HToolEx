@@ -1,7 +1,7 @@
 using HTool.Device.Protocol;
 using HTool.Format.Pro;
+using HTool.Format.Process;
 using HTool.Type;
-using Event = HTool.Format.Process.Event;
 
 namespace ToolSample.Services;
 
@@ -89,7 +89,7 @@ public sealed class HToolService : IDisposable {
     ///     PRO X 툴 이벤트 수신.
     ///     PRO X tool event received.
     /// </summary>
-    public event Action<Event>? ToolEventReceived;
+    public event Action<IFastenEvent>? ToolEventReceived;
 
     /// <summary>
     ///     PRO X 잡 이벤트 수신.
@@ -223,7 +223,7 @@ public sealed class HToolService : IDisposable {
     ///     PRO X 툴 이벤트 핸들러.
     ///     PRO X tool event handler.
     /// </summary>
-    private void OnToolEventReceived(Event ev) {
+    private void OnToolEventReceived(IFastenEvent ev) {
         ToolEventReceived?.Invoke(ev);
     }
 

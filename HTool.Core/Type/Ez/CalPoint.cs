@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Ez;
 ///     calibration point enumeration. Represents percentage of rated capacity.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Ez.CalibrationData"/>.
-///     used by: <see cref="HTool.Format.Ez.CalibrationData"/>.
+///     사용처: <c>HTool.Format.Ez.CalibrationData</c>.
+///     used by: <c>HTool.Format.Ez.CalibrationData</c>.
 /// </remarks>
 public enum CalPoint {
 	/// <summary>

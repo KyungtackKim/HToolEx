@@ -98,10 +98,10 @@ MODBUS 응답 페이로드를 강타입 `readonly struct`로 파싱하는 라이
 
 **Key namespaces**:
 - `HTool.Format.Device`: SimpleInfo (13B, FC 0x11), Info (200B, FC 0x04), Status
-- `HTool.Format.Process`: Event, Graph, Barcode
+- `HTool.Format.Process`: EventFrame (0x65/poll, 214B), GraphFrame (0x64 curve), HighResGraph (0x66, EventFrame+curves), Barcode, Analysis (64B shared block), GraphMeta (74B shared block), GraphStepInfo, GraphSource, IFastenEvent, IHighResGraph
 - `HTool.Format.Param`: Preset (4B), AdvPreset, Control (register mapping)
 - `HTool.Format.Ez`: CalibrationData, CalibrationSettings, DeviceSettings
-- `HTool.Format.Pro`: ToolInfo, SystemInfo, JobEvent, NgCause, RecipeVersion
+- `HTool.Format.Pro`: ToolInfo, SystemInfo, JobEvent, NgCause, RecipeVersion, ProHighResGraph (PRO X gateway-processed high-res, revision-branched [1702, 2214])
 - `HTool.Format.Pro.Setting`: Operation, Network, Barcode, LogSettings, Sound, Share, InOut, Encoder, IoToolName
 - `HTool.Format.Pro.Job`: Job, Step, StepHeader, JobHeader, FastenBody, DelayBody, InputBody, OutputBody, MessageBody
 
@@ -186,7 +186,7 @@ tool.ReceivedData += (ModbusResponse response) => { };
 tool.ReceiveError += (ComError error) => { };
 
 // PRO X events (when Type is ComType.Pro)
-tool.Pro!.EventDataReceived += (Event ev) => { };
+tool.Pro!.EventDataReceived += (IFastenEvent ev) => { };  // direct or PRO X (ProHighResGraph)
 tool.Pro.JobEventReceived += (JobEvent job) => { };
 tool.Pro.MemberToolsChanged += (IReadOnlyList<ToolInfo> tools) => { };
 ```
@@ -210,9 +210,9 @@ Features: O(1) enqueue/dequeue, thread-safe Lock-based synchronization, blocking
 - `0x06`: Write Single Register
 - `0x10`: Write Multiple Registers
 - `0x11`: Read Device Information (custom)
-- `0x64`: Graph Data (custom)
-- `0x65`: Graph Result (custom)
-- `0x66`: High Resolution Graph (custom)
+- `0x64`: Graph Data — curve only, per channel (`GraphFrame`) (custom)
+- `0x65`: Event Data — fastening analysis (`EventFrame`, 214B; also obtainable via FC 0x04 register polling) (custom)
+- `0x66`: High Resolution Graph — analysis + curves over Event-TCP (`HighResGraph`); PRO X re-packaged variant = `ProHighResGraph` (custom)
 
 **Message Lifecycle (Direct Mode)**:
 1. Call `ReadHoldingReg()` / `WriteSingleReg()` / etc.
@@ -305,7 +305,7 @@ Categories: Packet, Connection, Pipeline, KeepAlive, Pro, Ftp, Error
 
 **Naming (HTool v2)**:
 - Direct class names: `HTool`, `ProService`, `ToolService`, `FtpService`
-- Format classes: `SimpleInfo`, `Info`, `Status`, `Event`, `Graph` (no prefix)
+- Format classes: `SimpleInfo`, `Info`, `Status`, `EventFrame`, `GraphFrame`, `HighResGraph`, `ProHighResGraph` (`Frame` suffix on the wire-format singletons that would otherwise clash with `event`/generic naming; compound names like `HighResGraph` keep their descriptive form)
 - Type enums: `ComType`, `Connection`, `FunctionCode` (no suffix)
 
 **Threading**: Timer-based processing (System.Timers.Timer, 50ms for direct / 100ms for PRO X), KeyedQueue with Lock-based synchronization, volatile immutable swap for tool lists.

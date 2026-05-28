@@ -4,8 +4,8 @@ using Tester.TestHelpers;
 namespace Tester.Format.Process;
 
 /// <summary>
-///     Graph 구조체의 파싱 동작을 검증한다.
-///     verifies parsing behavior of the Graph struct.
+///     GraphFrame 구조체의 파싱 동작을 검증한다.
+///     verifies parsing behavior of the GraphFrame struct.
 /// </summary>
 public sealed class GraphTests {
     /// <summary>
@@ -23,9 +23,9 @@ public sealed class GraphTests {
             .SingleBigEndian(2.5f)
             .Build();
 
-        // Graph 구조체 파싱
-        // parse Graph struct
-        var graph = new Graph(data);
+        // GraphFrame 구조체 파싱
+        // parse GraphFrame struct
+        var graph = new GraphFrame(data);
 
         // Channel 값이 1인지 확인
         // verify Channel value is 1
@@ -51,9 +51,9 @@ public sealed class GraphTests {
             .SingleBigEndian(30.25f)
             .Build();
 
-        // Graph 구조체 파싱
-        // parse Graph struct
-        var graph = new Graph(data);
+        // GraphFrame 구조체 파싱
+        // parse GraphFrame struct
+        var graph = new GraphFrame(data);
 
         // Values 배열 길이가 3인지 확인
         // verify Values array length is 3
@@ -82,9 +82,9 @@ public sealed class GraphTests {
             .UInt16BigEndian(0)
             .Build();
 
-        // Graph 구조체 파싱
-        // parse Graph struct
-        var graph = new Graph(data);
+        // GraphFrame 구조체 파싱
+        // parse GraphFrame struct
+        var graph = new GraphFrame(data);
 
         // Count가 0인지 확인
         // verify Count is 0
@@ -106,7 +106,7 @@ public sealed class GraphTests {
 
         // FormatException 발생 확인
         // verify FormatException is thrown
-        Assert.Throws<FormatException>(() => new Graph(data));
+        Assert.Throws<FormatException>(() => new GraphFrame(data));
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class GraphTests {
 
         // FormatException 발생 확인
         // verify FormatException is thrown
-        Assert.Throws<FormatException>(() => new Graph(data));
+        Assert.Throws<FormatException>(() => new GraphFrame(data));
     }
 
     /// <summary>
@@ -140,7 +140,7 @@ public sealed class GraphTests {
 
         // TryParse가 false를 반환하는지 확인
         // verify TryParse returns false
-        var success = Graph.TryParse(data, out _);
+        var success = GraphFrame.TryParse(data, out _);
 
         // 파싱 실패 확인
         // verify parsing failed

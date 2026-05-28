@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Pro;
 ///     input signal type for Pro X
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Format.Pro.Job.InputBody"/>.
-///     used by: <see cref="HTool.Format.Pro.Job.InputBody"/>.
+///     사용처: <c>HTool.Format.Pro.Job.InputBody</c>.
+///     used by: <c>HTool.Format.Pro.Job.InputBody</c>.
 /// </remarks>
 public enum InputSignal {
 	/// <summary>
