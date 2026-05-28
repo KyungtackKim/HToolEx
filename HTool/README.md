@@ -130,12 +130,12 @@ tool.ChangedConnect += connected => {
     tool.Pro.Tools.TrySelectTool(0);
 };
 
-// register tool event handler — receives fastening result events from the selected tool
-// 툴 이벤트 핸들러 등록 — 선택된 툴의 체결 결과 이벤트 수신
+// register tool event handler — receives fastening events as IFastenEvent (direct or PRO X)
+// 툴 이벤트 핸들러 등록 — 직접/PRO X 공용 IFastenEvent로 체결 이벤트 수신
 tool.Pro!.EventDataReceived += ev => {
-    // ev.Result contains OK/NG verdict for the fastening cycle
-    // ev.Result에는 체결 사이클의 OK/NG 판정 결과가 포함됨
-    Console.WriteLine($"Tool Event: {ev.Result}");
+    // ev.Analysis.EventStatus carries the OK/NG verdict; ev.Source distinguishes Direct vs Pro
+    // ev.Analysis.EventStatus가 OK/NG 판정, ev.Source는 출처(Direct/Pro) 구분
+    Console.WriteLine($"Tool Event: {ev.Analysis.EventStatus} (Source={ev.Source}, Id={ev.Id})");
 };
 
 // register job event handler — receives step-level completion notifications during a job

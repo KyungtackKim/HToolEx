@@ -33,7 +33,8 @@ dotnet add package Hantas.HTool.Format
 ```
 HTool.Format/
 ├── Device/             # SimpleInfo, Info, Status / 기본 정보, 상세 정보, 상태
-├── Process/            # Event, Graph, Barcode / 이벤트, 그래프, 바코드
+├── Process/            # EventFrame, GraphFrame, HighResGraph, Barcode, Analysis, GraphMeta, IFastenEvent, IHighResGraph
+│                       # / 이벤트, 커브, 고해상도, 바코드, 분석 블록, 그래프 메타, 인터페이스
 ├── Param/              # Preset, AdvPreset, Control / 프리셋, 고급 프리셋, 제어 파라미터
 ├── Ez/                 # CalibrationData, CalibrationSettings, DeviceSettings / 캘리브레이션 데이터, 설정, 장치 설정
 └── Pro/
@@ -89,11 +90,18 @@ EZTorQ 토크 미터 캘리브레이션은 `CalibrationData` (포인트별 측�
 
 ### Process
 
-| Class     | Description                             |
-|-----------|-----------------------------------------|
-| `Event`   | Fastening result event / 체결 결과 이벤트      |
-| `Graph`   | Torque/angle graph data / 토크/각도 그래프 데이터 |
-| `Barcode` | Barcode scan result / 바코드 스캔 결과         |
+| Class            | Description                                                                                              |
+|------------------|----------------------------------------------------------------------------------------------------------|
+| `EventFrame`     | Direct fastening event (FC 0x65 / reg-poll, 214B) / 직접 체결 이벤트 (FC 0x65 또는 레지스터 폴링, 214B)             |
+| `GraphFrame`     | Direct curve data (FC 0x64, per channel) / 직접 커브 데이터 (FC 0x64, 채널당)                                  |
+| `HighResGraph`   | Direct high-res graph (FC 0x66, EventFrame + curves) / 직접 고해상도 그래프 (FC 0x66, EventFrame + 커브)         |
+| `Barcode`        | Barcode scan result / 바코드 스캔 결과                                                                       |
+| `Analysis`       | Shared 64B analysis block (FastenTime, Torque, Angle, etc.) / 공유 64B 분석 블록 (체결시간·토크·각도 등)            |
+| `GraphMeta`      | Shared 74B graph metadata block (channel types, counts, steps) / 공유 74B 메타 블록 (채널 타입·카운트·스텝)           |
+| `GraphStepInfo`  | Graph step entry (Type, Index) / 그래프 스텝 항목                                                            |
+| `GraphSource`    | Source enum (Direct / Pro) / 데이터 출처 열거형                                                               |
+| `IFastenEvent`   | Common analysis contract (direct + PRO X) / 공통 분석 계약                                                   |
+| `IHighResGraph`  | Adds curves to `IFastenEvent` / `IFastenEvent`에 커브 추가                                                   |
 
 ### Param
 
@@ -185,12 +193,23 @@ if (SimpleInfo.TryParse(data, out var simpleInfo)) {
 ```csharp
 using HTool.Format.Process;
 
-// parse fastening result event from MODBUS response payload
-// MODBUS 응답 페이로드에서 체결 결과 이벤트 파싱
-var ev = new Event(payload);
-// ev.Result holds OK/NG verdict; ev.Torque holds the measured torque value
-// ev.Result에는 OK/NG 판정, ev.Torque에는 측정된 토크값이 포함됨
-Console.WriteLine($"Result: {ev.Result}, Torque: {ev.Torque}");
+// parse the direct fastening event (0x65 / reg-poll) from a payload
+// 직접 체결 이벤트(0x65 / 레지스터 폴링) 페이로드 파싱
+var ev = new EventFrame(payload);
+// analysis fields live on the shared Analysis block; the OK/NG verdict is EventStatus
+// 분석 필드는 공유 Analysis 블록에 위치하며, OK/NG 판정은 EventStatus
+Console.WriteLine($"Status: {ev.Analysis.EventStatus}, Torque: {ev.Analysis.Torque}");
+
+// for the 0x66 high-res graph (analysis + curves), use HighResGraph
+// 0x66 고해상도(분석 + 커브)는 HighResGraph 사용
+var hi = new HighResGraph(payload);
+// access curve samples directly; analysis is delegated via the IHighResGraph interface
+// 커브 샘플 직접 접근; 분석은 IHighResGraph 인터페이스로 위임 노출
+Console.WriteLine($"Ch1 samples: {hi.Channel1.Length}, Torque: {hi.Analysis.Torque}");
+
+// for PRO X-processed high-res, use HTool.Format.Pro.ProHighResGraph with the PRO X revision
+// PRO X 가공본 고해상도는 HTool.Format.Pro.ProHighResGraph + PRO X 리비전
+// var pro = new HTool.Format.Pro.ProHighResGraph(payload, revision: 1);
 ```
 
 ### Preset / 프리셋
