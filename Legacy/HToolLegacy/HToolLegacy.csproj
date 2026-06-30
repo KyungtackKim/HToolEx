@@ -13,8 +13,8 @@
         <Title>HToolLegacy</Title>
         <RootNamespace>HTool</RootNamespace>
         <AssemblyName>HTool</AssemblyName>
-        <Version>1.1.25</Version>
-        <PackageVersion>1.1.25</PackageVersion>
+        <Version>1.1.26</Version>
+        <PackageVersion>1.1.26</PackageVersion>
         <PackageIcon>HTool.png</PackageIcon>
         <Company>HANTAS</Company>
         <Authors>Eloiz</Authors>

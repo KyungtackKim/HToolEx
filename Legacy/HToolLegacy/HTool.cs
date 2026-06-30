@@ -777,8 +777,8 @@ public sealed class HTool {
                 // 프로토콜 세대 설정
                 // set protocol revision
                 Tool.Revision = Info.Firmware switch {
-                    > (int)GenerationTypes.GenRev2                                  => GenerationTypes.GenRev2,
-                    > (int)GenerationTypes.GenRev1Plus                              => GenerationTypes.GenRev1Plus,
+                    >= (int)GenerationTypes.GenRev2                                 => GenerationTypes.GenRev2,
+                    >= (int)GenerationTypes.GenRev1Plus                             => GenerationTypes.GenRev1Plus,
                     > (int)GenerationTypes.GenRev1 when Info.Model == ModelTypes.Ad => GenerationTypes.GenRev1Ad,
                     _                                                               => GenerationTypes.GenRev1
                 };
