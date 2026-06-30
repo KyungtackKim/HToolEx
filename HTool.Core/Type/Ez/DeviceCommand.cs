@@ -8,7 +8,8 @@ namespace HTool.Core.Type.Ez;
 /// </summary>
 /// <remarks>
 ///     EZTorQ 토크미터 명령 정의. 본 라이브러리는 정의만 제공하며, 실제 통신은 HToolEz 패키지에서 수행합니다.
-///     EZTorQ torque meter command definition. This library provides only the definition; actual communication is handled by the HToolEz package.
+///     EZTorQ torque meter command definition. This library provides only the definition; actual communication is handled
+///     by the HToolEz package.
 /// </remarks>
 public enum DeviceCommand : byte {
 	/// <summary>

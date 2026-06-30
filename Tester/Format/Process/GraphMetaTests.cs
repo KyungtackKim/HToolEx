@@ -17,11 +17,11 @@ public sealed class GraphMetaTests {
         // 74바이트 메타 블록 구성
         // construct the 74-byte meta block
         var b = new ByteBuilder()
-            .UInt16BigEndian((ushort)GraphChannel.Torque)        // TypeOfChannel1
-            .UInt16BigEndian((ushort)GraphChannel.Angle)         // TypeOfChannel2
-            .UInt16BigEndian(500)                                // CountOfChannel1
-            .UInt16BigEndian(400)                                // CountOfChannel2
-            .UInt16BigEndian(2)                                  // SamplingRate
+            .UInt16BigEndian((ushort)GraphChannel.Torque) // TypeOfChannel1
+            .UInt16BigEndian((ushort)GraphChannel.Angle)  // TypeOfChannel2
+            .UInt16BigEndian(500)                         // CountOfChannel1
+            .UInt16BigEndian(400)                         // CountOfChannel2
+            .UInt16BigEndian(2)                           // SamplingRate
             .UInt16BigEndian((ushort)GraphStep.Seating).UInt16BigEndian(10)
             .UInt16BigEndian((ushort)GraphStep.Clamp).UInt16BigEndian(20);
         // 나머지 14개 스텝 슬롯은 0으로 채움

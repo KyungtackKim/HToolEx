@@ -7,8 +7,8 @@ namespace HTool.Type;
 ///     Defines communication error codes.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="ComError"/>, <see cref="MessagePipeline"/>.
-///     used by: <see cref="ComError"/>, <see cref="MessagePipeline"/>.
+///     사용처: <see cref="ComError" />, <see cref="MessagePipeline" />.
+///     used by: <see cref="ComError" />, <see cref="MessagePipeline" />.
 /// </remarks>
 public enum ComErrorCode {
 	/// <summary>

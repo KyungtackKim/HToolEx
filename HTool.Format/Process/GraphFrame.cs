@@ -5,14 +5,17 @@ namespace HTool.Format.Process;
 
 /// <summary>
 ///     직접 연결 커브 데이터를 담는 구조체 (FC 0x64). 채널당 1회 수신되는 [Channel][Count][float×Count] 프레임.
-///     readonly struct containing direct-connection curve data (FC 0x64). a [Channel][Count][float×Count] frame received once per channel.
+///     readonly struct containing direct-connection curve data (FC 0x64). a [Channel][Count][float×Count] frame received
+///     once per channel.
 /// </summary>
 /// <remarks>
 ///     data-only 페이로드 계약 (MODBUS 프레이밍 LEN/CRC는 코덱 계층에서 제거). Gen.2 전용. 채널당 최대 2000샘플.
 ///     0x65 이벤트(분석)는 <see cref="EventFrame" />, 0x66 고해상도(분석+커브)는 <see cref="HighResGraph" /> 참조.
 ///     타입명은 일관성을 위해 <c>Frame</c> 접미사를 사용한다 (<see cref="EventFrame" />와 짝).
-///     data-only payload contract (MODBUS framing LEN/CRC stripped by the codec layer). Gen.2 only. up to 2000 samples per channel.
-///     for the 0x65 event (analysis), see <see cref="EventFrame" />; for 0x66 high-res (analysis+curve), see <see cref="HighResGraph" />.
+///     data-only payload contract (MODBUS framing LEN/CRC stripped by the codec layer). Gen.2 only. up to 2000 samples per
+///     channel.
+///     for the 0x65 event (analysis), see <see cref="EventFrame" />; for 0x66 high-res (analysis+curve), see
+///     <see cref="HighResGraph" />.
 ///     the <c>Frame</c> suffix pairs with <see cref="EventFrame" /> for consistency.
 /// </remarks>
 public readonly struct GraphFrame {

@@ -7,8 +7,10 @@ namespace HTool.Core.Type.Device;
 ///     device model code enumeration. Uses raw values as reported by the device.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="ModelNames"/>, <c>HTool.Format.Device.SimpleInfo</c>, <c>HTool.Format.Device.Info</c>, <c>HTool.Format.Device.Status</c>.
-///     used by: <see cref="ModelNames"/>, <c>HTool.Format.Device.SimpleInfo</c>, <c>HTool.Format.Device.Info</c>, <c>HTool.Format.Device.Status</c>.
+///     사용처: <see cref="ModelNames" />, <c>HTool.Format.Device.SimpleInfo</c>, <c>HTool.Format.Device.Info</c>,
+///     <c>HTool.Format.Device.Status</c>.
+///     used by: <see cref="ModelNames" />, <c>HTool.Format.Device.SimpleInfo</c>, <c>HTool.Format.Device.Info</c>,
+///     <c>HTool.Format.Device.Status</c>.
 /// </remarks>
 public enum Model {
 	/// <summary>

@@ -5,15 +5,20 @@ namespace HTool.Format.Process;
 
 /// <summary>
 ///     직접 연결 체결 이벤트(분석 데이터, FC 0x65 / reg 폴링)를 담는 구조체. 214바이트 고정(Gen.2).
-///     readonly struct holding a direct-connection fastening event (analysis data, FC 0x65 / register polling). 214-byte fixed (Gen.2).
+///     readonly struct holding a direct-connection fastening event (analysis data, FC 0x65 / register polling). 214-byte
+///     fixed (Gen.2).
 /// </summary>
 /// <remarks>
-///     레이아웃: 헤더(Rev 2 + Id 2 + Date 8) + <see cref="Process.Analysis" />(64) + 바코드(64) + <see cref="Process.GraphMeta" />(74).
+///     레이아웃: 헤더(Rev 2 + Id 2 + Date 8) + <see cref="Process.Analysis" />(64) + 바코드(64) + <see cref="Process.GraphMeta" />
+///     (74).
 ///     커브 데이터는 포함하지 않는다(직접 그래프는 <see cref="GraphFrame" /> 0x64, 분석+커브 일괄은 <see cref="HighResGraph" /> 0x66).
 ///     리비전은 direct-tool 펌웨어가 결정하며 현재 단일 레이아웃이다. 타입명은 .NET <c>event</c> 키워드/델리게이트와의 혼동을 피하기 위해 <c>Frame</c> 접미사를 사용한다.
-///     layout: header (Rev 2 + Id 2 + Date 8) + <see cref="Process.Analysis" />(64) + barcode(64) + <see cref="Process.GraphMeta" />(74).
-///     no curve data (direct curve = <see cref="GraphFrame" /> 0x64; combined analysis+curve = <see cref="HighResGraph" /> 0x66).
-///     the revision is determined by direct-tool firmware and is currently a single layout. the <c>Frame</c> suffix avoids confusion
+///     layout: header (Rev 2 + Id 2 + Date 8) + <see cref="Process.Analysis" />(64) + barcode(64) +
+///     <see cref="Process.GraphMeta" />(74).
+///     no curve data (direct curve = <see cref="GraphFrame" /> 0x64; combined analysis+curve = <see cref="HighResGraph" />
+///     0x66).
+///     the revision is determined by direct-tool firmware and is currently a single layout. the <c>Frame</c> suffix avoids
+///     confusion
 ///     with the .NET <c>event</c> keyword/delegates.
 /// </remarks>
 public readonly struct EventFrame : IFastenEvent {
@@ -25,7 +30,8 @@ public readonly struct EventFrame : IFastenEvent {
 
     /// <summary>
     ///     원시 데이터에서 직접 이벤트를 파싱한다. 선두 214바이트만 소비하므로 상위 프레임(0x66)에 임베드할 수 있다.
-    ///     parses a direct event from raw data. consumes only the leading 214 bytes, so it can be embedded in an enclosing frame (0x66).
+    ///     parses a direct event from raw data. consumes only the leading 214 bytes, so it can be embedded in an enclosing
+    ///     frame (0x66).
     /// </summary>
     /// <param name="data">원시 이벤트 데이터 / raw event data</param>
     /// <exception cref="FormatException">데이터 길이가 부족할 때 / when data length is insufficient</exception>

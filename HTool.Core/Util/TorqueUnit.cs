@@ -9,7 +9,8 @@ namespace HTool.Core.Util;
 /// </summary>
 /// <remarks>
 ///     HANTAS 제품군에서 사용하는 토크 단위(kgf.cm, N.m, lbf.in 등) 간 변환과 UI 표시·입력 파싱을 제공합니다.
-///     provides conversion between torque units used by HANTAS products (kgf.cm, N.m, lbf.in, etc.) and UI display/parsing.
+///     provides conversion between torque units used by HANTAS products (kgf.cm, N.m, lbf.in, etc.) and UI
+///     display/parsing.
 /// </remarks>
 public static class TorqueUnit {
     /// <summary>

@@ -7,7 +7,8 @@ namespace Tester.Format.Process;
 
 /// <summary>
 ///     HighResGraph(0x66 직접) 파싱 동작을 검증한다. 임베드된 EventFrame과 헤더 없는 커브의 조합이 핵심이다.
-///     verifies HighResGraph (0x66 direct) parsing. the key is the combination of an embedded EventFrame and headerless curves.
+///     verifies HighResGraph (0x66 direct) parsing. the key is the combination of an embedded EventFrame and headerless
+///     curves.
 /// </summary>
 public sealed class HighResGraphTests {
     /// <summary>
@@ -30,8 +31,8 @@ public sealed class HighResGraphTests {
             .SingleBigEndian(45f).SingleBigEndian(2f).SingleBigEndian(20f)
             .UInt16BigEndian(250).UInt16BigEndian(80).UInt16BigEndian(120)
             .UInt16BigEndian(200).UInt16BigEndian(40)
-            .Zeros(14)                                              // reserved (14B)
-            .UInt16BigEndian(0)                                     // SyncId (2B, Rev.0=0)
+            .Zeros(14)          // reserved (14B)
+            .UInt16BigEndian(0) // SyncId (2B, Rev.0=0)
             .Ascii("HIRES-BC", 64)
             // 그래프 메타 74B (count1/count2 변동)
             // graph meta 74B (count1/count2 variable)

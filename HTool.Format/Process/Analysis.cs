@@ -6,13 +6,16 @@ namespace HTool.Format.Process;
 
 /// <summary>
 ///     체결 분석 공통 필드 블록 (64바이트). 이벤트(0x65)·고해상도 그래프(0x66)·PRO X 고해상도가 공유한다.
-///     fastening analysis common-field block (64 bytes). shared by event (0x65), high-res graph (0x66), and PRO X high-res.
+///     fastening analysis common-field block (64 bytes). shared by event (0x65), high-res graph (0x66), and PRO X
+///     high-res.
 /// </summary>
 /// <remarks>
 ///     상위 프레임이 자신의 헤더를 읽은 뒤 호출하는 블록 리더이며, 마지막 16바이트는 예약 영역 14바이트 + <see cref="SyncId" /> 2바이트로 구성된다.
 ///     <see cref="SyncId" />는 Rev.1 펌웨어에서만 의미 있는 값을 가지며 Rev.0에서는 항상 0이다.
-///     a block reader invoked by the enclosing frame after its header; the final 16 bytes are 14 reserved bytes followed by
-///     a 2-byte <see cref="SyncId" />. <see cref="SyncId" /> only carries meaning on Rev.1 firmware and is always 0 on Rev.0.
+///     a block reader invoked by the enclosing frame after its header; the final 16 bytes are 14 reserved bytes followed
+///     by
+///     a 2-byte <see cref="SyncId" />. <see cref="SyncId" /> only carries meaning on Rev.1 firmware and is always 0 on
+///     Rev.0.
 /// </remarks>
 public readonly struct Analysis {
     /// <summary>

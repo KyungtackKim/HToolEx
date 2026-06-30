@@ -29,11 +29,11 @@ public readonly record struct ModbusResponse(
     int                  Length,
     ReadOnlyMemory<byte> Payload
 ) {
-	/// <summary>
-	///     MODBUS 예외 코드. 오류 응답이 아니면 null.
-	///     MODBUS exception code. null if not an error response.
-	/// </summary>
-	public ModbusExceptionCode? Exception =>
+    /// <summary>
+    ///     MODBUS 예외 코드. 오류 응답이 아니면 null.
+    ///     MODBUS exception code. null if not an error response.
+    /// </summary>
+    public ModbusExceptionCode? Exception =>
         // 오류 응답이고 페이로드가 있으면 예외 코드 추출
         // extract exception code if error response with payload
         Code is FunctionCode.Error && Payload.Length > 0

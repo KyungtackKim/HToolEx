@@ -2,7 +2,8 @@ namespace HTool.Format.Process;
 
 /// <summary>
 ///     고해상도 그래프 계약. 분석 공통 필드(<see cref="IFastenEvent" />)에 채널 커브 데이터를 더한다.
-///     high-res graph contract. adds channel curve data on top of the analysis common fields (<see cref="IFastenEvent" />).
+///     high-res graph contract. adds channel curve data on top of the analysis common fields (<see cref="IFastenEvent" />
+///     ).
 /// </summary>
 /// <remarks>
 ///     직접 고해상도(<c>HTool.Format.Process.HighResGraph</c>)와 PRO X 고해상도(<c>HTool.Format.Pro.ProHighResGraph</c>)가

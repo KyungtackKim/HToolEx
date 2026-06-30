@@ -8,7 +8,8 @@ namespace HTool.Core.Type.Process;
 /// </summary>
 /// <remarks>
 ///     직결 통신 모델의 출력 신호 할당을 나타내는 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다.
-///     definition representing output signal assignments for directly-connected models; currently unreferenced within this library.
+///     definition representing output signal assignments for directly-connected models; currently unreferenced within this
+///     library.
 /// </remarks>
 public enum OutputSignal {
     /// <summary>

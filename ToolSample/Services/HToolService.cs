@@ -10,11 +10,11 @@ namespace ToolSample.Services;
 ///     Singleton wrapper for HTool.HTool. Re-publishes all HTool events for ViewModel consumption.
 /// </summary>
 public sealed class HToolService : IDisposable {
-	/// <summary>
-	///     HToolService 인스턴스를 생성하고 HTool 이벤트를 구독한다.
-	///     Creates HToolService instance and subscribes to HTool events.
-	/// </summary>
-	public HToolService() {
+    /// <summary>
+    ///     HToolService 인스턴스를 생성하고 HTool 이벤트를 구독한다.
+    ///     Creates HToolService instance and subscribes to HTool events.
+    /// </summary>
+    public HToolService() {
         // HTool 연결 상태 변경 이벤트 구독
         // subscribe to HTool connection changed event
         Tool.ChangedConnect += OnConnectionChanged;
@@ -39,11 +39,11 @@ public sealed class HToolService : IDisposable {
         Tool.Logger.LogReceived += OnLogReceived;
     }
 
-	/// <summary>
-	///     HTool 인스턴스.
-	///     HTool instance.
-	/// </summary>
-	public HTool.HTool Tool { get; } = new();
+    /// <summary>
+    ///     HTool 인스턴스.
+    ///     HTool instance.
+    /// </summary>
+    public HTool.HTool Tool { get; } = new();
 
     /// <inheritdoc />
     public void Dispose() {

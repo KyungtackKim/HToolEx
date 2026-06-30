@@ -378,7 +378,8 @@ internal sealed class MessagePipeline : IDisposable {
 
         // 응답 로그 기록
         // log response
-        _logger.Log(LogCategories.Pipeline, LogLevel.Debug, $"Response: FC=0x{(byte)code:X2} Addr={addr} Length={response.Length} PayloadLen={response.Payload.Length}");
+        _logger.Log(LogCategories.Pipeline, LogLevel.Debug,
+            $"Response: FC=0x{(byte)code:X2} Addr={addr} Length={response.Length} PayloadLen={response.Payload.Length}");
         // 응답 이벤트 발생
         // raise response event
         ResponseReceived?.Invoke(response);

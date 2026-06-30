@@ -48,33 +48,46 @@ HTool.Format/
 
 ## Format Groups / 포맷 그룹
 
-Related format classes work together as cohesive groups. The groupings below highlight how individual classes combine into a complete picture — useful when designing a device integration flow end-to-end.
+Related format classes work together as cohesive groups. The groupings below highlight how individual classes combine
+into a complete picture — useful when designing a device integration flow end-to-end.
 
 연관된 포맷 클래스는 응집력 있는 그룹으로 함께 동작합니다. 아래 그룹은 개별 클래스가 어떻게 전체 그림으로 결합되는지 보여주며 — 장치 통합 플로우를 종단 간 설계할 때 유용합니다.
 
 ### Device Info Group
 
-Device identity and runtime status are exposed through the `SimpleInfo`, `Info`, and `Status` trio — `SimpleInfo` carries the 13-byte fast-connection handshake (FC 0x11), `Info` holds the 200-byte detailed specification (FC 0x04), and `Status` reflects live device registers during operation.
+Device identity and runtime status are exposed through the `SimpleInfo`, `Info`, and `Status` trio — `SimpleInfo`
+carries the 13-byte fast-connection handshake (FC 0x11), `Info` holds the 200-byte detailed specification (FC 0x04), and
+`Status` reflects live device registers during operation.
 
-장치 식별 및 런타임 상태는 `SimpleInfo`, `Info`, `Status` 3종 세트로 노출됩니다 — `SimpleInfo`는 13바이트 고속 핸드셰이크(FC 0x11), `Info`는 200바이트 상세 스펙(FC 0x04), `Status`는 동작 중 실시간 장치 레지스터를 담당합니다.
+장치 식별 및 런타임 상태는 `SimpleInfo`, `Info`, `Status` 3종 세트로 노출됩니다 — `SimpleInfo`는 13바이트 고속 핸드셰이크(FC 0x11), `Info`는 200바이트 상세
+스펙(FC 0x04), `Status`는 동작 중 실시간 장치 레지스터를 담당합니다.
 
 ### Param Group
 
-Fastening parameter configuration is organized into three complementary classes — `Preset` (40002–40031, 60B), `AdvPreset` (41001–41045, 90B), and `Control` (43651–43750, 200B) — together covering the basic fastening preset, advanced mode-specific typed views, and global tool control settings.
+Fastening parameter configuration is organized into three complementary classes — `Preset` (40002–40031, 60B),
+`AdvPreset` (41001–41045, 90B), and `Control` (43651–43750, 200B) — together covering the basic fastening preset,
+advanced mode-specific typed views, and global tool control settings.
 
-체결 파라미터 구성은 상호 보완하는 3개 클래스 — `Preset` (40002–40031, 60B), `AdvPreset` (41001–41045, 90B), `Control` (43651–43750, 200B) — 로 구성되며 기본 체결 프리셋, 모드별 고급 타입 뷰, 전역 툴 제어 설정을 함께 다룹니다.
+체결 파라미터 구성은 상호 보완하는 3개 클래스 — `Preset` (40002–40031, 60B), `AdvPreset` (41001–41045, 90B), `Control` (43651–43750,
+200B) — 로 구성되며 기본 체결 프리셋, 모드별 고급 타입 뷰, 전역 툴 제어 설정을 함께 다룹니다.
 
 ### Pro Info Group
 
-PRO X gateway runtime state is distributed across `ProToolInfo` (connected tool identity), `SystemInfo` (gateway system information), `JobEvent` (per-fastening job result), `NgCause` (NG failure detail), and `RecipeVersion` (active recipe revision) — these five classes together describe the full PRO X runtime context.
+PRO X gateway runtime state is distributed across `ProToolInfo` (connected tool identity), `SystemInfo` (gateway system
+information), `JobEvent` (per-fastening job result), `NgCause` (NG failure detail), and `RecipeVersion` (active recipe
+revision) — these five classes together describe the full PRO X runtime context.
 
-PRO X 게이트웨이 런타임 상태는 `ProToolInfo` (연결 툴 식별), `SystemInfo` (게이트웨이 시스템 정보), `JobEvent` (체결별 작업 결과), `NgCause` (NG 실패 상세), `RecipeVersion` (활성 레시피 리비전)으로 분산되어 있으며 — 이 5개 클래스가 함께 PRO X 런타임 컨텍스트 전체를 기술합니다.
+PRO X 게이트웨이 런타임 상태는 `ProToolInfo` (연결 툴 식별), `SystemInfo` (게이트웨이 시스템 정보), `JobEvent` (체결별 작업 결과), `NgCause` (NG 실패 상세),
+`RecipeVersion` (활성 레시피 리비전)으로 분산되어 있으며 — 이 5개 클래스가 함께 PRO X 런타임 컨텍스트 전체를 기술합니다.
 
 ### Ez Calibration Group
 
-EZTorQ torque meter calibration is driven by `CalibrationData` (per-point measurement data), `CalibrationSettings` (calibration procedure parameters), and `DeviceSettings` (device-level configuration) working in concert throughout the calibration workflow.
+EZTorQ torque meter calibration is driven by `CalibrationData` (per-point measurement data), `CalibrationSettings` (
+calibration procedure parameters), and `DeviceSettings` (device-level configuration) working in concert throughout the
+calibration workflow.
 
-EZTorQ 토크 미터 캘리브레이션은 `CalibrationData` (포인트별 측정 데이터), `CalibrationSettings` (캘리브레이션 절차 파라미터), `DeviceSettings` (장치 수준 설정)가 캘리브레이션 워크플로우 전반에서 함께 동작하며 구동됩니다.
+EZTorQ 토크 미터 캘리브레이션은 `CalibrationData` (포인트별 측정 데이터), `CalibrationSettings` (캘리브레이션 절차 파라미터), `DeviceSettings` (장치 수준
+설정)가 캘리브레이션 워크플로우 전반에서 함께 동작하며 구동됩니다.
 
 ---
 
@@ -90,18 +103,18 @@ EZTorQ 토크 미터 캘리브레이션은 `CalibrationData` (포인트별 측�
 
 ### Process
 
-| Class            | Description                                                                                              |
-|------------------|----------------------------------------------------------------------------------------------------------|
-| `EventFrame`     | Direct fastening event (FC 0x65 / reg-poll, 214B) / 직접 체결 이벤트 (FC 0x65 또는 레지스터 폴링, 214B)             |
-| `GraphFrame`     | Direct curve data (FC 0x64, per channel) / 직접 커브 데이터 (FC 0x64, 채널당)                                  |
-| `HighResGraph`   | Direct high-res graph (FC 0x66, EventFrame + curves) / 직접 고해상도 그래프 (FC 0x66, EventFrame + 커브)         |
-| `Barcode`        | Barcode scan result / 바코드 스캔 결과                                                                       |
-| `Analysis`       | Shared 64B analysis block (FastenTime, Torque, Angle, etc.) / 공유 64B 분석 블록 (체결시간·토크·각도 등)            |
-| `GraphMeta`      | Shared 74B graph metadata block (channel types, counts, steps) / 공유 74B 메타 블록 (채널 타입·카운트·스텝)           |
-| `GraphStepInfo`  | Graph step entry (Type, Index) / 그래프 스텝 항목                                                            |
-| `GraphSource`    | Source enum (Direct / Pro) / 데이터 출처 열거형                                                               |
-| `IFastenEvent`   | Common analysis contract (direct + PRO X) / 공통 분석 계약                                                   |
-| `IHighResGraph`  | Adds curves to `IFastenEvent` / `IFastenEvent`에 커브 추가                                                   |
+| Class           | Description                                                                                   |
+|-----------------|-----------------------------------------------------------------------------------------------|
+| `EventFrame`    | Direct fastening event (FC 0x65 / reg-poll, 214B) / 직접 체결 이벤트 (FC 0x65 또는 레지스터 폴링, 214B)      |
+| `GraphFrame`    | Direct curve data (FC 0x64, per channel) / 직접 커브 데이터 (FC 0x64, 채널당)                           |
+| `HighResGraph`  | Direct high-res graph (FC 0x66, EventFrame + curves) / 직접 고해상도 그래프 (FC 0x66, EventFrame + 커브) |
+| `Barcode`       | Barcode scan result / 바코드 스캔 결과                                                               |
+| `Analysis`      | Shared 64B analysis block (FastenTime, Torque, Angle, etc.) / 공유 64B 분석 블록 (체결시간·토크·각도 등)     |
+| `GraphMeta`     | Shared 74B graph metadata block (channel types, counts, steps) / 공유 74B 메타 블록 (채널 타입·카운트·스텝)  |
+| `GraphStepInfo` | Graph step entry (Type, Index) / 그래프 스텝 항목                                                    |
+| `GraphSource`   | Source enum (Direct / Pro) / 데이터 출처 열거형                                                       |
+| `IFastenEvent`  | Common analysis contract (direct + PRO X) / 공통 분석 계약                                          |
+| `IHighResGraph` | Adds curves to `IFastenEvent` / `IFastenEvent`에 커브 추가                                         |
 
 ### Param
 

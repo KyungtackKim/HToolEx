@@ -8,8 +8,10 @@ namespace HTool.Type;
 ///     Defines log categories. Multiple categories can be selected via bit flags.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HToolLogger"/>, <see cref="MessagePipeline"/>, <see cref="ProService"/>, <see cref="FtpService"/>.
-///     used by: <see cref="HToolLogger"/>, <see cref="MessagePipeline"/>, <see cref="ProService"/>, <see cref="FtpService"/>.
+///     사용처: <see cref="HToolLogger" />, <see cref="MessagePipeline" />, <see cref="ProService" />,
+///     <see cref="FtpService" />.
+///     used by: <see cref="HToolLogger" />, <see cref="MessagePipeline" />, <see cref="ProService" />,
+///     <see cref="FtpService" />.
 /// </remarks>
 [Flags]
 public enum LogCategories {

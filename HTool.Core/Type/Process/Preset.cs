@@ -8,7 +8,8 @@ namespace HTool.Core.Type.Process;
 /// </summary>
 /// <remarks>
 ///     프리셋 선택 비트 마스크 정의이며, 본 라이브러리 내부에서 현재 참조되지 않습니다(호출자가 플래그 마스크로 사용).
-///     definition of preset selection bit masks; currently unreferenced within this library (callers use it as a flag mask).
+///     definition of preset selection bit masks; currently unreferenced within this library (callers use it as a flag
+///     mask).
 /// </remarks>
 [Flags]
 public enum Preset : ulong {

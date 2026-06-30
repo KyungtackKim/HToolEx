@@ -20,24 +20,24 @@ public sealed class EventFrameTests {
         return new ByteBuilder()
             // 헤더: 리비전(2) + Id(2) + Date(8) = 12B
             // header: revision(2) + Id(2) + Date(8) = 12B
-            .Byte(2).Byte(1)                                                                    // revision 2.1
-            .UInt16BigEndian(12345)                                                             // Id
-            .UInt16BigEndian(2026).Byte(5).Byte(28).Byte(14).Byte(30).Byte(45).Byte(123)        // date
+            .Byte(2).Byte(1)                                                             // revision 2.1
+            .UInt16BigEndian(12345)                                                      // Id
+            .UInt16BigEndian(2026).Byte(5).Byte(28).Byte(14).Byte(30).Byte(45).Byte(123) // date
             // 분석 블록 64B
             // analysis block 64B
-            .UInt16BigEndian(1500)                                                              // FastenTime
-            .UInt16BigEndian(5)                                                                 // Preset
-            .UInt16BigEndian((ushort)Unit.Nm)                                                   // TorqueUnit
-            .UInt16BigEndian(10)                                                                // RemainScrew
-            .UInt16BigEndian((ushort)Direction.Fastening)                                       // Direction
-            .UInt16BigEndian(0)                                                                 // Error
-            .UInt16BigEndian((ushort)EventType.FastenOk)                                        // Status
+            .UInt16BigEndian(1500)                        // FastenTime
+            .UInt16BigEndian(5)                           // Preset
+            .UInt16BigEndian((ushort)Unit.Nm)             // TorqueUnit
+            .UInt16BigEndian(10)                          // RemainScrew
+            .UInt16BigEndian((ushort)Direction.Fastening) // Direction
+            .UInt16BigEndian(0)                           // Error
+            .UInt16BigEndian((ushort)EventType.FastenOk)  // Status
             .SingleBigEndian(100.0f).SingleBigEndian(95.5f).SingleBigEndian(80.0f)
             .SingleBigEndian(90.0f).SingleBigEndian(5.0f).SingleBigEndian(50.0f)
             .UInt16BigEndian(300).UInt16BigEndian(100).UInt16BigEndian(200)
             .UInt16BigEndian(300).UInt16BigEndian(50)
-            .Zeros(14)                                                                          // reserved (14B)
-            .UInt16BigEndian(syncId)                                                            // SyncId (2B, Rev.1-only)
+            .Zeros(14)               // reserved (14B)
+            .UInt16BigEndian(syncId) // SyncId (2B, Rev.1-only)
             // 바코드 64B
             // barcode 64B
             .Ascii(barcode, 64)
@@ -45,7 +45,7 @@ public sealed class EventFrameTests {
             // graph meta 74B
             .UInt16BigEndian((ushort)GraphChannel.Torque).UInt16BigEndian((ushort)GraphChannel.Angle)
             .UInt16BigEndian(500).UInt16BigEndian(400).UInt16BigEndian(2)
-            .Zeros(16 * 4)                                                                      // 16 steps (zeros)
+            .Zeros(16 * 4) // 16 steps (zeros)
             .Build();
     }
 

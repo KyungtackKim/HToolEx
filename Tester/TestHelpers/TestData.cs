@@ -50,22 +50,22 @@ internal static class TestData {
         // 200바이트 구조: SystemInfo + DriverId + DriverModelNumber + DriverModelName(32) + ...
         // 200-byte structure: SystemInfo + DriverId + DriverModelNumber + DriverModelName(32) + ...
         return new ByteBuilder()
-            .UInt16BigEndian(0)                                                                    // SystemInfo
-            .UInt16BigEndian(1)                                                                    // DriverId
-            .UInt16BigEndian(15)                                                                   // DriverModelNumber
+            .UInt16BigEndian(0)                                                             // SystemInfo
+            .UInt16BigEndian(1)                                                             // DriverId
+            .UInt16BigEndian(15)                                                            // DriverModelNumber
             .Ascii("MDT-100", 32)                                                           // DriverModelName (32 bytes)
             .Ascii("SN12345678", 10)                                                        // DriverSerialNumber (10 bytes)
-            .UInt16BigEndian(15)                                                                   // ControllerModelNumber
+            .UInt16BigEndian(15)                                                            // ControllerModelNumber
             .Ascii("MDT-CTRL", 32)                                                          // ControllerModelName (32 bytes)
             .Ascii("CTRL00001", 10)                                                         // ControllerSerialNumber (10 bytes)
-            .UInt16BigEndian(2)                                                                    // FirmwareVersionMajor
-            .UInt16BigEndian(1)                                                                    // FirmwareVersionMinor
-            .UInt16BigEndian(5)                                                                    // FirmwareVersionPatch
-            .UInt32BigEndian(20250101)                                                             // ProductionDate
-            .UInt16BigEndian(0)                                                                    // AdvanceType
+            .UInt16BigEndian(2)                                                             // FirmwareVersionMajor
+            .UInt16BigEndian(1)                                                             // FirmwareVersionMinor
+            .UInt16BigEndian(5)                                                             // FirmwareVersionPatch
+            .UInt32BigEndian(20250101)                                                      // ProductionDate
+            .UInt16BigEndian(0)                                                             // AdvanceType
             .Raw(0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF)                                        // MacAddress (6 bytes)
-            .UInt16BigEndian(1)                                                                    // EventDataRevision
-            .UInt16BigEndian(1)                                                                    // ManufacturerCode
+            .UInt16BigEndian(1)                                                             // EventDataRevision
+            .UInt16BigEndian(1)                                                             // ManufacturerCode
             .Zeros(200 - 2 - 2 - 2 - 32 - 10 - 2 - 32 - 10 - 2 - 2 - 2 - 4 - 2 - 6 - 2 - 2) // 나머지 패딩 / remaining padding
             .Build();
     }
@@ -143,7 +143,7 @@ internal static class TestData {
             .UInt16BigEndian(0)     // MaxPulseCount
             .UInt16BigEndian(0)     // ScrewType (CW)
             .UInt16BigEndian(0)     // SoftStop (disabled)
-            .Zeros(16)       // Reserved (registers 40024-40031)
+            .Zeros(16)              // Reserved (registers 40024-40031)
             .Build();
     }
 }
