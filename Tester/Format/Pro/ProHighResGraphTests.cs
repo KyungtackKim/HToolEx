@@ -8,7 +8,8 @@ namespace Tester.Format.Pro;
 
 /// <summary>
 ///     ProHighResGraph(PRO X 고해상도) 파싱 동작을 검증한다. Rev.0/Rev.1 분기와 PRO X 전용 필드(Tool/IdPairs/Names)가 핵심이다.
-///     verifies ProHighResGraph (PRO X high-res) parsing. the key concerns are Rev.0/Rev.1 branching and PRO X-only fields (Tool/IdPairs/Names).
+///     verifies ProHighResGraph (PRO X high-res) parsing. the key concerns are Rev.0/Rev.1 branching and PRO X-only fields
+///     (Tool/IdPairs/Names).
 /// </summary>
 public sealed class ProHighResGraphTests {
     /// <summary>
@@ -21,10 +22,10 @@ public sealed class ProHighResGraphTests {
         var b = new ByteBuilder()
             // Tool(2) + Length(2) + Date ASCII(20) + Id(4) = 28B
             // Tool(2) + Length(2) + Date ASCII(20) + Id(4) = 28B
-            .Int16BigEndian(tool)                                       // Tool
-            .UInt16BigEndian(0)                                         // Length (informational)
-            .Ascii("2026-05-28 14:30:45", 20)                           // Date ASCII
-            .UInt32BigEndian(123456789u)                                // Id (uint32)
+            .Int16BigEndian(tool)             // Tool
+            .UInt16BigEndian(0)               // Length (informational)
+            .Ascii("2026-05-28 14:30:45", 20) // Date ASCII
+            .UInt32BigEndian(123456789u)      // Id (uint32)
             // 분석 64B
             // analysis 64B
             .UInt16BigEndian(2000).UInt16BigEndian(1).UInt16BigEndian((ushort)Unit.Nm)
@@ -34,8 +35,8 @@ public sealed class ProHighResGraphTests {
             .SingleBigEndian(145f).SingleBigEndian(3f).SingleBigEndian(60f)
             .UInt16BigEndian(400).UInt16BigEndian(50).UInt16BigEndian(80)
             .UInt16BigEndian(130).UInt16BigEndian(25)
-            .Zeros(14)                                                  // reserved (14B)
-            .UInt16BigEndian(0);                                        // SyncId (2B)
+            .Zeros(14)           // reserved (14B)
+            .UInt16BigEndian(0); // SyncId (2B)
         // ID 쌍 6세트 (Name + Value 각 128B = 12 × 128 = 1536B)
         // ID pairs 6 sets (name + value, 128B each = 12 × 128 = 1536B)
         for (var i = 1; i <= 6; i++) {
@@ -46,6 +47,7 @@ public sealed class ProHighResGraphTests {
             // append ID value
             b.Ascii($"VALUE{i}", 128);
         }
+
         // Rev.1 전용 이름 4종 (512B)
         // Rev.1-only 4 names (512B)
         if (revision >= 1) {
@@ -56,6 +58,7 @@ public sealed class ProHighResGraphTests {
             b.Ascii("TOOL-X", 128);
             b.Ascii("OK", 128);
         }
+
         // 그래프 메타 74B (커브 0/0으로 단순화)
         // graph meta 74B (curves 0/0 for simplicity)
         b.UInt16BigEndian((ushort)GraphChannel.Torque).UInt16BigEndian((ushort)GraphChannel.Angle)
@@ -74,14 +77,14 @@ public sealed class ProHighResGraphTests {
     public void Rev0_ParsesFixedBodyAndProOnlyFields() {
         // Rev.0 본문 (커브 0)
         // Rev.0 body (no curves)
-        var data = BuildProBody(0, tool: 3).Build();
+        var data = BuildProBody(0, 3).Build();
         // 본문 크기 검증
         // verify body size
         Assert.Equal(1702, data.Length);
 
         // 파싱
         // parse
-        var pro = new ProHighResGraph(data, revision: 0);
+        var pro = new ProHighResGraph(data, 0);
 
         // 인터페이스 위임
         // interface delegation
@@ -121,14 +124,14 @@ public sealed class ProHighResGraphTests {
     public void Rev1_IncludesNames() {
         // Rev.1 본문 (커브 0)
         // Rev.1 body (no curves)
-        var data = BuildProBody(1, tool: 0).Build();
+        var data = BuildProBody(1, 0).Build();
         // 본문 크기 검증 (Rev.0 + 512B)
         // verify body size (Rev.0 + 512B)
         Assert.Equal(2214, data.Length);
 
         // 파싱
         // parse
-        var pro = new ProHighResGraph(data, revision: 1);
+        var pro = new ProHighResGraph(data, 1);
 
         // 리비전 확인
         // verify revision
@@ -149,10 +152,10 @@ public sealed class ProHighResGraphTests {
     public void NegativeTool_AcceptedAsJobEvent() {
         // Tool=-1 (JOB 이벤트)
         // Tool=-1 (JOB event)
-        var data = BuildProBody(0, tool: -1).Build();
+        var data = BuildProBody(0, -1).Build();
         // 파싱
         // parse
-        var pro = new ProHighResGraph(data, revision: 0);
+        var pro = new ProHighResGraph(data, 0);
 
         // Tool=-1 확인
         // verify Tool=-1
@@ -170,8 +173,7 @@ public sealed class ProHighResGraphTests {
         var data = new byte[2214];
         // 범위 밖 리비전 → 예외
         // out-of-range revision → exception
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => ProHighResGraph.TryParse(data, out _, revision: 5));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ProHighResGraph.TryParse(data, out _, 5));
     }
 
     /// <summary>
@@ -185,7 +187,7 @@ public sealed class ProHighResGraphTests {
         var data = new byte[500];
         // TryParse 호출
         // call TryParse
-        var ok = ProHighResGraph.TryParse(data, out var pro, revision: 0);
+        var ok = ProHighResGraph.TryParse(data, out var pro, 0);
 
         // 실패해야 함
         // must fail

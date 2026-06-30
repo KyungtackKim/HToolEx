@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HTool.Core\HTool.Core.csproj" />
+        <ProjectReference Include="..\HTool.Core\HTool.Core.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -25,9 +25,9 @@ public sealed class ToolServiceTests {
             .Byte(1)                                 // ToolType (1 = 물리적 / physical)
             .Ascii(model, 16)                        // Model (16바이트 / bytes)
             .Ascii(serial, 16)                       // Serial (16바이트 / bytes)
-            .UInt16BigEndian(100)                           // Version
+            .UInt16BigEndian(100)                    // Version
             .Raw(192, 168, 1, 10)                    // IP 주소 / address
-            .UInt16BigEndian(502)                           // Port
+            .UInt16BigEndian(502)                    // Port
             .Raw(0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01) // MAC 주소 / address
             .Ascii("Tool-" + serial, 32)             // Name (32바이트 / bytes)
             .Byte(1)                                 // Status (활성 / active)
@@ -47,9 +47,9 @@ public sealed class ToolServiceTests {
             .Byte(0)                                 // ToolType (0 = I/O 가상 / virtual)
             .Ascii("IO-MODULE", 16)                  // Model
             .Ascii(serial, 16)                       // Serial
-            .UInt16BigEndian(50)                            // Version
+            .UInt16BigEndian(50)                     // Version
             .Raw(192, 168, 1, 20)                    // IP 주소 / address
-            .UInt16BigEndian(502)                           // Port
+            .UInt16BigEndian(502)                    // Port
             .Raw(0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02) // MAC 주소 / address
             .Ascii("IO-" + serial, 32)               // Name
             .Byte(1)                                 // Status
@@ -62,10 +62,11 @@ public sealed class ToolServiceTests {
     /// </summary>
     /// <param name="toolDataList">바이트 데이터 배열 목록 / list of byte data arrays</param>
     /// <returns>ProToolInfo 읽기 전용 목록 / ProToolInfo readonly list</returns>
-    private static IReadOnlyList<ProToolInfo> MakeToolList(params byte[][] toolDataList) =>
+    private static IReadOnlyList<ProToolInfo> MakeToolList(params byte[][] toolDataList) {
         // 각 바이트 데이터를 ProToolInfo로 파싱하여 목록 반환
         // parse each byte data into ProToolInfo and return as list
-        toolDataList.Select(data => new ProToolInfo(data)).ToList();
+        return toolDataList.Select(data => new ProToolInfo(data)).ToList();
+    }
 
     [Fact]
     public void UpdateMemberTools_ListUpdated() {

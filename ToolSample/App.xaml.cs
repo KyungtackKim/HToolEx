@@ -10,11 +10,11 @@ namespace ToolSample;
 ///     Application entry point. Configures DI container and shows main window.
 /// </summary>
 public partial class App : Application {
-	/// <summary>
-	///     전역 서비스 프로바이더.
-	///     Global service provider.
-	/// </summary>
-	public static IServiceProvider Services { get; private set; } = null!;
+    /// <summary>
+    ///     전역 서비스 프로바이더.
+    ///     Global service provider.
+    /// </summary>
+    public static IServiceProvider Services { get; private set; } = null!;
 
     /// <inheritdoc />
     protected override void OnStartup(StartupEventArgs e) {

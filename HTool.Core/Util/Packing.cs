@@ -9,7 +9,8 @@ namespace HTool.Core.Util;
 /// </summary>
 /// <remarks>
 ///     MODBUS 레지스터는 16비트 워드 단위이므로, 32비트 값이나 문자열을 레지스터 배열에 맞게 분해·결합하는 헬퍼를 제공합니다.
-///     MODBUS registers are 16-bit word sized, so these helpers split or combine 32-bit values and strings to fit register arrays.
+///     MODBUS registers are 16-bit word sized, so these helpers split or combine 32-bit values and strings to fit register
+///     arrays.
 /// </remarks>
 public static class Packing {
     /// <summary>

@@ -7,8 +7,10 @@ namespace HTool.Core.Type.Pro;
 ///     message ID for Remote-Pro X communication
 /// </summary>
 /// <remarks>
-///     사용처: <c>HTool.Device.Codec.ProCodec</c>, <c>HTool.Device.Protocol.ProRequest</c>, <c>HTool.Device.Protocol.ProMessage</c>, <c>HTool.Device.Pro.ProService</c>.
-///     used by: <c>HTool.Device.Codec.ProCodec</c>, <c>HTool.Device.Protocol.ProRequest</c>, <c>HTool.Device.Protocol.ProMessage</c>, <c>HTool.Device.Pro.ProService</c>.
+///     사용처: <c>HTool.Device.Codec.ProCodec</c>, <c>HTool.Device.Protocol.ProRequest</c>,
+///     <c>HTool.Device.Protocol.ProMessage</c>, <c>HTool.Device.Pro.ProService</c>.
+///     used by: <c>HTool.Device.Codec.ProCodec</c>, <c>HTool.Device.Protocol.ProRequest</c>,
+///     <c>HTool.Device.Protocol.ProMessage</c>, <c>HTool.Device.Pro.ProService</c>.
 /// </remarks>
 public enum MessageId {
     #region General

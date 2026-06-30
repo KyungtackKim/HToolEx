@@ -14,8 +14,10 @@ namespace HTool.Format.Pro;
 ///     [Tool 2 + Length 2 + Date ASCII 20 + Id 4] + <see cref="Process.Analysis" />(64) + ID쌍(1536) + (Rev.1 전용 Names 512)
 ///     + <see cref="Process.GraphMeta" />(74) + 채널 커브 가변. 고정 본문 크기 = Rev.0 1702, Rev.1 2214.
 ///     공유 분석 블록은 <see cref="Process" /> 네임스페이스의 타입을 재사용한다.
-///     the revision is determined by PRO X firmware and passed via the MID header (parameter), not the stream. Both revisions:
-///     [Tool 2 + Length 2 + Date ASCII 20 + Id 4] + <see cref="Process.Analysis" />(64) + IdPairs(1536) + (Rev.1-only Names 512)
+///     the revision is determined by PRO X firmware and passed via the MID header (parameter), not the stream. Both
+///     revisions:
+///     [Tool 2 + Length 2 + Date ASCII 20 + Id 4] + <see cref="Process.Analysis" />(64) + IdPairs(1536) + (Rev.1-only
+///     Names 512)
 ///     + <see cref="Process.GraphMeta" />(74) + variable channel curves. fixed body size = 1702 (Rev.0), 2214 (Rev.1).
 ///     reuses the shared analysis blocks from the <see cref="Process" /> namespace.
 /// </remarks>
@@ -120,7 +122,7 @@ public readonly struct ProHighResGraph : IHighResGraph {
 
         // ID 이름/값 쌍 배열 할당
         // allocate ID name/value pair arrays
-        var idNames = new string[IdPairCount];
+        var idNames  = new string[IdPairCount];
         var idValues = new string[IdPairCount];
         // ID 쌍 순회 (6쌍)
         // iterate ID pairs (6 pairs)
@@ -142,10 +144,10 @@ public readonly struct ProHighResGraph : IHighResGraph {
 
         // Rev.1 전용 이름 초기값 (Rev.0에서는 빈 문자열)
         // Rev.1-only names default (empty strings for Rev.0)
-        var jobName = string.Empty;
+        var jobName  = string.Empty;
         var stepName = string.Empty;
         var toolName = string.Empty;
-        var ngCause = string.Empty;
+        var ngCause  = string.Empty;
         // Rev.1 이상일 때 이름 4종 파싱
         // parse the 4 name fields when Rev.1 or higher
         if (revision >= 1) {
@@ -162,12 +164,13 @@ public readonly struct ProHighResGraph : IHighResGraph {
             // parse NG cause
             ngCause = BinarySpanReader.ReadAsciiString(data, ref pos, NameFieldLength);
         }
+
         // Rev.1 전용 필드 저장
         // store the Rev.1-only fields
-        JobName = jobName;
+        JobName  = jobName;
         StepName = stepName;
         ToolName = toolName;
-        NgCause = ngCause;
+        NgCause  = ngCause;
 
         // 그래프 메타데이터 블록 파싱 (74B)
         // parse graph metadata block (74B)

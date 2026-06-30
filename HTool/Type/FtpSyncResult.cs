@@ -11,7 +11,7 @@ namespace HTool.Type;
 /// <param name="FilesSkipped">건너뛴 파일 수 / number of files skipped</param>
 /// <param name="Elapsed">소요 시간 / elapsed time</param>
 /// <remarks>
-///     사용처: <see cref="FtpService"/>.
-///     used by: <see cref="FtpService"/>.
+///     사용처: <see cref="FtpService" />.
+///     used by: <see cref="FtpService" />.
 /// </remarks>
 public readonly record struct FtpSyncResult(bool Success, int FilesUpdated, int FilesSkipped, TimeSpan Elapsed);

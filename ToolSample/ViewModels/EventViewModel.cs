@@ -261,7 +261,8 @@ public sealed partial class EventViewModel(
 
     /// <summary>
     ///     IFastenEvent를 EventRecord로 변환하여 목록에 추가한다. 분석 필드는 <see cref="IFastenEvent.Analysis" />에서 가져온다.
-    ///     Converts an IFastenEvent to an EventRecord and adds to the list. Analysis fields come from <see cref="IFastenEvent.Analysis" />.
+    ///     Converts an IFastenEvent to an EventRecord and adds to the list. Analysis fields come from
+    ///     <see cref="IFastenEvent.Analysis" />.
     /// </summary>
     private void AddEventRecord(IFastenEvent ev) {
         // 분석 블록 참조

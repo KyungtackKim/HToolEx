@@ -7,8 +7,8 @@ namespace HTool.Core.Type.Process;
 ///     word order for 32-bit MODBUS register values
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool.Core.Util.ByteOrder"/>, <see cref="HTool.Core.Util.Packing"/>.
-///     used by: <see cref="HTool.Core.Util.ByteOrder"/>, <see cref="HTool.Core.Util.Packing"/>.
+///     사용처: <see cref="HTool.Core.Util.ByteOrder" />, <see cref="HTool.Core.Util.Packing" />.
+///     used by: <see cref="HTool.Core.Util.ByteOrder" />, <see cref="HTool.Core.Util.Packing" />.
 /// </remarks>
 public enum WordOrder {
 	/// <summary>

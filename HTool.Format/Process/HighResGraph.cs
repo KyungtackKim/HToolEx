@@ -11,8 +11,10 @@ namespace HTool.Format.Process;
 /// <remarks>
 ///     레이아웃 = 이벤트 본문(214B, <see cref="EventFrame" /> 0x65와 동일) + 채널1 커브 + 채널2 커브. 커브는 헤더가 없으며
 ///     샘플 수는 본문의 메타(<see cref="GraphMeta.CountOfChannel1" />/<see cref="GraphMeta.CountOfChannel2" />)에서 가져온다.
-///     layout = event body (214B, identical to <see cref="EventFrame" /> 0x65) + channel-1 curve + channel-2 curve. curves are
-///     headerless; sample counts come from the body metadata (<see cref="GraphMeta.CountOfChannel1" />/<see cref="GraphMeta.CountOfChannel2" />).
+///     layout = event body (214B, identical to <see cref="EventFrame" /> 0x65) + channel-1 curve + channel-2 curve. curves
+///     are
+///     headerless; sample counts come from the body metadata (<see cref="GraphMeta.CountOfChannel1" />/
+///     <see cref="GraphMeta.CountOfChannel2" />).
 /// </remarks>
 public readonly struct HighResGraph : IHighResGraph {
     /// <summary>

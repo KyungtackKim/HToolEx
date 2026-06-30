@@ -7,8 +7,8 @@ namespace HTool.Type;
 ///     Defines MODBUS protocol exception codes.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="ModbusResponse"/>.
-///     used by: <see cref="ModbusResponse"/>.
+///     사용처: <see cref="ModbusResponse" />.
+///     used by: <see cref="ModbusResponse" />.
 /// </remarks>
 public enum ModbusExceptionCode : byte {
 	/// <summary>

@@ -7,8 +7,8 @@ namespace HTool.Type;
 ///     FTP synchronization state.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="FtpService"/>.
-///     used by: <see cref="FtpService"/>.
+///     사용처: <see cref="FtpService" />.
+///     used by: <see cref="FtpService" />.
 /// </remarks>
 public enum FtpSyncState {
 	/// <summary>

@@ -67,11 +67,11 @@ HTool.Core/
 | `RingBuffer`          | Fixed-size circular buffer for streaming data / 스트리밍 데이터용 고정 크기 순환 버퍼          |
 | `BinarySpanReader`    | Zero-allocation Big-Endian reader using `BinaryPrimitives` / 할당 없는 빅 엔디언 이진 리더 |
 | `DataHash`            | XxHash3-based hash for efficient change detection / 효율적인 변경 감지를 위한 XxHash3 해시  |
-| `Checksum`            | MODBUS CRC-16 calculation and validation / MODBUS CRC-16 계산 및 검증                  |
-| `ByteOrder`           | Endian/word-order byte read/write helpers / 엔디언·워드 순서 바이트 읽기·쓰기 도우미             |
-| `Packing`             | Value → ushort[] MODBUS register packing / 값을 ushort[] MODBUS 레지스터로 패킹          |
-| `TorqueUnit`          | Torque unit conversion, format, and parse / 토크 단위 변환·포맷·파싱                       |
-| `TextFormat`          | Hex dump formatting and ASCII decoding / 16진수 덤프 포맷과 ASCII 디코딩                  |
+| `Checksum`            | MODBUS CRC-16 calculation and validation / MODBUS CRC-16 계산 및 검증               |
+| `ByteOrder`           | Endian/word-order byte read/write helpers / 엔디언·워드 순서 바이트 읽기·쓰기 도우미            |
+| `Packing`             | Value → ushort[] MODBUS register packing / 값을 ushort[] MODBUS 레지스터로 패킹         |
+| `TorqueUnit`          | Torque unit conversion, format, and parse / 토크 단위 변환·포맷·파싱                     |
+| `TextFormat`          | Hex dump formatting and ASCII decoding / 16진수 덤프 포맷과 ASCII 디코딩                 |
 
 ---
 

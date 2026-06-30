@@ -18,26 +18,26 @@ public sealed class AnalysisTests {
         // 64바이트 분석 블록 구성
         // construct the 64-byte analysis block
         return new ByteBuilder()
-            .UInt16BigEndian(1500)         // FastenTime
-            .UInt16BigEndian(5)            // Preset
-            .UInt16BigEndian(unit)         // Unit
-            .UInt16BigEndian(10)           // RemainScrew
-            .UInt16BigEndian(dir)          // Direction
-            .UInt16BigEndian(0)            // Error
-            .UInt16BigEndian(status)       // EventStatus
-            .SingleBigEndian(100.0f)       // TargetTorque
-            .SingleBigEndian(95.5f)        // Torque
-            .SingleBigEndian(80.0f)        // SeatingTorque
-            .SingleBigEndian(90.0f)        // ClampTorque
-            .SingleBigEndian(5.0f)         // PrevailingTorque
-            .SingleBigEndian(50.0f)        // SnugTorque
-            .UInt16BigEndian(300)          // Speed
-            .UInt16BigEndian(100)          // Angle1
-            .UInt16BigEndian(200)          // Angle2
-            .UInt16BigEndian(300)          // Angle
-            .UInt16BigEndian(50)           // SnugAngle
-            .Zeros(14)                     // reserved (14B)
-            .UInt16BigEndian(syncId)       // SyncId (2B, Rev.1-only)
+            .UInt16BigEndian(1500)   // FastenTime
+            .UInt16BigEndian(5)      // Preset
+            .UInt16BigEndian(unit)   // Unit
+            .UInt16BigEndian(10)     // RemainScrew
+            .UInt16BigEndian(dir)    // Direction
+            .UInt16BigEndian(0)      // Error
+            .UInt16BigEndian(status) // EventStatus
+            .SingleBigEndian(100.0f) // TargetTorque
+            .SingleBigEndian(95.5f)  // Torque
+            .SingleBigEndian(80.0f)  // SeatingTorque
+            .SingleBigEndian(90.0f)  // ClampTorque
+            .SingleBigEndian(5.0f)   // PrevailingTorque
+            .SingleBigEndian(50.0f)  // SnugTorque
+            .UInt16BigEndian(300)    // Speed
+            .UInt16BigEndian(100)    // Angle1
+            .UInt16BigEndian(200)    // Angle2
+            .UInt16BigEndian(300)    // Angle
+            .UInt16BigEndian(50)     // SnugAngle
+            .Zeros(14)               // reserved (14B)
+            .UInt16BigEndian(syncId) // SyncId (2B, Rev.1-only)
             .Build();
     }
 
@@ -125,7 +125,7 @@ public sealed class AnalysisTests {
         // Rev.1 시뮬레이션을 위한 SyncId=0x1234 데이터 생성
         // build data with SyncId=0x1234 to simulate a Rev.1 payload
         var data = BuildAnalysisBytes((ushort)Unit.Nm, (ushort)Direction.Fastening, (ushort)EventType.FastenOk,
-            syncId: 0x1234);
+            0x1234);
         // 읽기 위치 초기화
         // initialize read position
         var pos = 0;

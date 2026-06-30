@@ -7,8 +7,8 @@ namespace HTool.Type;
 ///     Defines the connection state.
 /// </summary>
 /// <remarks>
-///     사용처: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
-///     used by: <see cref="HTool"/>, <see cref="MessagePipeline"/>.
+///     사용처: <see cref="HTool" />, <see cref="MessagePipeline" />.
+///     used by: <see cref="HTool" />, <see cref="MessagePipeline" />.
 /// </remarks>
 public enum Connection {
 	/// <summary>
