@@ -88,4 +88,11 @@ public enum LogTypes {
     Id6,
 
     #endregion
+
+    #region REV.3
+
+    [Description("Job ID")]
+    JobId,
+
+    #endregion
 }
