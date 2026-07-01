@@ -13,13 +13,13 @@ public class FormatSetLog {
     ///     Data field count
     /// </summary>
     [PublicAPI]
-    public static readonly int[] DataFieldCount = [22, 35, 35];
+    public static readonly int[] DataFieldCount = [22, 35, 35, 36];
 
     /// <summary>
     ///     Operation setting size each version
     /// </summary>
     [PublicAPI]
-    public static readonly int[] Size = [27, 56, 63];
+    public static readonly int[] Size = [27, 56, 63, 64];
 
     /// <summary>
     ///     Data field
@@ -88,6 +88,13 @@ public class FormatSetLog {
         WithId4        = bin.ReadByte();
         WithId5        = bin.ReadByte();
         WithId6        = bin.ReadByte();
+        // check revision.3 information
+        if (revision < 3)
+            return;
+        // check revision.3 data field count
+        for (var i = DataFieldCount[2]; i < DataFieldCount[3]; i++)
+            // set data field
+            DataField[i] = Convert.ToInt32(bin.ReadByte());
     }
 
     /// <summary>
@@ -139,6 +146,13 @@ public class FormatSetLog {
         values.Add(Convert.ToByte(WithId4));
         values.Add(Convert.ToByte(WithId5));
         values.Add(Convert.ToByte(WithId6));
+        // check revision.3
+        if (revision < 3)
+            return values.ToArray();
+        // get revision.3 data field
+        for (var i = DataFieldCount[2]; i < DataFieldCount[3]; i++)
+            // get data field
+            values.Add(Convert.ToByte(DataField[i]));
         // values
         return values.ToArray();
     }

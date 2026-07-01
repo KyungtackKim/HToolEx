@@ -59,6 +59,11 @@ public sealed class FormatStepMessage : FormatStep {
     public int DelayTime { get; set; }
 
     /// <summary>
+    ///     Minimum display time (sec)
+    /// </summary>
+    public int MinDisplayTime { get; set; }
+
+    /// <summary>
     ///     Update values
     /// </summary>
     /// <param name="revision">revision</param>
@@ -89,6 +94,10 @@ public sealed class FormatStepMessage : FormatStep {
             case MessageTypes.DelayTime:
                 // update delay time
                 bin.Write(DelayTime);
+                break;
+            case MessageTypes.MinDisplayTime:
+                // update minimum display time
+                bin.Write(MinDisplayTime);
                 break;
             case MessageTypes.Validation:
             case MessageTypes.NextStep:
@@ -134,6 +143,10 @@ public sealed class FormatStepMessage : FormatStep {
             case MessageTypes.DelayTime:
                 // set time value
                 DelayTime = bin.ReadInt32();
+                break;
+            case MessageTypes.MinDisplayTime:
+                // set minimum display time
+                MinDisplayTime = bin.ReadInt32();
                 break;
             case MessageTypes.Validation:
             case MessageTypes.NextStep:

@@ -13,7 +13,7 @@ public class FormatSetOperation {
     ///     Operation setting size each version
     /// </summary>
     [PublicAPI]
-    public static readonly int[] Size = [178, 220, 221, 504, 506];
+    public static readonly int[] Size = [178, 220, 221, 504, 506, 635];
 
     /// <summary>
     ///     Constructor
@@ -158,6 +158,12 @@ public class FormatSetOperation {
         // get revision.4 information
         ResetToolAlarmWithoutPassword = Convert.ToInt32(bin.ReadByte());
         EnableSidePanel               = Convert.ToInt32(bin.ReadByte());
+        // check revision.5
+        if (revision < 5)
+            return;
+        // get revision.5 information
+        DisplayId          = Convert.ToInt32(bin.ReadByte());
+        DeviceNameForJobId = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
     }
 
     /// <summary>
@@ -319,6 +325,16 @@ public class FormatSetOperation {
             return values.ToArray();
         values.Add(Convert.ToByte(ResetToolAlarmWithoutPassword));
         values.Add(Convert.ToByte(EnableSidePanel));
+        // check revision.5
+        if (revision < 5)
+            return values.ToArray();
+        // get string values
+        var jobIdName = Encoding.ASCII.GetBytes(DeviceNameForJobId).ToList();
+        // string length offset
+        jobIdName.AddRange(new byte[128 - DeviceNameForJobId.Length]);
+        // get revision.5 values
+        values.Add(Convert.ToByte(DisplayId));
+        values.AddRange(jobIdName);
         // values
         return values.ToArray();
     }
@@ -675,6 +691,21 @@ public class FormatSetOperation {
     ///     Enable side panel
     /// </summary>
     public int EnableSidePanel { get; set; }
+
+    #endregion
+
+    #region REV.5
+
+    /// <summary>
+    ///     Display ID for job ID
+    ///     (0 = ID1 ... 5, 6 = Latest)
+    /// </summary>
+    public int DisplayId { get; set; }
+
+    /// <summary>
+    ///     Device name for job ID
+    /// </summary>
+    public string DeviceNameForJobId { get; set; } = default!;
 
     #endregion
 

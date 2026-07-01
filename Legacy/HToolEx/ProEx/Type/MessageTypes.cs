@@ -7,8 +7,10 @@ namespace HToolEx.ProEx.Type;
 public enum MessageTypes {
     [Description("Validation")]
     Validation,
-    [Description("Dealy time (sec)")]
+    [Description("Delay time (sec)")]
     DelayTime,
     [Description("Next step")]
-    NextStep
+    NextStep,
+    [Description("Minimum display time (sec)")]
+    MinDisplayTime
 }

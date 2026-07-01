@@ -3,7 +3,4 @@
 /// <summary>
 ///     Motor direction types
 /// </summary>
-public enum DirectionTypes {
-    Fastening,
-    Loosening
-}
+public enum DirectionTypes { Fastening, Loosening }

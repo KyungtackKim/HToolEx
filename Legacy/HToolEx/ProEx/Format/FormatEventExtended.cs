@@ -28,6 +28,12 @@ public class FormatEventExtended : FormatEvent {
         IdName5 = string.Empty;
         Id6     = string.Empty;
         IdName6 = string.Empty;
+        // reset revision.1 / revision.2 strings
+        JobName   = string.Empty;
+        StepName  = string.Empty;
+        ToolName  = string.Empty;
+        NgComment = string.Empty;
+        JobId     = string.Empty;
     }
 
     /// <summary>
@@ -36,8 +42,14 @@ public class FormatEventExtended : FormatEvent {
     /// <param name="values">values</param>
     /// <param name="revision">revision</param>
     public FormatEventExtended(byte[] values, string revision = "0.0") : this() {
+        // split revision text by dot ("0.{minor}")
+        var parts = revision.Split('.');
+        // parse minor revision value (0 when missing or non-numeric)
+        var minor = parts.Length > 1 && int.TryParse(parts[1], out var n) ? n : 0;
+        // per-revision minimum size (Rev.0 1702 / Rev.1 +512 / Rev.2 +128)
+        var minSize = ExtendSize + (minor >= 1 ? 512 : 0) + (minor >= 2 ? 128 : 0);
         // check min size
-        if (values.Length < ExtendSize)
+        if (values.Length < minSize)
             return;
         // memory stream
         using var stream = new MemoryStream(values);
@@ -113,6 +125,22 @@ public class FormatEventExtended : FormatEvent {
         Id5     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         IdName6 = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         Id6     = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        // check revision.1
+        if (minor >= 1) {
+            // set job name
+            JobName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+            // set step name
+            StepName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+            // set tool name
+            ToolName = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+            // set ng comment
+            NgComment = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
+        }
+
+        // check revision.2
+        if (minor >= 2)
+            // set job id
+            JobId = Encoding.ASCII.GetString(bin.ReadBytes(128)).TrimEnd('\0');
         // get type of channel 1
         var ch1 = bin.ReadUInt16();
         // check type of channel 1
@@ -239,6 +267,36 @@ public class FormatEventExtended : FormatEvent {
     /// </summary>
     [PublicAPI]
     public string IdName6 { get; set; }
+
+    /// <summary>
+    ///     Job name (Rev.1)
+    /// </summary>
+    [PublicAPI]
+    public string JobName { get; set; }
+
+    /// <summary>
+    ///     Step name (Rev.1)
+    /// </summary>
+    [PublicAPI]
+    public string StepName { get; set; }
+
+    /// <summary>
+    ///     Tool name (Rev.1)
+    /// </summary>
+    [PublicAPI]
+    public string ToolName { get; set; }
+
+    /// <summary>
+    ///     NG comment (Rev.1)
+    /// </summary>
+    [PublicAPI]
+    public string NgComment { get; set; }
+
+    /// <summary>
+    ///     Job ID (Rev.2)
+    /// </summary>
+    [PublicAPI]
+    public string JobId { get; set; }
 
     /// <summary>
     ///     Graph values
