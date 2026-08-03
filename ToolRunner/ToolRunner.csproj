@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+        <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>ToolRunner</RootNamespace>
+        <AssemblyName>ToolRunner</AssemblyName>
+        <Version>1.0.0</Version>
+        <Company>HANTAS</Company>
+        <Product>Tool Runner</Product>
+        <Description>External run-control tester for HANTAS tools — connects over MODBUS-TCP, shows the connected tool identity, and drives a repeating run / stop / reverse-direction cycle with operator-tunable delays.</Description>
+        <Copyright>Copyright © HANTAS</Copyright>
+        <ApplicationIcon>Assets\ToolRunner.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- the same icon file backs the executable icon and the window icon bound in MainWindow -->
+        <Resource Include="Assets\ToolRunner.ico"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\HTool.Core\HTool.Core.csproj"/>
+        <ProjectReference Include="..\HTool.Format\HTool.Format.csproj"/>
+        <ProjectReference Include="..\HTool\HTool.csproj"/>
+    </ItemGroup>
+
+</Project>
