@@ -39,7 +39,9 @@ public sealed class FormatStatus {
             case GenerationTypes.GenRev1Plus:
                 // Gen1 상태값 파싱
                 // parse Gen1 status values
-                Torque   = BinarySpanReader.ReadUInt16(span, ref pos);
+                // 측정 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // measured torque is a signed 16-bit value, read it with the sign preserved
+                Torque   = BinarySpanReader.ReadInt16(span, ref pos);
                 Speed    = BinarySpanReader.ReadUInt16(span, ref pos);
                 Current  = BinarySpanReader.ReadUInt16(span, ref pos);
                 Preset   = BinarySpanReader.ReadUInt16(span, ref pos);

@@ -254,7 +254,9 @@ public sealed class FormatEvent {
                 FastenTime   = BinarySpanReader.ReadUInt16(span, ref pos);
                 Preset       = BinarySpanReader.ReadUInt16(span, ref pos);
                 TargetTorque = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                // 최종 측정 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // final measured torque is a signed 16-bit value, read it with the sign preserved
+                Torque       = BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
                 Speed        = BinarySpanReader.ReadUInt16(span, ref pos);
                 Angle1       = BinarySpanReader.ReadUInt16(span, ref pos);
                 Angle2       = BinarySpanReader.ReadUInt16(span, ref pos);
@@ -287,7 +289,9 @@ public sealed class FormatEvent {
                 FastenTime   = BinarySpanReader.ReadUInt16(span, ref pos);
                 Preset       = BinarySpanReader.ReadUInt16(span, ref pos);
                 TargetTorque = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
-                Torque       = BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                // 최종 측정 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // final measured torque is a signed 16-bit value, read it with the sign preserved
+                Torque       = BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
                 Speed        = BinarySpanReader.ReadUInt16(span, ref pos);
                 Angle1       = BinarySpanReader.ReadUInt16(span, ref pos);
                 Angle2       = BinarySpanReader.ReadUInt16(span, ref pos);
@@ -309,10 +313,18 @@ public sealed class FormatEvent {
                 if (status <= (int)EventTypes.ScrewCountReset)
                     Event = (EventTypes)status;
                 SnugAngle        =  BinarySpanReader.ReadUInt16(span, ref pos);
-                SeatingTorque    =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
-                ClampTorque      =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
-                PrevailingTorque =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
-                SnugTorque       =  BinarySpanReader.ReadUInt16(span, ref pos) / 100.0f;
+                // 착좌 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // seating torque is a signed 16-bit value, read it with the sign preserved
+                SeatingTorque    =  BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
+                // 클램프 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // clamp torque is a signed 16-bit value, read it with the sign preserved
+                ClampTorque      =  BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
+                // 프리베일링 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // prevailing torque is a signed 16-bit value, read it with the sign preserved
+                PrevailingTorque =  BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
+                // 스너그 토크는 부호 있는 16비트이므로 부호를 유지해 읽음
+                // snug torque is a signed 16-bit value, read it with the sign preserved
+                SnugTorque       =  BinarySpanReader.ReadInt16(span, ref pos) / 100.0f;
                 Barcode          =  Utils.ToAsciiTrimEnd(span.Slice(pos, Constants.BarcodeLength));
                 pos              += Constants.BarcodeLength;
                 break;

@@ -15,25 +15,56 @@ public class FormatEventExtended : FormatEvent {
     ///     Constructor
     /// </summary>
     public FormatEventExtended() {
-        // reset id and name
-        Id1     = string.Empty;
-        IdName1 = string.Empty;
-        Id2     = string.Empty;
-        IdName2 = string.Empty;
-        Id3     = string.Empty;
-        IdName3 = string.Empty;
-        Id4     = string.Empty;
-        IdName4 = string.Empty;
-        Id5     = string.Empty;
-        IdName5 = string.Empty;
-        Id6     = string.Empty;
-        IdName6 = string.Empty;
-        // reset revision.1 / revision.2 strings
-        JobName   = string.Empty;
-        StepName  = string.Empty;
-        ToolName  = string.Empty;
-        NgComment = string.Empty;
-        JobId     = string.Empty;
+        // every string member is initialized by its property initializer
+    }
+
+    /// <summary>
+    ///     Constructor by csv row text
+    /// </summary>
+    /// <param name="values">values</param>
+    /// <param name="msg">error</param>
+    /// <param name="hasGraphData">true when graph values are appended after the event columns</param>
+    public FormatEventExtended(string values, out string msg, bool hasGraphData = false)
+        : base(values, out msg) {
+        // check the base event format result
+        if (!string.IsNullOrEmpty(msg))
+            // stop restoring when the base format failed
+            return;
+
+        // split values
+        var data = values.Split(',');
+        // count of columns that belong to the event row, excluding the appended graph values
+        var columns = hasGraphData ? data.Length - (CountOfChannel1 + CountOfChannel2) : data.Length;
+        // count of extended columns actually written, which differs by the version that saved the file
+        var extended = Math.Min(ExtendCount, columns - Count);
+        // check written extended columns
+        if (extended < 1)
+            // stop restoring when the file holds no extended column
+            return;
+
+        // local helper that reads the extended column at the written position
+        string Value(int index) => index < extended ? data[Count + index] : string.Empty;
+
+        // restore code.2
+        Id2 = Value(0);
+        // restore code.3
+        Id3 = Value(1);
+        // restore code.4
+        Id4 = Value(2);
+        // restore code.5
+        Id5 = Value(3);
+        // restore code.6
+        Id6 = Value(4);
+        // restore job name (rev.1)
+        JobName = Value(5);
+        // restore step name (rev.1)
+        StepName = Value(6);
+        // restore tool name (rev.1)
+        ToolName = Value(7);
+        // restore ng comment (rev.1)
+        NgComment = Value(8);
+        // restore job id (rev.2)
+        JobId = Value(9);
     }
 
     /// <summary>
@@ -191,6 +222,13 @@ public class FormatEventExtended : FormatEvent {
     public static int ExtendSize => 1702;
 
     /// <summary>
+    ///     Extended event column count that is
+    ///     written after the barcode column in a csv row
+    /// </summary>
+    [PublicAPI]
+    public static int ExtendCount => 10;
+
+    /// <summary>
     ///     Tool number
     /// </summary>
     [PublicAPI]
@@ -200,103 +238,103 @@ public class FormatEventExtended : FormatEvent {
     ///     ID 1
     /// </summary>
     [PublicAPI]
-    public string Id1 { get; set; }
+    public string Id1 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 1
     /// </summary>
     [PublicAPI]
-    public string IdName1 { get; set; }
+    public string IdName1 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID 2
     /// </summary>
     [PublicAPI]
-    public string Id2 { get; set; }
+    public string Id2 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 2
     /// </summary>
     [PublicAPI]
-    public string IdName2 { get; set; }
+    public string IdName2 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID 3
     /// </summary>
     [PublicAPI]
-    public string Id3 { get; set; }
+    public string Id3 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 3
     /// </summary>
     [PublicAPI]
-    public string IdName3 { get; set; }
+    public string IdName3 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID 4
     /// </summary>
     [PublicAPI]
-    public string Id4 { get; set; }
+    public string Id4 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 4
     /// </summary>
     [PublicAPI]
-    public string IdName4 { get; set; }
+    public string IdName4 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID 5
     /// </summary>
     [PublicAPI]
-    public string Id5 { get; set; }
+    public string Id5 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 5
     /// </summary>
     [PublicAPI]
-    public string IdName5 { get; set; }
+    public string IdName5 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID 6
     /// </summary>
     [PublicAPI]
-    public string Id6 { get; set; }
+    public string Id6 { get; set; } = string.Empty;
 
     /// <summary>
     ///     ID Name 6
     /// </summary>
     [PublicAPI]
-    public string IdName6 { get; set; }
+    public string IdName6 { get; set; } = string.Empty;
 
     /// <summary>
     ///     Job name (Rev.1)
     /// </summary>
     [PublicAPI]
-    public string JobName { get; set; }
+    public string JobName { get; set; } = string.Empty;
 
     /// <summary>
     ///     Step name (Rev.1)
     /// </summary>
     [PublicAPI]
-    public string StepName { get; set; }
+    public string StepName { get; set; } = string.Empty;
 
     /// <summary>
     ///     Tool name (Rev.1)
     /// </summary>
     [PublicAPI]
-    public string ToolName { get; set; }
+    public string ToolName { get; set; } = string.Empty;
 
     /// <summary>
     ///     NG comment (Rev.1)
     /// </summary>
     [PublicAPI]
-    public string NgComment { get; set; }
+    public string NgComment { get; set; } = string.Empty;
 
     /// <summary>
     ///     Job ID (Rev.2)
     /// </summary>
     [PublicAPI]
-    public string JobId { get; set; }
+    public string JobId { get; set; } = string.Empty;
 
     /// <summary>
     ///     Graph values
