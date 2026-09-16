@@ -27,9 +27,9 @@ public enum ModelTypes {
     Bt = 32,
     // automation model codes, split from AD(2) since xml 4.2.3
     [Description("ADE")]
-    Ade = 34,
+    Ade = 35,
     [Description("ADT")]
-    Adt = 35,
+    Adt = 36,
     // neXus (QSC)
     [Description("EPT")]
     Ept = 99

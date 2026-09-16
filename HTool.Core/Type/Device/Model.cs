@@ -81,12 +81,12 @@ public enum Model {
 	///     ADE model. AD(2) was split into ADE/ADT as of xml 4.2.3.
 	/// </summary>
 	[Description("ADE")]
-    Ade = 34,
+    Ade = 35,
 
 	/// <summary>
 	///     ADT 모델. xml 4.2.3에서 AD(2)가 ADE/ADT로 분할되었습니다.
 	///     ADT model. AD(2) was split into ADE/ADT as of xml 4.2.3.
 	/// </summary>
 	[Description("ADT")]
-    Adt = 35
+    Adt = 36
 }
