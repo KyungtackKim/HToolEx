@@ -11,7 +11,6 @@ public static class ModelNames {
     private static readonly FrozenDictionary<Model, string> HantasNames =
         new Dictionary<Model, string> {
             [Model.Md]    = "MD",
-            [Model.Ad]    = "AD",
             [Model.Bm]    = "BM",
             [Model.Mdt]   = "MDT",
             [Model.Bmt]   = "BMT",
@@ -19,14 +18,15 @@ public static class ModelNames {
             [Model.Mdt40] = "MDT40",
             [Model.Bmt40] = "BMT40",
             [Model.Et]    = "ET",
-            [Model.Bt]    = "BT"
+            [Model.Bt]    = "BT",
+            [Model.Ade]   = "ADE",
+            [Model.Adt]   = "ADT"
         }.ToFrozenDictionary();
 
     // 마운츠 모델 → 표시 이름 매핑 / Mountz model-to-display-name mapping
     private static readonly FrozenDictionary<Model, string> MountzNames =
         new Dictionary<Model, string> {
             [Model.Md]    = "EC",
-            [Model.Ad]    = "AD",
             [Model.Bm]    = "EP",
             [Model.Mdt]   = "ECT",
             [Model.Bmt]   = "EPT",
@@ -34,7 +34,10 @@ public static class ModelNames {
             [Model.Mdt40] = "ECT40",
             [Model.Bmt40] = "EPT40",
             [Model.Et]    = "ETM",
-            [Model.Bt]    = "BTM"
+            [Model.Bt]    = "BTM",
+            // no OEM rename is published for the automation models yet, so the Hantas names are reused
+            [Model.Ade]   = "ADE",
+            [Model.Adt]   = "ADT"
         }.ToFrozenDictionary();
 
     // name-to-(model, manufacturer) reverse mapping (case-insensitive) / 이름 → (모델, 제조사) 역방향 매핑 (대소문자 무시)

@@ -9,8 +9,6 @@ public enum ModelTypes {
     // Hantas model codes
     [Description("MD")]
     Md = 1,
-    [Description("AD")]
-    Ad = 2,
     [Description("MDT")]
     Mdt = 15,
     [Description("BM")]
@@ -27,6 +25,11 @@ public enum ModelTypes {
     Et = 30,
     [Description("BT")]
     Bt = 32,
+    // automation model codes, split from AD(2) since xml 4.2.3
+    [Description("ADE")]
+    Ade = 35,
+    [Description("ADT")]
+    Adt = 36,
     // neXus (QSC)
     [Description("EPT")]
     Ept = 99

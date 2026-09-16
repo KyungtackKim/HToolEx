@@ -60,7 +60,6 @@ public class ModelNamesTests {
     /// </summary>
     [Theory]
     [InlineData(Model.Md, Manufacturer.Hantas, "MD")]
-    [InlineData(Model.Ad, Manufacturer.Hantas, "AD")]
     [InlineData(Model.Bm, Manufacturer.Hantas, "BM")]
     [InlineData(Model.Mdt, Manufacturer.Hantas, "MDT")]
     [InlineData(Model.Bmt, Manufacturer.Hantas, "BMT")]
@@ -69,12 +68,16 @@ public class ModelNamesTests {
     [InlineData(Model.Bmt40, Manufacturer.Hantas, "BMT40")]
     [InlineData(Model.Et, Manufacturer.Hantas, "ET")]
     [InlineData(Model.Bt, Manufacturer.Hantas, "BT")]
+    [InlineData(Model.Ade, Manufacturer.Hantas, "ADE")]
+    [InlineData(Model.Adt, Manufacturer.Hantas, "ADT")]
     [InlineData(Model.Md, Manufacturer.Mountz, "EC")]
     [InlineData(Model.Bm, Manufacturer.Mountz, "EP")]
     [InlineData(Model.Mdt, Manufacturer.Mountz, "ECT")]
     [InlineData(Model.Bmt, Manufacturer.Mountz, "EPT")]
     [InlineData(Model.Et, Manufacturer.Mountz, "ETM")]
     [InlineData(Model.Bt, Manufacturer.Mountz, "BTM")]
+    [InlineData(Model.Ade, Manufacturer.Mountz, "ADE")]
+    [InlineData(Model.Adt, Manufacturer.Mountz, "ADT")]
     public void ToName_AllModels_ReturnsExpectedName(Model model, Manufacturer manufacturer, string expected) {
         // 모델과 제조사로 표시 이름 가져오기
         // get display name by model and manufacturer
@@ -141,8 +144,8 @@ public class ModelNamesTests {
     }
 
     /// <summary>
-    ///     한타스와 마운츠가 공유하는 이름("AD", "BPT")에 대해 한타스가 우선하는지 검증합니다.
-    ///     verifies Hantas takes priority for names shared between Hantas and Mountz ("AD", "BPT").
+    ///     한타스와 마운츠가 공유하는 이름("BPT", "ADE", "ADT")에 대해 한타스가 우선하는지 검증합니다.
+    ///     verifies Hantas takes priority for names shared between Hantas and Mountz ("BPT", "ADE", "ADT").
     /// </summary>
     [Fact]
     public void FromName_SharedName_HantasOverridesMountz() {
